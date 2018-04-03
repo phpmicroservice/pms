@@ -4,7 +4,7 @@
 # 设置php常用配置
 date_default_timezone_set("PRC");
 # 加载函数库
-include __DIR__.'./function.php';
+require __DIR__.'/function.php';
 # 设置 常量
 defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
 define('PMS_DIR', __DIR__);

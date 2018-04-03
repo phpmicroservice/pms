@@ -99,10 +99,10 @@ class Register extends Base
      */
     private function save($data)
     {
-        $type=$data['t'];
+        $type = $data['t'];
         output($data, 'reg_save');
-        if($type=='service_reg'){
-            $this->reg_status=1;
+        if ($type == 'service_reg') {
+            $this->reg_status = 1;
         }
 
     }
@@ -128,7 +128,7 @@ class Register extends Base
                 # 没有注册完毕,先注册
                 $this->register_client->send_ask('service_reg', $data);
             }
-        }else{
+        } else {
             $this->register_client->start();
         }
     }

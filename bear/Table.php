@@ -95,7 +95,7 @@ abstract class Table
      * @param int $mode
      * @return mixed
      */
-    public function count($mode=0)
+    public function count($mode = 0)
     {
         return $this->swoole_table->count($mode);
     }
@@ -108,8 +108,6 @@ abstract class Table
     {
         return $this->swoole_table->destroy();
     }
-
-
 
 
 }

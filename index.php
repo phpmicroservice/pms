@@ -17,16 +17,16 @@ define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启
 define('PACKAGE_EOF', '_pms_');
 
 # 服务的地址和端口
-if(empty(get_env("APP_HOST_IP"))){
-    $ip_list=swoole_get_local_ip();
-    $host_ip=$ip_list['eth0'];
-}else{
-    $host_ip=get_env("APP_HOST_IP");
+if (empty(get_env("APP_HOST_IP"))) {
+    $ip_list = swoole_get_local_ip();
+    $host_ip = $ip_list['eth0'];
+} else {
+    $host_ip = get_env("APP_HOST_IP");
 }
 define('APP_HOST_IP', $host_ip);
-if(empty(get_env("APP_HOST_PORT"))){
-    $host_port=9502;
-}else{
-    $host_port=get_env("APP_HOST_PORT");
+if (empty(get_env("APP_HOST_PORT"))) {
+    $host_port = 9502;
+} else {
+    $host_port = get_env("APP_HOST_PORT");
 }
 define('APP_HOST_PORT', $host_port);

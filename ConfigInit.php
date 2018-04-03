@@ -12,6 +12,7 @@ use Phalcon\Events\Event;
  */
 class ConfigInit extends Base
 {
+
     protected $swoole_server;
     private $config_client;
     private $config_ip;

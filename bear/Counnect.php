@@ -58,13 +58,13 @@ class Counnect
      * @param int $e 错误代码
      * @param int $t 类型,路由
      */
-    public function send_error($m, $d = [], $e = 1,$t='')
+    public function send_error($m, $d = [], $e = 1, $t = '')
     {
         $data = [
             'm' => $m,
             'd' => $d,
-            'e' => $e            ,
-            't'=>empty($t)?$this->getRouter():$t
+            'e' => $e,
+            't' => empty($t) ? $this->getRouter() : $t
         ];
         return $this->send($data);
     }
@@ -89,12 +89,12 @@ class Counnect
      * @param array $d 数据
      * @param int $t 类型
      */
-    public function send_succee($d = [], $m = '成功',$t='')
+    public function send_succee($d = [], $m = '成功', $t = '')
     {
         $data = [
             'm' => $m,
             'd' => $d,
-            't'=>empty($t)?$this->getRouter():$t
+            't' => empty($t) ? $this->getRouter() : $t
         ];
         return $this->send($data);
     }

@@ -78,13 +78,13 @@ class Router extends Base
      */
     private function handleCall($controller_name, $action_name)
     {
-        $this->controller_name=$controller_name;
-        $this->action_name=$action_name;
-        if ($this->eventsManager->fire($this->name.':handleCall', $this, $this->connect->getData(),true) === false) {
+        $this->controller_name = $controller_name;
+        $this->action_name = $action_name;
+        if ($this->eventsManager->fire($this->name . ':handleCall', $this, $this->connect->getData(), true) === false) {
             return 1;
         }
-        
-        if(!$this->dConfig->ready){
+
+        if (!$this->dConfig->ready) {
             return $this->connect->send_error('服务未完成初始化',[],503);
         }
         $class_name = '\\app\\controller\\' . ucfirst($controller_name);

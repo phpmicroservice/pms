@@ -22,7 +22,7 @@ class Controller extends \Phalcon\Di\Injectable
     public function __construct(Counnect $connect)
     {
         $this->connect = $connect;
-        $this->onInitialize( $this->connect );
+        $this->onInitialize($this->connect);
     }
 
     // 初始化事件

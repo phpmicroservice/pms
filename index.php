@@ -1,20 +1,19 @@
 <?php
 # 启动索引文件
 # 加载函数库
-include './tool/function.php';
+include './function.php';
 
 # 设置php常用配置
 date_default_timezone_set("PRC");
 
 # 设置 常量
-define('ROOT_DIR', dirname(__DIR__));
+defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
 define('PMS_DIR', __DIR__);
 echo '项目目录为:' . ROOT_DIR  .',pms目录为:' . PMS_DIR . " \n";
-
-define('RUNTIME_DIR', './runtime/');# 运行目录
-define('CACHE_DIR', './runtime/cache/');# 缓存目录
-define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启
-define('PACKAGE_EOF', '_pms_');
+defined('RUNTIME_DIR') || define('RUNTIME_DIR',ROOT_DIR. './runtime/');# 运行目录
+defined('CACHE_DIR') || define('CACHE_DIR', ROOT_DIR.'./runtime/cache/');# 缓存目录
+defined('CACHE_DIR') || define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启
+defined('CACHE_DIR') || define('PACKAGE_EOF', '_pms_');
 
 # 服务的地址和端口
 if (empty(get_env("APP_HOST_IP"))) {

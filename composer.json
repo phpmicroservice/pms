@@ -24,6 +24,10 @@
     "autoload": {
         "psr-4": {
             "pms\\": ""
+        },
+        "autoload": {
+            "files": ["/index.php"]
         }
     }
+    
 }

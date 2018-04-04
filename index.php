@@ -8,8 +8,8 @@ require __DIR__.'/function.php';
 # 设置 常量
 defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
 define('PMS_DIR', __DIR__);
-defined('RUNTIME_DIR') || define('RUNTIME_DIR',ROOT_DIR. './runtime/');# 运行目录
-defined('CACHE_DIR') || define('CACHE_DIR', ROOT_DIR.'./runtime/cache/');# 缓存目录
+defined('RUNTIME_DIR') || define('RUNTIME_DIR', ROOT_DIR . '/runtime/');# 运行目录
+defined('CACHE_DIR') || define('CACHE_DIR', ROOT_DIR . '/runtime/cache/');# 缓存目录
 defined('APP_DEBUG') || define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启
 defined('PACKAGE_EOF') || define('PACKAGE_EOF', '_pms_');
 

@@ -137,10 +137,8 @@ class Server extends Base
             # 热更新
             global $last_mtime;
             $last_mtime = time();
-            \swoole_timer_tick(3000, [$this, 'codeUpdata'], ROOT_DIR . '/tool/');
-            \swoole_timer_tick(3000, [$this, 'codeUpdata'], ROOT_DIR . '/app/');
-            \swoole_timer_tick(3000, [$this, 'codeUpdata'], ROOT_DIR . '/pms/');
-            \swoole_timer_tick(3000, [$this, 'codeUpdata'], ROOT_DIR . '/start/');
+            \swoole_timer_tick(3000, [$this, 'codeUpdata']);
+
             # 应用初始化
             $this->app->init($server, $worker_id);
         }
@@ -183,10 +181,23 @@ class Server extends Base
      * 重新加载
      * @param $dir
      */
-    public function codeUpdata($timer_id,$dir)
+    public function codeUpdata($timer_id)
+    {
+        $array = $this->dConfig->codeUpdata;
+        output([$last_mtime, ROOT_DIR, $dir], 'codeUpdata');
+        foreach ($array as $dir) {
+            $this->codeUpdateCall($timer_id, ROOT_DIR . $dir);
+        }
+    }
+
+    /**
+     * 更新代码的执行部分
+     * @param $timer_id
+     * @param $dir
+     */
+    private function codeUpdateCall($timer_id, $dir)
     {
         global $last_mtime;
-//        output([$last_mtime,$dir],'codeUpdata');
         // recursive traversal directory
         $dir_iterator = new \RecursiveDirectoryIterator($dir);
         $iterator = new \RecursiveIteratorIterator($dir_iterator);

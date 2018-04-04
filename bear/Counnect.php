@@ -113,7 +113,6 @@ class Counnect
      */
     public function __destruct()
     {
-//        echo "销毁一个链接对象 \n";
-        // TODO: Implement __destruct() method.
+        output('销毁一个链接对象');
     }
 }

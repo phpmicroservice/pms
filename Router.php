@@ -110,8 +110,7 @@ class Router extends Base
      */
     public function __destruct()
     {
-//        echo "销毁一个路由";
-        // TODO: Implement __destruct() method.
+        output('销毁一个路由');
     }
 
 }

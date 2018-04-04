@@ -20,7 +20,7 @@
     }
   ],
   "require": {
-    "phpmicroservice/funch": "dev-master",
+    "phpmicroservice/funch": "dev-master@dev",
     "ext-swoole": ">=2.1",
     "ext-phalcon": "3.1.*",
     "php": ">7.1"

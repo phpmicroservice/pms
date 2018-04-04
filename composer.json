@@ -1,32 +1,39 @@
 {
-    "name": "phpmicroservice/pms-frame",
-    "type": "project",
-    "keywords": ["swoole","phalcon","microservice","websockect","tcp"],
-    "homepage": "http://pms.2xso.com",
-    "description": "一个采用Swoole做底层,采用Phalcon作为框架类库的微服务框架",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Dongasai",
-            "email": "1514582970@qq.com",
-            "homepage": "http://www.2xso.com",
-            "role": "Creator"
-        }
-    ],
-    "require": {
-      "phpmicroservice/funch": "dev-master",
-        "ext-swoole": ">=2.1",
-        "ext-phalcon": "3.1.*",
-        "php": "7.1.*"
-    },
-    "require-dev": {
-        "eaglewu/swoole-ide-helper": "dev-master"
-    },
-    "autoload": {
-        "psr-4": {
-            "pms\\": ""
-        },
-        "files": ["/index.php"]
+  "name": "phpmicroservice/pms-frame",
+  "type": "project",
+  "keywords": [
+    "swoole",
+    "phalcon",
+    "microservice",
+    "websockect",
+    "tcp"
+  ],
+  "homepage": "http://pms.2xso.com",
+  "description": "一个采用Swoole做底层,采用Phalcon作为框架类库的微服务框架",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dongasai",
+      "email": "1514582970@qq.com",
+      "homepage": "http://www.2xso.com",
+      "role": "Creator"
     }
-    
+  ],
+  "require": {
+    "phpmicroservice/funch": "dev-master",
+    "ext-swoole": ">=2.1",
+    "ext-phalcon": "3.1.*",
+    "php": ">7.1"
+  },
+  "require-dev": {
+    "eaglewu/swoole-ide-helper": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "pms\\": ""
+    },
+    "files": [
+      "/index.php"
+    ]
+  }
 }

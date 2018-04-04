@@ -101,9 +101,9 @@ class ConfigInit extends Base
     private function save($data)
     {
         $config = $data['d'];
-        if ($this->cache->get('config_md5') != \tool\Arr::array_md5($config)) {
+        if ($this->cache->get('config_md5') != \funch\Arr::array_md5($config)) {
             # 存在更新 更新hash
-            $this->cache->save('config_md5', \tool\Arr::array_md5($config));
+            $this->cache->save('config_md5', \funch\Arr::array_md5($config));
             # 更新配置信息
             $this->cache->save('config_data', $config);
             self::updata_cache();

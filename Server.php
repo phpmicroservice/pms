@@ -125,8 +125,6 @@ class Server extends Base
         output('WorkerStart','onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';
-        # 加载辅助函数库
-        include_once ROOT_DIR . '/tool/function.php';
 
         $this->eventsManager->fire($this->name.':onWorkerStart', $this, $server);
         if ($server->taskworker) {

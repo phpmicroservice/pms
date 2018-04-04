@@ -1,5 +1,5 @@
 {
-    "name": "phpmicroservice/PMSFrame",
+    "name": "phpmicroservice/pms-frame",
     "type": "project",
     "keywords": ["swoole","phalcon","microservice","websockect","tcp"],
     "homepage": "http://pms.2xso.com",

@@ -26,7 +26,7 @@
     "php": ">7.1"
   },
   "require-dev": {
-    "eaglewu/swoole-ide-helper": "dev-master"
+    "eaglewu/swoole-ide-helper": "dev-master@dev"
   },
   "autoload": {
     "psr-4": {

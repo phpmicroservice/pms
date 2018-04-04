@@ -1,6 +1,6 @@
 {
-    "name": "dongasai/pms_frame",
-    "type": "library",
+    "name": "phpmicroservice/pms_frame",
+    "type": "FrameWorks",
     "keywords": ["swoole","phalcon","microservice","websockect","tcp"],
     "homepage": "http://pms.2xso.com",
     "description": "一个采用Swoole做底层,采用Phalcon作为框架类库的微服务框架",

@@ -150,7 +150,7 @@ class Server extends Base
         }
 
         # 准备判断事件
-        \swoole_timer_tick(2000, [$this, 'readyJudge']);
+        \swoole_timer_tick(5000, [$this, 'readyJudge']);
     }
 
 
@@ -184,7 +184,7 @@ class Server extends Base
     public function codeUpdata($timer_id)
     {
         $array = $this->dConfig->codeUpdata;
-        output([$last_mtime, ROOT_DIR, $dir], 'codeUpdata');
+        output( ROOT_DIR, 'codeUpdata');
         foreach ($array as $dir) {
             $this->codeUpdateCall($timer_id, ROOT_DIR . $dir);
         }

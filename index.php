@@ -6,8 +6,11 @@ date_default_timezone_set("PRC");
 # 加载函数库
 require __DIR__.'/function.php';
 # 设置 常量
+defined('SERVICE_NAME') || define('SERVICE_NAME', ROOT_DIR . '/runtime/');# 设置服务器名字
+
 defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
 define('PMS_DIR', __DIR__);
+defined('SERVICE_NAME') || define('SERVICE_NAME', ROOT_DIR);# 设置服务器名字
 defined('RUNTIME_DIR') || define('RUNTIME_DIR', ROOT_DIR . '/runtime/');# 运行目录
 defined('CACHE_DIR') || define('CACHE_DIR', ROOT_DIR . '/runtime/cache/');# 缓存目录
 defined('APP_DEBUG') || define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启

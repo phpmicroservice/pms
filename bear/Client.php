@@ -117,8 +117,9 @@ class Client extends \pms\Base
      * 发送数据
      * @param $data
      */
-    public function send($data)
+    public function send(array $data)
     {
+        $data['f']=SERVICE_NAME;
         $this->eventsManager->fire($this->name . ":beforeSend", $this, $data);
         $this->swoole_client->send($this->encode($data));
     }

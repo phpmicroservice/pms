@@ -48,6 +48,7 @@ class Counnect
         if ($this->passing) {
             $data['p'] = $this->passing;
         }
+        $data['f']=SERVICE_NAME;
         return $this->swoole_server->send($this->fd, \swoole_serialize::pack($data) . PACKAGE_EOF);
     }
 

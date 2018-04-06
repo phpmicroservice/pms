@@ -25,6 +25,7 @@ class App extends Base
             $this->config_init = new Register($server);
             $this->config_init->ping();
         }
+        $this->eventsManager->fire($this->name . ":init", $this, $server);
 
     }
 

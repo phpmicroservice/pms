@@ -45,7 +45,7 @@ class ConfigInit extends Base
     private function get_key()
     {
         return md5(md5(CONFIG_SECRET_KEY) . md5(CONFIG_DATA_KEY) . md5(strtolower(SERVICE_NAME)));
-    }
+}
 
 
     /**
@@ -120,7 +120,7 @@ class ConfigInit extends Base
         $this->send(
             'config_acquire',
             [
-                'n' => "register",
+                'n' => strtolower(SERVICE_NAME),
                 'k' => $this->get_key()
             ]
         );

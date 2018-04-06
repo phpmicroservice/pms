@@ -215,7 +215,7 @@ class Client extends \pms\Base
      */
     public function error(\swoole_client $client)
     {
-        output('client error');
+        output(['client error',$this->name],'error');
         $this->eventsManager->fire($this->name . ":error", $this, $client);
     }
 

@@ -43,7 +43,7 @@ class Register extends Base
      */
     private function get_key()
     {
-        return md5(md5(REGISTER_SECRET_KEY) . md5('config'));
+        return md5(md5(REGISTER_SECRET_KEY) . md5(strtolower(SERVICE_NAME)));
     }
 
 

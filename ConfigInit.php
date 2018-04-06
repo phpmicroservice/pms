@@ -44,7 +44,7 @@ class ConfigInit extends Base
      */
     private function get_key()
     {
-        return md5(md5(CONFIG_SECRET_KEY) . md5(CONFIG_DATA_KEY) . md5('register'));
+        return md5(md5(CONFIG_SECRET_KEY) . md5(CONFIG_DATA_KEY) . md5(strtolower(SERVICE_NAME)));
     }
 
 

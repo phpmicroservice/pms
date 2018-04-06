@@ -115,7 +115,7 @@ class Register extends Base
     {
         if ($this->register_client->isConnected()) {
             $data = [
-                'name' => 'config',
+                'name' => strtolower(SERVICE_NAME),
                 'host' => APP_HOST_IP,
                 'port' => APP_HOST_PORT,
                 'k' => $this->get_key()

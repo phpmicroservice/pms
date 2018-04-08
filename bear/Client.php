@@ -126,7 +126,7 @@ class Client extends \pms\Base
 
     /**
      * 发送一个请求
-     * @param $router
+     * @param $router _分隔符
      * @param $data
      * @return bool
      */

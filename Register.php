@@ -43,7 +43,7 @@ class Register extends Base
      */
     private function get_key()
     {
-        define('REGISTER_SECRET_KEY')||exit('缺少必要的常量REGISTER_SECRET_KEY');
+        defined('REGISTER_SECRET_KEY') || exit('缺少必要的常量REGISTER_SECRET_KEY');
         return md5(md5(REGISTER_SECRET_KEY) . md5(strtolower(SERVICE_NAME)));
     }
 

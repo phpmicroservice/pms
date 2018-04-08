@@ -1,5 +1,5 @@
 /.idea
-/nbproject/private/
+/nbproject/
 /yarn.lock
 .vscode/
 .cache/

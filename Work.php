@@ -44,7 +44,7 @@ class Work extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        output($worker_id, 'onWorkerStart');
+        output($worker_id, 'onWorkerStart in work');
         $this->eventsManager->fire($this->name.':onWorkerStart', $this, $worker_id);
     }
 

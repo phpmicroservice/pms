@@ -46,7 +46,7 @@ class Task extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        output('onWorkerStart in task');
+        output($worker_id, 'onWorkerStart in task');
         $this->eventsManager->fire($this->name.':onWorkerStart', $this, $worker_id);
     }
 

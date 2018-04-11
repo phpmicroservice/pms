@@ -83,14 +83,14 @@ class Register extends Base
      */
     public function receive(Event $event, bear\Client $Client, $data)
     {
-//        output($data, 'receive_configinit');
+        Output::debug($data, 'receive_configinit');
         $error = $data['e'] ?? 0;
         if (!$error) {
             #没有错误 config_init config_md5 config_data
             $this->save($data);
         } else {
             # 出现了错误!
-            output([$data], 'error');
+            Output::error([$data], 'error');
         }
     }
 
@@ -101,7 +101,7 @@ class Register extends Base
     private function save($data)
     {
         $type = $data['t'];
-        output($data, 'reg_save');
+        Output::debug($data, 'reg_save');
         if ($type == 'service_reg') {
             $this->reg_status = 1;
         }
@@ -121,7 +121,7 @@ class Register extends Base
                 'port' => APP_HOST_PORT,
                 'k' => $this->get_key()
             ];
-            output('ping', 'ping');
+            Output::info('ping', 'ping');
             if ($this->reg_status) {
                 # 注册完毕进行ping
                 $this->register_client->send_ask('service_ping', $data);

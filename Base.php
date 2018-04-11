@@ -17,7 +17,7 @@ abstract class Base extends \Phalcon\Di\Injectable implements \Phalcon\Events\Ev
     protected $swoole_server;
     protected $name;
 
-    public function __construct(\Swoole\Server $server)
+    public function __construct($server)
     {
 //        $this->logo = require 'logo.php';
         $this->swoole_server = $server;

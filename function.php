@@ -10,14 +10,23 @@ function get_env($name, $default = '')
     return getenv(strtoupper($name)) === false ? $default : getenv(strtoupper($name));
 }
 
+/**
+ * 输出内容
+ * @param $data
+ * @param string $msg
+ */
 function output($data,$msg='info')
 {
-    echo '['.date('H:i:s').']['.$msg.']';
-    if(is_string($data)){
-        echo $data;
-    }else{
-        echo var_export($data,true);
-    }
-    echo " \n";
+    \pms\Output::info($data, $msg);
+}
 
+/**
+ * 获取通讯key
+ * @param $secret
+ * @param $data
+ * @param $name
+ */
+function get_key($secret, $data, $name = '')
+{
+    md5(md5($secret) . md5(CONFIG_DATA_KEY) . md5(strtolower(SERVICE_NAME)));
 }

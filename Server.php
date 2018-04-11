@@ -10,12 +10,14 @@ use Phalcon\Events\ManagerInterface;
  * @property \pms\Work $work;
  * @property \pms\Task $task;
  * @property \pms\App $app;
+ * @property \Swoole\Channel $channel;
  * @property \Swoole\Server $swoole_server;
  * @package pms
  */
 class Server extends Base
 {
-    protected $swoole_server;
+    public $swoole_server;
+    public $channel;
     private $task;
     private $work;
     private $app;
@@ -171,6 +173,7 @@ class Server extends Base
      */
     public function readySucceed()
     {
+        \pms\Output::debug('readySucceed', 'readySucceed');
         $this->eventsManager->fire($this->name . ':readySucceed', $this, $this->swoole_server);
 
     }

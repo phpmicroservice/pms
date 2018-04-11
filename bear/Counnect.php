@@ -10,8 +10,8 @@ namespace pms\bear;
  */
 class Counnect
 {
-    private $swoole_server;
-    private $request;
+    public $swoole_server;
+    public $request;
     private $fd;
     private $reactor_id;
     private $passing = false;
@@ -27,6 +27,15 @@ class Counnect
         if (isset($data['p'])) {
             $this->passing = $this->request['p'];
         }
+    }
+
+
+    /**
+     * 获取fd_id
+     */
+    public function getFd()
+    {
+        return $this->fd;
     }
 
     /**
@@ -114,6 +123,6 @@ class Counnect
      */
     public function __destruct()
     {
-        output('销毁一个链接对象');
+        \pms\Output::debug('销毁一个链接对象');
     }
 }

@@ -73,7 +73,7 @@ class Client extends \pms\Base
      */
     private function get_swoole_client()
     {
-        output('get_swoole_client');
+        \pms\Output::debug('get_swoole_client');
         if ($this->swoole_client instanceof \Swoole\Client) {
         } else {
             $this->swoole_client = new \Swoole\Client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
@@ -146,8 +146,8 @@ class Client extends \pms\Base
     {
         $this->send($data);
         $string = $this->swoole_client->recv();
-        output($string,'send_recv');
-        output($this->swoole_client->errCode,'send_recv_e');
+        \pms\Output::debug($string, 'send_recv');
+        \pms\Output::debug($this->swoole_client->errCode, 'send_recv_e');
         return $this->decode($string);
     }
 
@@ -190,7 +190,7 @@ class Client extends \pms\Base
     public function receive_true(\swoole_client $client, $data)
     {
         $this->eventsManager->fire($this->name . ":receive_true", $this, $data);
-        //output('内容就不展示了', 'client_receive_true');
+        \pms\Output::debug('内容不展示', '客户端收到消息' . $this->name);
         $data_arr = explode(PACKAGE_EOF, rtrim($data, PACKAGE_EOF));
         foreach ($data_arr as $value) {
             $this->receive($value);
@@ -206,7 +206,7 @@ class Client extends \pms\Base
     private function receive($value)
     {
         $data = $this->decode($value);
-        // output('这是内容', 'client_receive');
+        \pms\Output::debug($value, 'client_receive' . $this->name);
         $this->eventsManager->fire($this->name . ":receive", $this, $data);
     }
 
@@ -216,7 +216,7 @@ class Client extends \pms\Base
      */
     public function error(\swoole_client $client)
     {
-        output(['client error',$this->name],'error');
+        \pms\Output::error(['client error', $this->name], 'error');
         $this->eventsManager->fire($this->name . ":error", $this, $client);
     }
 
@@ -226,7 +226,7 @@ class Client extends \pms\Base
      */
     public function close(\swoole_client $client)
     {
-        output('client server close');
+        \pms\Output::info('client server close');
         $this->eventsManager->fire($this->name . ":close", $this, $client);
     }
 

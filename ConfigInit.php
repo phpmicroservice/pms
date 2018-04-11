@@ -42,9 +42,11 @@ class ConfigInit extends Base
      * 获取通讯key
      * @return string
      */
-    private function get_key()
+    private function get_key($slat = '')
     {
-        return md5(md5(CONFIG_SECRET_KEY) . md5(CONFIG_DATA_KEY) . md5(strtolower(SERVICE_NAME)));
+        return md5(
+            md5(get_env('CONFIG_SECRET_KEY')) . md5(get_env('CONFIG_DATA_KEY')) . md5(strtolower(SERVICE_NAME)) . $slat
+        );
 }
 
 

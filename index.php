@@ -14,6 +14,13 @@ defined('SERVICE_NAME') || define('SERVICE_NAME', ROOT_DIR);# 设置服务器名
 defined('RUNTIME_DIR') || define('RUNTIME_DIR', ROOT_DIR . '/runtime/');# 运行目录
 defined('CACHE_DIR') || define('CACHE_DIR', ROOT_DIR . '/runtime/cache/');# 缓存目录
 defined('APP_DEBUG') || define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启
+# 输出级别定义
+defined('OUTPUT_ERROR') || define('OUTPUT_ERROR', boolval(get_env("OUTPUT_ERROR", 1)));# error级别的输出 的开启
+defined('OUTPUT_INFO') || define('OUTPUT_INFO', boolval(get_env("OUTPUT_INFO", 1)));# error级别的输出 的开启
+defined('OUTPUT_APP') || define('OUTPUT_APP', boolval(get_env("OUTPUT_APP", 1)));# APP级别的输出 的开启
+defined('OUTPUT_NOTICE') || define('OUTPUT_NOTICE', boolval(get_env("OUTPUT_NOTICE", 1)));# notice级别的输出 的开启
+defined('OUTPUT_PMS') || define('OUTPUT_PMS', boolval(get_env("OUTPUT_PMS", 1)));# notice级别的输出 的开启
+
 defined('PACKAGE_EOF') || define('PACKAGE_EOF', '_pms_');
 
 echo '项目目录为:' . ROOT_DIR  .',pms目录为:' . PMS_DIR . " \n";

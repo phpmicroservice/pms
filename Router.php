@@ -78,26 +78,32 @@ class Router extends Base
      */
     private function handleCall($controller_name, $action_name)
     {
+        Output::debug((func_get_args(),'handleCall');
         $this->controller_name = $controller_name;
         $this->action_name = $action_name;
         if ($this->eventsManager->fire($this->name . ':handleCall', $this, $this->connect->getData(), true) === false) {
+            Output::debug('钩子执行中断', 'info');
             return 1;
         }
-
+        Output::debug('钩子执行完成', 'info');
         if (!$this->dConfig->ready) {
+            Output::debug('服务未完成初始化', 'info');
             return $this->connect->send_error('服务未完成初始化',[],503);
         }
+        Output::debug('服务初始化检测通过', 'info');
         $class_name = '\\app\\controller\\' . ucfirst($controller_name);
-        output($class_name, 'class_name');
+        Output::pms($class_name, 'class_name');
         $faultcontroller = 'app\controller\Fault';
         if (class_exists($class_name)) {
             $controller = new $class_name($this->connect);
             if (method_exists($controller, $action_name)) {
                 $controller->$action_name($this->connect->getData());
             } else {
+                Output::debug('不合法的方法', 'info');
                 $controller->action($this->connect->getData());
             }
         } else {
+            Output::debug('不合法的控制器', 'info');
             # 不合法的控制器
             $controller = new $faultcontroller($this->connect);
             $controller->controller($this->connect->getData());
@@ -110,7 +116,7 @@ class Router extends Base
      */
     public function __destruct()
     {
-        output('销毁一个路由');
+        Output::debug('销毁一个路由');
     }
 
 }

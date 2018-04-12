@@ -29,7 +29,7 @@ class ConfigInit extends Base
         $this->config_client = new bear\Client($server, $this->config_ip, $this->config_port);
         $this->config_client->onBind('receive',$this);
         $ConfigInit = $this;
-
+        $ConfigInit->update();
         swoole_timer_tick(5000, function ($timeid) use ($ConfigInit, $server) {
             # 没有初始化完毕
             $ConfigInit->update();
@@ -137,7 +137,10 @@ class ConfigInit extends Base
         $cache = \Phalcon\Di::getDefault()->get('cache');
         $config = \Phalcon\Di::getDefault()->get('config');
         if ($cache->exists('config_data')) {
-            $config_data = $cache->get('config_data', []);
+            $config_data = $cache->get('config_data');
+            if (empty($config_data)) {
+                $config_data = [];
+            }
         } else {
             $config_data = [];
         }

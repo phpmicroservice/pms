@@ -22,7 +22,7 @@ class Server extends Base
     private $work;
     private $app;
     private $logo;
-    protected $name='Server';
+    protected $name = 'Server';
 
 
     /**
@@ -38,9 +38,9 @@ class Server extends Base
     {
 //        $this->logo = require 'logo.php';
         # 加载依赖注入
-        require ROOT_DIR.'/app/di.php';
+        require ROOT_DIR . '/app/di.php';
         $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
-        parent::__construct( $this->swoole_server);
+        parent::__construct($this->swoole_server);
         # 设置运行参数
         $this->swoole_server->set($option);
         $this->task = new  Task($this->swoole_server);
@@ -50,8 +50,9 @@ class Server extends Base
         $this->workCall();
         # 注册链接回调函数
         $this->tcpCall();
+        $this->swoole_server->wkinit = false;
+        $this->swoole_server->channel = new \Swoole\Channel(1024 * 1024 * 128);# 128M
     }
-
 
 
     /**
@@ -114,7 +115,7 @@ class Server extends Base
     {
         echo $this->logo;
         output('onStart');
-        $this->eventsManager->fire($this->name.':onStart', $this, $server);
+        $this->eventsManager->fire($this->name . ':onStart', $this, $server);
     }
 
     /**
@@ -124,18 +125,22 @@ class Server extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        output('WorkerStart','onWorkerStart');
+        output('WorkerStart', 'onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';
 
-        $this->eventsManager->fire($this->name.':onWorkerStart', $this, $server);
+        $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $server);
         if ($server->taskworker) {
             #task
             $this->task->onWorkerStart($server, $worker_id);
         } else {
             $this->work->onWorkerStart($server, $worker_id);
+            # 准备判断事件
+            \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
-        if ($worker_id == 1) {
+
+        if (!$server->wkinit && !$server->taskworker) {
+            $server->wkinit = true;
             # 热更新
             global $last_mtime;
             $last_mtime = time();
@@ -151,8 +156,7 @@ class Server extends Base
             });
         }
 
-        # 准备判断事件
-        \swoole_timer_tick(5000, [$this, 'readyJudge']);
+
     }
 
 
@@ -179,7 +183,6 @@ class Server extends Base
     }
 
 
-
     /**
      * 重新加载
      * @param $dir
@@ -187,7 +190,7 @@ class Server extends Base
     public function codeUpdata($timer_id)
     {
         $array = $this->dConfig->codeUpdata;
-        output( ROOT_DIR, 'codeUpdata');
+        output(ROOT_DIR, 'codeUpdata');
         foreach ($array as $dir) {
             $this->codeUpdateCall($timer_id, ROOT_DIR . $dir);
         }
@@ -229,7 +232,7 @@ class Server extends Base
     public function onShutdown(\Swoole\Server $server)
     {
         output('onShutdown');
-        $this->eventsManager->fire($this->name.':onShutdown', $this, $server);
+        $this->eventsManager->fire($this->name . ':onShutdown', $this, $server);
     }
 
     /**
@@ -240,7 +243,7 @@ class Server extends Base
      */
     public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message)
     {
-        $this->eventsManager->fire($this->name.':onPipeMessage', $this, [$src_worker_id, $message]);
+        $this->eventsManager->fire($this->name . ':onPipeMessage', $this, [$src_worker_id, $message]);
         if ($server->taskworker) {
             $this->task->onPipeMessage($server, $src_worker_id, $message);
         } else {
@@ -274,7 +277,7 @@ class Server extends Base
     public function onManagerStart(\Swoole\Server $server)
     {
         output('on ManagerStart');
-        $this->eventsManager->fire($this->name.':onManagerStart', $this, $server);
+        $this->eventsManager->fire($this->name . ':onManagerStart', $this, $server);
     }
 
     /**
@@ -284,6 +287,6 @@ class Server extends Base
     public function onManagerStop(\Swoole\Server $server)
     {
         output('on onManagerStop');
-        $this->eventsManager->fire($this->name.':onManagerStop', $this, $server);
+        $this->eventsManager->fire($this->name . ':onManagerStop', $this, $server);
     }
 }

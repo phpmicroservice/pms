@@ -123,10 +123,11 @@ class Client extends \pms\Base
     {
         if (!$this->isConnected) {
             $this->start();
+            return false;
         } else {
             $data['f'] = SERVICE_NAME;
             $this->eventsManager->fire($this->name . ":beforeSend", $this, $data);
-            $this->swoole_client->send($this->encode($data));
+            return $this->swoole_client->send($this->encode($data));
         }
 
     }

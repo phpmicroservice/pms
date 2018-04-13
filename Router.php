@@ -100,15 +100,15 @@ class Router extends Base
                 $controller->$action_name($this->connect->getData());
             } else {
                 Output::debug('不合法的方法', 'info');
-                if (method_exists($controller, 'action')) {
-                    $this->connect->send_error('不存在的资源', [], 404);
+                if (!method_exists($controller, 'action')) {
+                    return $this->connect->send_error('不存在的资源', [], 404);
                 }
                 $controller->action($this->connect->getData());
             }
         } else {
             Output::debug('不合法的控制器', 'info');
             # 不合法的控制器
-            if (class_exists($class_name)) {
+            if (!class_exists($faultcontroller)) {
                 # 依旧不存在
                 $this->connect->send_error('不存在的资源', [], 404);
             }

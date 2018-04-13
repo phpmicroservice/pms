@@ -11,11 +11,38 @@ function get_env($name, $default = '')
 }
 
 /**
+ * 获取环境变量的方法
+ * @param $name
+ * @param string $default
+ * @return bool
+ */
+function get_envbl($name, $default = true)
+{
+    return getenv(strtoupper($name)) === false ? $default : boolval(getenv(strtoupper($name)));
+}
+
+/**
+ * 判断环境变量是否存在
+ * @param array $list
+ * @return bool|string 都存在返回true,有不存在的返回string 环境变量名字
+ *
+ */
+function env_exist(array $list = [])
+{
+    foreach ($list as $value) {
+        if (getenv(strtoupper($value)) === false) {
+            return $value;
+        }
+    }
+    return true;
+}
+
+/**
  * 输出内容
  * @param $data
  * @param string $msg
  */
-function output($data,$msg='info')
+function output($data, $msg = 'info')
 {
     \pms\Output::info($data, $msg);
 }

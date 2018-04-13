@@ -214,7 +214,7 @@ class Client extends \pms\Base
     private function receive($value)
     {
         $data = $this->decode($value);
-        \pms\Output::debug($value, 'client_receive' . $this->name);
+        \pms\Output::debug($data, 'client_receive' . $this->name);
         $this->eventsManager->fire($this->name . ":receive", $this, $data);
     }
 

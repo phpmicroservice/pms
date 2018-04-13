@@ -15,11 +15,7 @@ class App extends Base
 
     public function init(\Swoole\Server $server)
     {
-        if ($this->dConfig->config_init) {
-            # 需要配置初始化
-            $this->config_init = new ConfigInit($server);
-            $this->config_init->update();
-        }
+
         if ($this->dConfig->server_reg) {
             # 进行服务注册
             $this->config_init = new Register($server);

@@ -149,13 +149,6 @@ class Server extends Base
             # 应用初始化
             $this->app->init($server, $worker_id);
         }
-        if ($this->dConfig->config_init) {
-            # 从缓存更新配置
-            \swoole_timer_tick(5000, function () {
-                \pms\ConfigInit::updata_cache();
-            });
-        }
-
 
     }
 

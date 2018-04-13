@@ -85,7 +85,7 @@ class Router extends Base
             Output::debug('钩子执行中断', 'info');
             return 1;
         }
-        Output::debug('钩子执行完成', 'info');
+        Output::debug('钩子执行完成', 'info88');
         if (!$this->dConfig->ready) {
             Output::debug('服务未完成初始化', 'info');
             return $this->connect->send_error('服务未完成初始化',[],503);

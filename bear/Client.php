@@ -122,7 +122,6 @@ class Client extends \pms\Base
     public function send(array $data)
     {
         if (!$this->isConnected) {
-            $this->start();
             return false;
         } else {
             $data['f'] = SERVICE_NAME;

@@ -55,7 +55,7 @@ class Output
      */
     public static function error($data, $message = 'error')
     {
-        if ($lv == 0 && OUTPUT_ERROR) {
+        if (OUTPUT_ERROR) {
             self::output($data, $message);
         }
 
@@ -68,7 +68,7 @@ class Output
      */
     public static function info($data, $message = 'info')
     {
-        if ($lv == 0 && OUTPUT_INFO) {
+        if (OUTPUT_INFO) {
             self::output($data, $message);
         }
 
@@ -81,7 +81,7 @@ class Output
      */
     public static function app($data, $message = 'app')
     {
-        if ($lv == 3 && OUTPUT_APP) {
+        if (OUTPUT_APP) {
             self::output($data, $message);
         }
     }
@@ -93,7 +93,7 @@ class Output
      */
     public static function debug($data, $message = 'debug')
     {
-        if ($lv == 2 && APP_DEBUG) {
+        if (APP_DEBUG) {
             self::output($data, $message);
         }
     }
@@ -105,7 +105,7 @@ class Output
      */
     public static function notice($data, $message = 'notice')
     {
-        if ($lv == 2 && OUTPUT_NOTICE) {
+        if (OUTPUT_NOTICE) {
             self::output($data, $message);
         }
     }
@@ -117,7 +117,7 @@ class Output
      */
     public static function pms($data, $message = 'pms')
     {
-        if ($lv == 2 && OUTPUT_PMS) {
+        if (OUTPUT_PMS) {
             self::output($data, $message);
         }
     }

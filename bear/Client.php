@@ -23,7 +23,7 @@ class Client extends \pms\Base
         'package_eof' => PACKAGE_EOF, //设置EOF
     ];
     protected $name = 'Client';
-    protected $isConnected = false;
+    public $isConnected = false;
 
     /**
      * 配置初始化
@@ -48,7 +48,7 @@ class Client extends \pms\Base
      */
     public function isConnected()
     {
-        return $this->swoole_client->isConnected();
+        return $this->isConnected;
     }
 
 

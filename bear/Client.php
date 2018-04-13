@@ -58,7 +58,7 @@ class Client extends \pms\Base
     public function start($timeout = 3)
     {
         if (!$this->isConnected) {
-            output($this->isConnected, 'client_start');
+            \pms\Output::debug([$this->isConnected, $this->server_ip, $this->server_port], 'client_start');
             return $this->swoole_client->connect($this->server_ip, $this->server_port, $timeout);
         }
         return true;

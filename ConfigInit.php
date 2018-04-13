@@ -28,14 +28,23 @@ class ConfigInit extends Base
         $this->swoole_server = $server;
         $this->config_client = new bear\Client($server, $this->config_ip, $this->config_port);
         $this->config_client->onBind('receive',$this);
+        $this->config_client->onBind('connect', $this);
+        $this->config_client->onBind('close', $this);
         $this->config_client->start();
         $ConfigInit = $this;
         $ConfigInit->update();
         swoole_timer_tick(5000, function ($timeid) use ($ConfigInit, $server) {
             # 没有初始化完毕
+
             $ConfigInit->update();
         });
 
+    }
+
+    public function close()
+    {
+        Output::debug('config client close');
+        $this->config_client->start();
     }
 
 
@@ -81,7 +90,7 @@ class ConfigInit extends Base
      */
     public function receive(Event $event, bear\Client $Client, $data)
     {
-//        output($data, 'receive_configinit');
+        output($data, 'receive_configinit');
         $error = $data['e'] ?? 0;
         if (!$error) {
             #没有错误 config_init config_md5 config_data
@@ -114,14 +123,18 @@ class ConfigInit extends Base
      */
     public function update()
     {
-        output('ConfigInit update ...');
-        $this->send(
+
+        $re = $this->send(
             'config_acquire',
             [
                 'n' => strtolower(SERVICE_NAME),
                 'k' => $this->get_key()
             ]
         );
+        if ($re === false) {
+            $this->config_client->start();
+        }
+        output($re, 'ConfigInit update ...');
     }
 
     /**

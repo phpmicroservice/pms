@@ -23,6 +23,12 @@ class Register extends Base
      */
     public function __construct(\Swoole\Server $server)
     {
+        getenv('REGISTER_SECRET_KEY') === false || exit(':REGISTER_SECRET_KEY');
+        if (is_string(env_exist(['REGISTER_SECRET_KEY', 'REGISTER_ADDRESS', 'REGISTER_PORT']))) {
+            exit('缺少必要的环境变量!');
+            $server->shutdown();
+        }
+
         $this->client_ip = get_env('REGISTER_ADDRESS', 'pms_register');
         $this->client_port = get_env('REGISTER_PORT', '9502');
         $this->swoole_server = $server;
@@ -43,8 +49,7 @@ class Register extends Base
      */
     private function get_key()
     {
-        defined('REGISTER_SECRET_KEY') || exit('缺少必要的常量REGISTER_SECRET_KEY');
-        return md5(md5(REGISTER_SECRET_KEY) . md5(strtolower(SERVICE_NAME)));
+        return md5(md5(get_env('REGISTER_SECRET_KEY')) . md5(strtolower(SERVICE_NAME)));
     }
 
 

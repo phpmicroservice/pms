@@ -23,9 +23,8 @@ class Register extends Base
      */
     public function __construct(\Swoole\Server $server)
     {
-        getenv('REGISTER_SECRET_KEY') === false || exit(':REGISTER_SECRET_KEY');
         if (is_string(env_exist(['REGISTER_SECRET_KEY', 'REGISTER_ADDRESS', 'REGISTER_PORT']))) {
-            exit('缺少必要的环境变量!');
+            Output::error('缺少必要的环境变量!');
             $server->shutdown();
         }
 

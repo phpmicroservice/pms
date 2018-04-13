@@ -28,6 +28,7 @@ class ConfigInit extends Base
         $this->swoole_server = $server;
         $this->config_client = new bear\Client($server, $this->config_ip, $this->config_port);
         $this->config_client->onBind('receive',$this);
+        $this->config_client->start();
         $ConfigInit = $this;
         $ConfigInit->update();
         swoole_timer_tick(5000, function ($timeid) use ($ConfigInit, $server) {
@@ -56,12 +57,7 @@ class ConfigInit extends Base
      */
     public function send($router, $data)
     {
-        if ($this->config_client->isConnected()) {
-            return $this->config_client->send_ask($router,$data);
-        } else {
-            $this->config_client->start();
-        }
-
+        return $this->config_client->send_ask($router, $data);
     }
 
 

@@ -23,6 +23,7 @@ class Client extends \pms\Base
         'package_eof' => PACKAGE_EOF, //设置EOF
     ];
     protected $name = 'Client';
+    protected $isConnected = false;
 
     /**
      * 配置初始化
@@ -54,10 +55,11 @@ class Client extends \pms\Base
     /**
      * 开始,链接服务器
      */
-    public function start($timeout =3)
+    public function start($timeout = 3)
     {
-        if (!$this->swoole_client->isConnected()) {
-            return $this->swoole_client->connect($this->server_ip, $this->server_port,$timeout);
+        if (!$this->isConnected) {
+            output($this->isConnected, 'client_start');
+            return $this->swoole_client->connect($this->server_ip, $this->server_port, $timeout);
         }
         return true;
 
@@ -119,9 +121,14 @@ class Client extends \pms\Base
      */
     public function send(array $data)
     {
-        $data['f']=SERVICE_NAME;
-        $this->eventsManager->fire($this->name . ":beforeSend", $this, $data);
-        $this->swoole_client->send($this->encode($data));
+        if (!$this->isConnected) {
+            $this->start();
+        } else {
+            $data['f'] = SERVICE_NAME;
+            $this->eventsManager->fire($this->name . ":beforeSend", $this, $data);
+            $this->swoole_client->send($this->encode($data));
+        }
+
     }
 
     /**
@@ -130,9 +137,9 @@ class Client extends \pms\Base
      * @param $data
      * @return bool
      */
-    public function send_ask($router,$data)
+    public function send_ask($router, $data)
     {
-        return $this->send( [
+        return $this->send([
             'r' => $router,
             'd' => $data
         ]);
@@ -177,6 +184,7 @@ class Client extends \pms\Base
      */
     public function connect(\swoole_client $client)
     {
+        $this->isConnected = true;
         echo "Client connect \n";
         $this->eventsManager->fire($this->name . ":connect", $this, $client);
     }
@@ -226,6 +234,7 @@ class Client extends \pms\Base
      */
     public function close(\swoole_client $client)
     {
+        $this->isConnected = false;
         \pms\Output::info('client server close');
         $this->eventsManager->fire($this->name . ":close", $this, $client);
     }

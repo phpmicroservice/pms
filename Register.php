@@ -54,12 +54,8 @@ class Register extends Base
      */
     public function send($router, $data)
     {
-        if ($this->register_client->isConnected()) {
-            return $this->register_client->send_ask($router, $data);
-        } else {
-            $this->register_client->start();
-        }
 
+        return $this->register_client->send_ask($router, $data);
     }
 
 
@@ -114,24 +110,22 @@ class Register extends Base
      */
     public function ping()
     {
-        if ($this->register_client->isConnected()) {
-            $data = [
-                'name' => strtolower(SERVICE_NAME),
-                'host' => APP_HOST_IP,
-                'port' => APP_HOST_PORT,
-                'k' => $this->get_key()
-            ];
-            Output::info('ping', 'ping');
-            if ($this->reg_status) {
-                # 注册完毕进行ping
-                $this->register_client->send_ask('service_ping', $data);
-            } else {
-                # 没有注册完毕,先注册
-                $this->register_client->send_ask('service_reg', $data);
-            }
+
+        $data = [
+            'name' => strtolower(SERVICE_NAME),
+            'host' => APP_HOST_IP,
+            'port' => APP_HOST_PORT,
+            'k' => $this->get_key()
+        ];
+        Output::info('ping', 'ping');
+        if ($this->reg_status) {
+            # 注册完毕进行ping
+            $this->register_client->send_ask('service_ping', $data);
         } else {
-            $this->register_client->start();
+            # 没有注册完毕,先注册
+            $this->register_client->send_ask('service_reg', $data);
         }
+
     }
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 /**
  * exist
@@ -19,13 +19,12 @@ namespace \pms\Validation\Validator;
  */
 class ExistValidator extends \pms\Validation\Validator
 {
-    private $type = 'exist';
+    protected $type = 'exist';
 
     public function validate(\Phalcon\Validation $validation, $attribute)
     {
 
         $allowEmpty = $this->getOption('allowEmpty');
-
         $ob_list = $message = $this->getOption("class_name_list");
         if (is_array($ob_list)) {
             $index = $this->getOption("object_name");
@@ -52,15 +51,7 @@ class ExistValidator extends \pms\Validation\Validator
         }
 
         $re = $obj_true->$function_name($validation->getValue($attribute));
-
         if (!$this->isExist($re)) {
-            Trace::add('info', [
-                $this->getOption("function_name"),
-                $this->getOption("object_name"),
-                $this->getOption("class_name_list"),
-                $function_name,
-                $validation->getValue($attribute),
-            ]);
             $validation->appendMessage(
                 new \Phalcon\Validation\Message($this->getOption("message"), $attribute, $this->type)
             );
@@ -76,7 +67,7 @@ class ExistValidator extends \pms\Validation\Validator
     private function isExist($dataModel)
     {
 
-//        reverse
+        # reverse
         $reverse = $this->getOption("reverse", false);
         if ($reverse) {
             $this->type = 'reverse';

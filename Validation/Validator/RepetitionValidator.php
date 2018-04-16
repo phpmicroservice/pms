@@ -1,7 +1,6 @@
 <?php
 
-
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 /**
  *

@@ -1,14 +1,11 @@
 <?php
 
-namespace \pms\Validation\Validator;
-
-use core\CoreModel;
-use core\Sundry\Trace;
+namespace pms\Validation\Validator;
 
 /**
  * wheres 条件查询验证 存在返回true通过验证   negation取反  model
  * Class whereValidator
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class whereValidator extends \pms\Validation\Validator
 {
@@ -24,7 +21,7 @@ class whereValidator extends \pms\Validation\Validator
         if (is_string($model_name)) {
 
         } else {
-            Trace::add('where', 'model');
+
             $this->type = 'model';
             return $this->appendMessage($validation, $attribute);
         }
@@ -32,7 +29,7 @@ class whereValidator extends \pms\Validation\Validator
         $builder = $modelsManager->createBuilder();
         if (!($builder instanceof \Phalcon\Mvc\Model\Query\Builder)) {
 
-            Trace::add('where', 'builder');
+
             $this->type = 'builder';
             return $this->appendMessage($validation, $attribute);
         }
@@ -41,11 +38,7 @@ class whereValidator extends \pms\Validation\Validator
         if (empty($wheres)) {
             $wheres = $validation->getData();
         }
-        Trace::add('whereValidator', [
-            'wheres' => $wheres,
-            'data' => $validation->getData(),
-            $attribute
-        ]);
+
 
         foreach ($wheres as $key => $value) {
             $builder->andWhere($key . ' = :' . $key . ':', [
@@ -56,7 +49,7 @@ class whereValidator extends \pms\Validation\Validator
         $data = $builder->getQuery()->execute();
         # 取反 negation
         $negation = $this->getOption('negation', false);
-        Trace::add('error', [$data->toArray(), $negation]);
+
         if (empty($data->toArray())) {
             # 不存在数据
             if ($negation) {

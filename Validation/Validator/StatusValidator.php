@@ -1,14 +1,14 @@
 <?php
 
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 use core\CoreModel;
-use core\Sundry\Trace;
+
 
 /**
  * 状态判断
  * Class whereValidator
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class StatusValidator extends \pms\Validation\Validator
 {
@@ -24,7 +24,7 @@ class StatusValidator extends \pms\Validation\Validator
         if (is_string($model_name)) {
 
         } else {
-            Trace::add('where', 'model');
+
             $this->type = 'model';
             return $this->appendMessage($validation, $attribute);
         }
@@ -44,7 +44,7 @@ class StatusValidator extends \pms\Validation\Validator
             if ($m_value == $d_vcal) {
                 return true;
             } else {
-                Trace::add('error', [$m_value, $d_vcal, $status_key, $status_val]);
+
                 $this->type = "key-" . $status_key;
                 return $this->appendMessage($validation, $attribute);
             }

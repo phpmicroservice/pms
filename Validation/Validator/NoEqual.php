@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dongasai
- * Date: 2018/1/11
- * Time: 19:41
- */
 
-namespace \pms\Validation\Validator;
-
+namespace pms\Validation\Validator;
 
 /**
  * 不等于验证
@@ -48,7 +41,7 @@ namespace \pms\Validation\Validator;
  * );
  * </code>
  *
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class NoEqual extends \pms\Validation\Validator
 {

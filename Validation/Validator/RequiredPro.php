@@ -1,11 +1,11 @@
 <?php
 
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 /**
  * 必填验证的增强版 可以进行多个字段的选一必填,即多选一
  * Class RequiredPro
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class RequiredPro extends \pms\Validation\Validator
 {

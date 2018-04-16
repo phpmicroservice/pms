@@ -1,18 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dongasai
- * Date: 2018/1/18
- * Time: 16:06
- */
 
-namespace \pms\Validation\Validator;
-
+namespace pms\Validation\Validator;
 
 /**
  * 减弱版本的正则验证,
  * Class RegexSlack
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class RegexSlack extends \pms\Validation\Validator
 {

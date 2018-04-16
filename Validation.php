@@ -20,46 +20,6 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
     protected $rules_ = []; #重复的验证规则
     protected $filter_rule; # 数据过滤规则
 
-    /**
-     * 执行验证之前看验证规则是否正确
-     * @return boolean
-     */
-
-    public function beforeValidation($data)
-    {
-        if (!is_array($data) || !is_object($data)) {
-            $this->appendMessage(new \Phalcon\Validation\Message('_data-Wrong-type'));
-        }
-        $message = $this->getMessage();
-        if ($message) {
-            return $message;
-        }
-        return true;
-    }
-
-    /**
-     * 获取所有消息
-     */
-    public final function getMessage()
-    {
-
-        $string = '';
-        $mess = $this->getMessages();
-        if (count($mess)) {
-            foreach ($mess as $k => $v) {
-                $index = $v->getMessage() . '-' . $v->getType();
-                if ($k) {
-                    $string .= ' & ';
-                }
-                $string .= $this->translate->t('validation-' . $index, [
-                    'field' => $this->translate->t($this->lang_field_prefix . '-' . $v->getField())
-                ]);
-            }
-            return $string;
-        } else {
-            return '';
-        }
-    }
 
     /**
      * 判断验证的时候是否出错了!
@@ -174,5 +134,18 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
                 }
             }
         }
+    }
+
+    /**
+     * Appends a message to the messages list
+     */
+    public function appendMessage(\Phalcon\Validation\MessageInterface $message): Validation
+    {
+        if ($this->_messages) {
+            $messages = new Validation\Message\Group();
+        }
+        $messages->appendMessage($message);
+        $this->_messages = $messages;
+        return $this;
     }
 }

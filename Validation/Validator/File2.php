@@ -1,6 +1,6 @@
 <?php
 
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 /**
  * 文件验证器  验证要求的是phalcon的http文件对象

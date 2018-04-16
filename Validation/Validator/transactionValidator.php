@@ -1,12 +1,11 @@
 <?php
 
-
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 /**
  * 事务验证
  * Class transactionValidator
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class transactionValidator extends \pms\Validation\Validator
 {

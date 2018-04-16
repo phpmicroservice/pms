@@ -1,12 +1,12 @@
 <?php
 
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 
 /**
  * 检测数组长度
  * Class ArrayLength
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class ArrayLength extends \pms\Validation\Validator
 {
@@ -14,7 +14,7 @@ class ArrayLength extends \pms\Validation\Validator
     {
 
         $value = $validation->getValue($attribute);
-        Trace::add('ArrayLength', $value);
+
         if (!is_array($value)) {
             $this->type = 'is_array';
             return $this->appendMessage($validation, $attribute);

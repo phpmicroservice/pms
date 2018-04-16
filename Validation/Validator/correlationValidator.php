@@ -6,7 +6,7 @@
  * Time: 10:34
  */
 
-namespace \pms\Validation\Validator;
+namespace pms\Validation\Validator;
 
 
 /**
@@ -32,7 +32,7 @@ namespace \pms\Validation\Validator;
 /**
  * 关联关系验证,用于删除
  * Class correlationValidator
- * @package core\Validator
+ * @package pms\Validation\Validator
  */
 class correlationValidator extends \pms\Validation\Validator
 {

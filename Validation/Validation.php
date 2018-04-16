@@ -26,7 +26,7 @@ trait Validation
     {
         $parameter['message'] = $parameter['message'] ?? 'repetition';
         $this->add(
-            $name, new \core\Validator\RepetitionValidator(
+            $name, new \pms\Validation\Validator\RepetitionValidator(
                 $parameter
             )
         );
@@ -47,7 +47,7 @@ trait Validation
     {
         $parameter['message'] = $parameter['message'] ?? 'exist';
         $this->add(
-            $name, new \core\Validator\ExistValidator(
+            $name, new \pms\Validation\Validator\ExistValidator(
                 $parameter
             )
         );
@@ -66,7 +66,7 @@ trait Validation
     {
         $parameter['message'] = $parameter['message'] ?? 'correlation';
         $this->add(
-            $name, new \core\Validator\correlationValidator(
+            $name, new \pms\Validation\Validator\correlationValidator(
                 $parameter
             )
         );
@@ -128,7 +128,7 @@ trait Validation
         $parameter['message'] = $parameter['message'] ?? 'musten';
         $parameter['pattern'] = '/[a-zA-Z]/';
         $this->add(
-            $name, new \core\Validator\RegexSlack(
+            $name, new \pms\Validation\Validator\RegexSlack(
                 $parameter
             )
         );
@@ -196,7 +196,7 @@ trait Validation
 
         $parameter['message'] = $parameter['message'] ?? 'arrayLength';
         $this->add(
-            $name, new \core\Validator\ArrayLength(
+            $name, new \pms\Validation\Validator\ArrayLength(
                 $parameter
             )
         );
@@ -237,7 +237,7 @@ trait Validation
     public function add_where($name, $parameter)
     {
         $parameter['message'] = $parameter['message'] ?? 'where';
-        $this->add($name, new \core\Validator\whereValidator(
+        $this->add($name, new \pms\Validation\Validator\whereValidator(
             $parameter
         ));
     }
@@ -248,7 +248,7 @@ trait Validation
     public function add_transaction($name = '')
     {
         $parameter['message'] = $parameter['message'] ?? 'transaction';
-        $this->add($name, new \core\Validator\transactionValidator());
+        $this->add($name, new \pms\Validation\Validator\transactionValidator());
     }
 
     /**
@@ -354,7 +354,7 @@ trait Validation
     public function add_NoEqual($name, $parameter)
     {
         $parameter['message'] = $parameter['message'] ?? 'NoEqual';
-        $this->add($name, new \core\Validator\NoEqual($parameter));
+        $this->add($name, new \pms\Validation\Validator\NoEqual($parameter));
     }
 
     /**
@@ -464,7 +464,7 @@ trait Validation
     {
         $parameter['message'] = $parameter['message'] ?? 'file2';
         $this->add(
-            $name, new \core\Validator\File2(
+            $name, new \pms\Validation\Validator\File2(
                 $parameter
             )
         );

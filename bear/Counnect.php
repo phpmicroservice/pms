@@ -29,6 +29,15 @@ class Counnect
         }
     }
 
+    /**
+     * @param $name
+     * @return mixed|null
+     */
+    public function __get($name)
+    {
+        return $this->request[$name] ?? null;
+    }
+
 
     /**
      * 获取fd_id

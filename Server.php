@@ -144,10 +144,9 @@ class Server extends Base
             # 热更新
             global $last_mtime;
             $last_mtime = time();
-            \swoole_timer_tick(3000, [$this, 'codeUpdata']);
-
             # 应用初始化
             $this->app->init($server, $worker_id);
+            \swoole_timer_tick(3000, [$this, 'codeUpdata']);
         }
 
     }
@@ -187,6 +186,7 @@ class Server extends Base
         foreach ($array as $dir) {
             $this->codeUpdateCall($timer_id, ROOT_DIR . $dir);
         }
+        output(ROOT_DIR, 'codeUpdata2');
     }
 
     /**

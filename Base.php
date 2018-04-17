@@ -7,6 +7,7 @@ use Phalcon\Events\ManagerInterface;
 /**
  * Class Base
  * @property \Phalcon\Cache\BackendInterface $cache
+ * @property \Phalcon\Cache\BackendInterface $gCache
  * @property \Phalcon\Config $config
  * @property \Phalcon\Config $dConfig
  * @property \Swoole\Server $swoole_server

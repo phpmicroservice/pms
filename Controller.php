@@ -16,23 +16,17 @@ class Controller extends \Phalcon\Di\Injectable
 
     protected $connect;
 
-    /**
-     * 构造函数
-     * Controller constructor.
-     * @param Counnect $connect
-     */
-    public function __construct(Counnect $connect)
-    {
-        $this->connect = $connect;
-        if ($this->dConfig->session) {
-            $this->init_sid();
-        }
-
-        $this->onInitialize($this->connect);
-    }
-
     // 初始化事件
     protected function onInitialize($connect)
+    {
+
+    }
+
+    /**
+     * 在执行之前调度
+     * @param Dispatcher $dispatcher
+     */
+    public function beforeExecuteRoute(Dispatcher $dispatcher)
     {
 
     }

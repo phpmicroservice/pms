@@ -79,8 +79,28 @@ class App extends Base
         $this->eventsManager->fire($this->name . ":receive", $this, [$fd, $reactor_id, $string]);
         $data = $this->decode($string);
         output($data, 'receive');
-        $router = new Router($server, $fd, $reactor_id, $data);
-        $router->handle($server, $fd, $reactor_id, $data);
+        $connect = new bear\Counnect($server, $fd, $reactor_id, $data);
+        $this->router->handle($connect->getRouter());
+        $dispatcher = new \Phalcon\Cli\Dispatcher();
+        $dispatcher->setDi($this->di);
+        $dispatcher->setActionSuffix('');
+        $dispatcher->setTaskSuffix('');
+        $dispatcher->setEventsManager($this->eventsManager);
+        output([
+            'n' => $this->router->getNamespaceName(),
+            'c' => $this->router->getControllerName(),
+            'a' => $this->router->getActionName(),
+            'm' => $this->router->getModuleName(),
+        ], 'handel');
+        $dispatcher->setDefaultNamespace($this->router->getNamespaceName());
+        $dispatcher->setTaskName($this->router->getControllerName());
+        $dispatcher->setActionName($this->router->getActionName());
+        $dispatcher->setModuleName($this->router->getModuleName());
+        $dispatcher->setParams($this->router->getParams());
+        $handle = $dispatcher->dispatch();
+        output(get_class($handle), 'handel');
+
+
     }
 
     /**

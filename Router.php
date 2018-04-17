@@ -50,7 +50,7 @@ class Router extends Base
      */
     private function analysis(string $router_string): array
     {
-        $arr = explode('/', $this->map($router_string));
+        $arr = explode('_', $this->map($router_string));
         $this->eventsManager->fire($this->name.':analysis', $this, $arr);
         return $arr;
     }

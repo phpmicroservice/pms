@@ -43,6 +43,46 @@ class Session
     }
 
     /**
+     * 获取内容
+     * @param $index
+     * @param null $default
+     * @return null
+     */
+    public function get($index, $default = null)
+    {
+        return $this->data[$index] ?? $default;
+    }
+
+    /**
+     * 设置内容
+     * @param $index
+     * @param $value
+     */
+    public function set($index, $value)
+    {
+        return $this->data[$index] = $value;
+    }
+
+    /**
+     * 判断索引是否存在
+     * @param $index
+     * @return bool
+     */
+    public function has($index)
+    {
+        return isset($this->data[$index]);
+    }
+
+    /**
+     * 移除一个索引
+     * @param $index
+     */
+    public function remove($index)
+    {
+        unset($this->data[$index]);
+    }
+
+    /**
      * 获取当前session的id
      */
     public function getId()
@@ -71,6 +111,15 @@ class Session
     }
 
     /**
+     * 储存
+     */
+    public function reserve()
+    {
+        Output::debug($this->data, 'session_reserve');
+        $this->gCache->save($this->session_key, $this->data, $this->option['lifetime']);
+    }
+
+    /**
      * 更新数据
      */
     public function update()
@@ -95,42 +144,11 @@ class Session
     }
 
     /**
-     * 获取内容
-     * @param $index
-     * @param null $default
-     * @return null
-     */
-    public function get($index, $default = null)
-    {
-        return $this->data[$index] ?? $default;
-    }
-
-    /**
-     * 设置内容
-     * @param $index
-     * @param $value
-     */
-    public function set($index, $value)
-    {
-        return $this->data[$index] = $value;
-    }
-
-    /**
      * Alias: Check whether a session variable is set in an application context
      */
     public function __isset(string $index)
     {
         return $this->has($index);
-    }
-
-    /**
-     * 判断索引是否存在
-     * @param $index
-     * @return bool
-     */
-    public function has($index)
-    {
-        return isset($this->data[$index]);
     }
 
     /**
@@ -146,15 +164,6 @@ class Session
     }
 
     /**
-     * 移除一个索引
-     * @param $index
-     */
-    public function remove($index)
-    {
-        unset($this->data[$index]);
-    }
-
-    /**
      * 析构函数
      */
     public function __destruct()
@@ -162,14 +171,6 @@ class Session
         $this->reserve();
     }
 
-    /**
-     * 储存
-     */
-    public function reserve()
-    {
-        Output::debug($this->data, 'session_reserve');
-        $this->gCache->save($this->session_key, $this->data, $this->option['lifetime']);
-    }
 
 
 }

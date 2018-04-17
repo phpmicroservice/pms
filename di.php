@@ -22,6 +22,20 @@ $loader->registerNamespaces(
 $loader->register();
 
 
+$di["router"] = function () {
+    $router = new Router();
+    $router->setDefaultController('index');
+    $router->setDefaultAction('index');
+    $router->add(
+        "/:controller/:action/:params", [
+            "controller" => 2,
+            "action" => 3,
+            'params' => 4
+        ]
+    );
+
+    return $router;
+};
 
 
 /**

@@ -82,16 +82,16 @@ class Dispatcher extends CliDispatcher
             $handlerClass = $this->getHandlerClass();
 
             // Handlers are retrieved as shared instances from the Service Container
-            # �������ӷ��������м���Ϊ����ʵ����
+            # 处理程序从服务容器中检索为共享实例。
             $hasService = (bool)$dependencyInjector->has($handlerClass);
             if (!$hasService) {
-                # DIû��ʹ��������Ƶķ��񣬳���ʹ���Զ���������������
+                # DI没有使用这个名称的服务，尝试使用自动加载器加载它。
                 // DI doesn't have a service with that name, try to load it using an autoloader
                 $hasService = (bool)class_exists($handlerClass);
             }
 
             // If the service can be loaded we throw an exception
-            # ���������Լ��أ������׳�һ���쳣��
+            # 如果服务可以加载，我们抛出一个异常。
             if (!$hasService) {
                 $status = $this->{"_throwDispatchException"}($handlerClass . " handler class cannot be loaded", self::EXCEPTION_HANDLER_NOT_FOUND);
                 if ($status === false && $this->_finished === false) {
@@ -119,10 +119,10 @@ class Dispatcher extends CliDispatcher
             $actionName = $this->_actionName;
             $params = $this->_params;
 
-            // �������Ƿ���һ������
+            // 检查参数是否是一个数组
 
             if (!is_array($params)) {
-                // ������һ����Ч�Ĳ����������׳��쳣
+                // 传递了一个无效的参数变量会抛出异常
                 $status = $this->_throwDispatchException("Action parameters must be an Array", self::EXCEPTION_INVALID_PARAMS);
                 if ($status === false && $this->_finished === false) {
                     continue;
@@ -154,11 +154,11 @@ class Dispatcher extends CliDispatcher
                 break;
             }
 
-            // Ϊ��ȷ��initialize���������ã����ǽ����ٵ�ǰ��handlerClass
-            // ����������󣬲������Ǽ����Ӹ�������ȡ�������DI������ȡ���� ���
-            // �Ǳ�Ҫ�ģ���Ϊ��ʵ���ļ�����ִ��֮���ǲ����ݵ�
-            // initialize�����¼��� �ӱ���ĽǶ������������ܻ��������
-            // ��beforeExecuteRoute֮ǰ����initialize�������⽫���������⡣ ���ǣ�Ϊ�˱��ֺ����������һ���ԣ����ǽ�ȷ��Ĭ�Ϻͼ�¼����Ϊ����������
+            // 为了确保initialize（）被调用，我们将销毁当前的handlerClass
+            // 如果发生错误，并且我们继续从该容器中取出，则从DI容器中取出。 这个
+            // 是必要的，因为在实例的检索和执行之间是不相容的
+            // initialize（）事件。 从编码的角度来看，它可能会更有意义
+            // 在beforeExecuteRoute之前放置initialize（），这将解决这个问题。 但是，为了保持后代，并保持一致性，我们将确保默认和记录的行为正常工作。
 
             if ($hasEventsManager) {
 
@@ -171,7 +171,7 @@ class Dispatcher extends CliDispatcher
             }
 
             if (method_exists($handler, "beforeExecuteRoute")) {
-                // ֱ�ӵ��á�beforeExecuteRoute������
+                // 直接调用“beforeExecuteRoute”方法
                 if ($handler->beforeExecuteRoute($this) === false || $this->_finished === false) {
                     continue;
                 }
@@ -186,7 +186,7 @@ class Dispatcher extends CliDispatcher
 
                 $this->_isControllerInitialize = false;
 
-                // ���á�dispatch��afterInitialize���¼�
+                // 调用“dispatch：afterInitialize”事件
                 if ($eventsManager) {
                     if ($eventsManager->fire("dispatch:afterInitialize", $this) === false || $this->_finished === false) {
                         continue;
@@ -212,13 +212,13 @@ class Dispatcher extends CliDispatcher
                 }
 			}
 
-            // ����afterBinding��Ϊ�ص����¼�
+            // 调用afterBinding作为回调和事件
             if (method_exists($handler, "afterBinding")) {
                 if ($handler->afterBinding($this) === false) {
                     continue;
                 }
 
-                // ����û��Ƿ�����������ǰ��
+                // 检查用户是否在侦听器中前进
                 if ($this->_finished === false) {
                     continue;
                 }
@@ -260,12 +260,12 @@ class Dispatcher extends CliDispatcher
                 }
 			}
 
-            // ���á�dispatch��afterDispatch���¼�
+            // 调用“dispatch：afterDispatch”事件
             if ($hasEventsManager) {
                 try {
                     $eventsManager->fire("dispatch:afterDispatch", $this, $value);
                 } catch (Exception $e) {
-                    // ��Ȼ�������������Ϊ���������ȿ���forwarding��������
+                    // 仍然检查完成在这里，因为我们想优先考虑forwarding（）调用
                     if ($this->{"_handleException"}($e) === false || $this->_finished === false) {
                         continue;
                     }

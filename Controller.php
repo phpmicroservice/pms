@@ -9,16 +9,21 @@ use \pms\bear\Counnect;
  * Class Controller
  * @property \pms\bear\Counnect $connect
  * @property \pms\Session $session
+ * @property \Phalcon\Config $dConfig
  * @package pms
  */
 class Controller extends \Phalcon\Di\Injectable
 {
 
-    protected $connect;
+    public $connect;
 
     // 初始化事件
-    protected function onInitialize($connect)
+    public function initialize()
     {
+        output(get_class($this->connect), '2323');
+        if ($this->dConfig->session) {
+            $this->init_sid();
+        }
 
     }
 

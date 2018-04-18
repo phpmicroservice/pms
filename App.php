@@ -80,28 +80,31 @@ class App extends Base
         $data = $this->decode($string);
         output($data, 'receive');
         $connect = new bear\Counnect($server, $fd, $reactor_id, $data);
-        $this->router->handle($connect->getRouter());
-        $dispatcher = new \Phalcon\Cli\Dispatcher();
+        $router = $this->di->get('router');
+        $router->handle($connect->getRouter());
+        $dispatcher = new \pms\Dispatcher();
         $dispatcher->setDi($this->di);
         $dispatcher->setActionSuffix('');
         $dispatcher->setTaskSuffix('');
+        $this->eventsManager->attach('dispatch:beforeExecuteRoute', function ($Event, $handle, $app) use ($connect) {
+            $handle->connect = $connect;
+        });
         $dispatcher->setEventsManager($this->eventsManager);
         output([
-            'n' => $this->router->getNamespaceName(),
-            'c' => $this->router->getControllerName(),
-            'a' => $this->router->getActionName(),
-            'm' => $this->router->getModuleName(),
+            'n' => $router->getNamespaceName(),
+            'c' => $router->getControllerName(),
+            'a' => $router->getActionName(),
+            'm' => $router->getModuleName(),
         ], 'handel');
-        $dispatcher->setDefaultNamespace($this->router->getNamespaceName());
-        $dispatcher->setTaskName($this->router->getControllerName());
-        $dispatcher->setActionName($this->router->getActionName());
-        $dispatcher->setModuleName($this->router->getModuleName());
-        $dispatcher->setParams($this->router->getParams());
+        $dispatcher->setDefaultNamespace($router->getNamespaceName());
+        $dispatcher->setTaskName($router->getControllerName());
+        $dispatcher->setActionName($router->getActionName());
+        $dispatcher->setModuleName($router->getModuleName());
+        $dispatcher->setParams($router->getParams());
         $handle = $dispatcher->dispatch();
         output(get_class($handle), 'handel');
-
-
     }
+    
 
     /**
      * upd 收到数据
@@ -111,7 +114,7 @@ class App extends Base
      */
     public function onPacket(\Swoole\Server $server, string $data, array $client_info)
     {
-        $this->eventsManager->fire($this->name . ":onPacket", $this, [$data,$client_info]);
+        $this->eventsManager->fire($this->name . ":onPacket", $this, [$data, $client_info]);
     }
 
 

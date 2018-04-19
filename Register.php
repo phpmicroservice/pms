@@ -102,7 +102,7 @@ class Register extends Base
     {
         $type = $data['t'];
         Output::debug($data, 'reg_save');
-        if ($type == 'service_reg') {
+        if ($type == '/service/reg') {
             $this->reg_status = 1;
         }
 
@@ -124,10 +124,10 @@ class Register extends Base
         Output::info('ping', 'ping');
         if ($this->reg_status) {
             # 注册完毕进行ping
-            $this->register_client->send_ask('service_ping', $data);
+            $this->register_client->send_ask('/service/ping', $data);
         } else {
             # 没有注册完毕,先注册
-            $this->register_client->send_ask('service_reg', $data);
+            $this->register_client->send_ask('/service/reg', $data);
         }
 
     }

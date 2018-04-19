@@ -53,7 +53,21 @@ function output($data, $msg = 'info')
  * @param $data
  * @param $name
  */
-function get_key($secret, $data, $name = '')
+function get_access($secret, $data, $name = '')
 {
-    md5(md5($secret) . md5(CONFIG_DATA_KEY) . md5(strtolower(SERVICE_NAME)));
+    return md5(md5($secret) . md5(serialize(sort($data))) . md5(strtolower($name)));
+}
+
+
+/**
+ * 通讯key验证
+ * @param $accessKey
+ * @param $secret
+ * @param $data
+ * @param string $name
+ * @return bool
+ */
+function verify_access($accessKey, $secret, $data, $name = '')
+{
+    return hash_equals(get_access($secret, $data, $name), $accessKey);
 }

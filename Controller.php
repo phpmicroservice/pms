@@ -63,7 +63,9 @@ class Controller extends \Phalcon\Di\Injectable
     public function __destruct()
     {
         Output::debug('销毁控制器!');
-        $this->session->reserve();
+        if ($this->dConfig->session) {
+            $this->session->reserve();
+        }
         $this->onDestruct();
     }
 

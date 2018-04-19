@@ -55,7 +55,7 @@ function output($data, $msg = 'info')
  */
 function get_access($secret, $data, $name = '')
 {
-    return md5(md5($secret) . md5(serialize(sort($data))) . md5(strtolower($name)));
+    return md5(md5($secret) . md5(serialize(asort($data))) . md5(strtolower($name)));
 }
 
 

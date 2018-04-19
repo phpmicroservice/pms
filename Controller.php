@@ -47,7 +47,7 @@ class Controller extends \Phalcon\Di\Injectable
         $sid = $this->connect->sid;
         if (empty($sid)) {
             # 没有发送sid
-            $sid = \strtolower(md5(uniqid() . time()));
+            $sid = \strtolower(md5(mt_rand(1, 999999) . uniqid() . time()));
             $this->connect->send_succee($sid, '初始化sid', 'init_sid');
         }
         $this->session_id = $sid;

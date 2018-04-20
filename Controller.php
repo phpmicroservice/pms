@@ -16,6 +16,7 @@ class Controller extends \Phalcon\Di\Injectable
 {
 
     public $connect;
+    public $session;
 
     public function __construct()
     {

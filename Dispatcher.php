@@ -8,10 +8,12 @@
 
 namespace pms;
 
+use Phalcon\Config;
 use Phalcon\FilterInterface;
 use Phalcon\Events\ManagerInterface;
 use Phalcon\Cli\Dispatcher\Exception;
 use Phalcon\Cli\Dispatcher as CliDispatcher;
+use pms\bear\Counnect;
 
 /**
  * Class Dispatcher
@@ -46,7 +48,11 @@ class Dispatcher extends CliDispatcher
             $this->_throwDispatchException("A dependency injection container is required to access related dispatching services", self::EXCEPTION_NO_DI);
             return false;
         }
-
+        $dConfig = $dependencyInjector->getShared('dConfig');
+        if (!($dConfig instanceof Config)) {
+            $this->_throwDispatchException("dConfig is not instanceof Config ", self::EXCEPTION_NO_DI);
+            return false;
+        }
         $eventsManager = $this->_eventsManager;
         $hasEventsManager = is_object($eventsManager);
         $this->_finished = true;
@@ -60,11 +66,10 @@ class Dispatcher extends CliDispatcher
             }
 
         }
-        if ($this->dConfig->session) {
-            $session = $this->init_session($connect);
+        if ($dConfig->session) {
+            $session = $this->init_session($this->connect);
             $this->session = $session;
         }
-
         $value = null;
         $handler = null;
         $numberDispatches = 0;
@@ -113,13 +118,13 @@ class Dispatcher extends CliDispatcher
                 break;
             }
             $handler = new $handlerClass();
-            if ($this->dConfig->session) {
+            if ($dConfig->session) {
                 $handler->session = $session;
             }
 
             $wasFresh = true;
 
-			// Handlers must be only objects
+            // Handlers must be only objects
 
             if (!is_object($handler)) {
                 $status = $this->{"_throwDispatchException"}("Invalid handler returned from the services container", self::EXCEPTION_INVALID_HANDLER);
@@ -147,7 +152,7 @@ class Dispatcher extends CliDispatcher
                 break;
             }
 
-			// Check if the method exists in the handler
+            // Check if the method exists in the handler
             $actionMethod = $this->getActiveMethod();
 
             if (!is_callable([$handler, $actionMethod])) {
@@ -179,7 +184,7 @@ class Dispatcher extends CliDispatcher
 
             if ($hasEventsManager) {
 
-                    // Calling "dispatch:beforeExecuteRoute" event
+                // Calling "dispatch:beforeExecuteRoute" event
                 if ($eventsManager->fire("dispatch:beforeExecuteRoute", $handler) === false || $this->_finished === false) {
 
                     continue;
@@ -209,25 +214,25 @@ class Dispatcher extends CliDispatcher
                         continue;
                     }
                 }
-			}
+            }
 
             if ($this->_modelBinding) {
                 $modelBinder = $this->_modelBinder;
                 $bindCacheKey = "_PHMB_" . $handlerClass . "_" . $actionMethod;
                 $params = $modelBinder->bindToHandler($handler, $params, $bindCacheKey, $actionMethod);
-			}
+            }
 
-			// Calling afterBinding
+            // Calling afterBinding
             if ($hasEventsManager) {
                 if ($eventsManager->fire("dispatch:afterBinding", this) === false) {
                     continue;
                 }
 
-				// Check if the user made a forward in the listener
+                // Check if the user made a forward in the listener
                 if ($this->_finished === false) {
                     continue;
                 }
-			}
+            }
 
             // 调用afterBinding作为回调和事件
             if (method_exists($handler, "afterBinding")) {
@@ -241,30 +246,30 @@ class Dispatcher extends CliDispatcher
                 }
             }
 
-			// Save the current handler
+            // Save the current handler
             $this->_lastHandler = $handler;
 
 
-                // We update the latest value produced by the latest handler
+            // We update the latest value produced by the latest handler
             $this->_returnedValue = $this->callActionMethod($handler, $actionMethod, $params);
 
             if ($this->_finished === false) {
-                    continue;
-                }
+                continue;
+            }
 
 
-			// Calling "dispatch:afterExecuteRoute" event
+            // Calling "dispatch:afterExecuteRoute" event
             if ($hasEventsManager) {
 
                 if ($eventsManager->fire("dispatch:afterExecuteRoute", $this, $value) === false || $this->_finished === false) {
-                        continue;
-                    }
+                    continue;
+                }
 
-			}
+            }
 
-			// Calling "afterExecuteRoute" as direct method
+            // Calling "afterExecuteRoute" as direct method
             if (method_exists($handler, "afterExecuteRoute")) {
-				try {
+                try {
                     if ($handler->afterExecuteRoute(this, value) === false || $this->_finished === false) {
                         continue;
                     }
@@ -275,7 +280,7 @@ class Dispatcher extends CliDispatcher
 
                     throw e;
                 }
-			}
+            }
 
             // 调用“dispatch：afterDispatch”事件
             if ($hasEventsManager) {
@@ -289,8 +294,8 @@ class Dispatcher extends CliDispatcher
 
                     throw e;
                 }
-			}
-		}
+            }
+        }
 
         if ($hasEventsManager) {
             try {
@@ -305,7 +310,7 @@ class Dispatcher extends CliDispatcher
 
 
             }
-		}
+        }
 
         return $handler;
     }
@@ -313,7 +318,7 @@ class Dispatcher extends CliDispatcher
     /**
      * 初始化session
      */
-    protected function init_session($connect)
+    protected function init_session(Counnect $connect)
     {
         # 进行模拟session
         # 读取session_id
@@ -321,7 +326,7 @@ class Dispatcher extends CliDispatcher
         if (empty($sid)) {
             # 没有发送sid
             $sid = \strtolower(md5(mt_rand(1, 999999) . uniqid() . time()));
-            $connect->send_succee($sid, '初始化sid', 'init_sid');
+            $connect->send_succee($sid, '初始化sid', '/init_sid');
         }
         $this->session_id = $sid;
         output($sid, 'sid');

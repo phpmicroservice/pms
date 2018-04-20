@@ -83,7 +83,7 @@ class Register extends Base
      */
     public function receive(Event $event, bear\Client $Client, $data)
     {
-        Output::debug($data, 'receive_configinit');
+        Output::debug($data, 'receive_reg');
         $error = $data['e'] ?? 0;
         if (!$error) {
             #没有错误 config_init config_md5 config_data

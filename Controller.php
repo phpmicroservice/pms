@@ -17,14 +17,14 @@ class Controller extends \Phalcon\Di\Injectable
 
     public $connect;
 
+    public function __construct()
+    {
+
+    }
+
     // 初始化事件
     public function initialize()
     {
-        output(get_class($this->connect), '2323');
-        if ($this->dConfig->session) {
-            $this->init_sid();
-        }
-
     }
 
     /**
@@ -36,26 +36,6 @@ class Controller extends \Phalcon\Di\Injectable
 
     }
 
-    /**
-     * 初始化session
-     */
-    protected function init_sid()
-    {
-        # 进行模拟session
-
-        # 读取session_id
-        $sid = $this->connect->sid;
-        if (empty($sid)) {
-            # 没有发送sid
-            $sid = \strtolower(md5(mt_rand(1, 999999) . uniqid() . time()));
-            $this->connect->send_succee($sid, '初始化sid', 'init_sid');
-        }
-        $this->session_id = $sid;
-        output($sid, 'sid');
-
-        $this->session = new Session($sid);
-
-    }
 
     /**
      * 西沟函数
@@ -63,9 +43,6 @@ class Controller extends \Phalcon\Di\Injectable
     public function __destruct()
     {
         Output::debug('销毁控制器!');
-        if ($this->dConfig->session) {
-            $this->session->reserve();
-        }
         $this->onDestruct();
     }
 

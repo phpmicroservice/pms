@@ -13,8 +13,17 @@ use Phalcon\Events\ManagerInterface;
 use Phalcon\Cli\Dispatcher\Exception;
 use Phalcon\Cli\Dispatcher as CliDispatcher;
 
+/**
+ * Class Dispatcher
+ * @property \pms\bear\Counnect $connect
+ * @property  \pms\Session $session
+ * @package pms
+ */
 class Dispatcher extends CliDispatcher
 {
+
+    public $connect;
+    public $session;
 
     /**
      * Process the results of the router by calling into the appropriate controller action(s)
@@ -50,6 +59,10 @@ class Dispatcher extends CliDispatcher
                 return false;
             }
 
+        }
+        if ($this->dConfig->session) {
+            $session = $this->init_session($connect);
+            $this->session = $session;
         }
 
         $value = null;
@@ -91,7 +104,7 @@ class Dispatcher extends CliDispatcher
             }
 
             // If the service can be loaded we throw an exception
-            # 如果服务可以加载，我们抛出一个异常。
+            # 如果服务不可以加载，我们抛出一个异常。
             if (!$hasService) {
                 $status = $this->{"_throwDispatchException"}($handlerClass . " handler class cannot be loaded", self::EXCEPTION_HANDLER_NOT_FOUND);
                 if ($status === false && $this->_finished === false) {
@@ -100,6 +113,10 @@ class Dispatcher extends CliDispatcher
                 break;
             }
             $handler = new $handlerClass();
+            if ($this->dConfig->session) {
+                $handler->session = $session;
+            }
+
             $wasFresh = true;
 
 			// Handlers must be only objects
@@ -291,6 +308,31 @@ class Dispatcher extends CliDispatcher
 		}
 
         return $handler;
+    }
+
+    /**
+     * 初始化session
+     */
+    protected function init_session($connect)
+    {
+        # 进行模拟session
+        # 读取session_id
+        $sid = $connect->sid;
+        if (empty($sid)) {
+            # 没有发送sid
+            $sid = \strtolower(md5(mt_rand(1, 999999) . uniqid() . time()));
+            $connect->send_succee($sid, '初始化sid', 'init_sid');
+        }
+        $this->session_id = $sid;
+        output($sid, 'sid');
+        return new Session($sid);
+    }
+
+    public function __destruct()
+    {
+        if ($this->dConfig->session) {
+            $this->session->reserve();
+        }
     }
 
 }

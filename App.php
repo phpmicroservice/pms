@@ -86,6 +86,11 @@ class App extends Base
         $dispatcher->setDi($this->di);
         $dispatcher->setActionSuffix('');
         $dispatcher->setTaskSuffix('');
+
+        $this->eventsManager->attach('dispatch:beforeDispatchLoop', function ($Event, $dispatch) use ($connect) {
+            $dispatch->connect = $connect;
+        });
+
         $this->eventsManager->attach('dispatch:beforeExecuteRoute', function ($Event, $handle, $app) use ($connect) {
             $handle->connect = $connect;
         });
@@ -102,9 +107,9 @@ class App extends Base
         $dispatcher->setModuleName($router->getModuleName());
         $dispatcher->setParams($router->getParams());
         $handle = $dispatcher->dispatch();
-        output(get_class($handle), 'handel');
+
     }
-    
+
 
     /**
      * upd 收到数据

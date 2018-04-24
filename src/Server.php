@@ -150,8 +150,6 @@ class Server extends Base
             if (get_envbl('APP_CODEUPDATE', true)) {
                 \swoole_timer_tick(10000, [$this, 'codeUpdata']);
             }
-
-
             # 应用初始化
             $this->app->init($server, $worker_id);
 
@@ -187,7 +185,7 @@ class Server extends Base
      * 重新加载
      * @param $dir
      */
-    public function codeUpdata($timer_id)
+    public function codeUpdata()
     {
         $this->swoole_server->task('codeUpdata');
     }

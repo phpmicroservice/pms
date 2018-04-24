@@ -147,11 +147,10 @@ class Server extends Base
         if (!$server->wkinit && !$server->taskworker) {
             $server->wkinit = true;
             # 热更新
-            global $last_mtime;
-            $last_mtime = time();
+
             # 应用初始化
             $this->app->init($server, $worker_id);
-            \swoole_timer_tick(3000, [$this, 'codeUpdata']);
+            \swoole_timer_tick(10000, [$this, 'codeUpdata']);
         }
 
     }
@@ -186,41 +185,7 @@ class Server extends Base
      */
     public function codeUpdata($timer_id)
     {
-        $array = $this->dConfig->codeUpdata;
-        output(ROOT_DIR, 'codeUpdata');
-        foreach ($array as $dir) {
-            $this->codeUpdateCall($timer_id, ROOT_DIR . $dir);
-        }
-        output(ROOT_DIR, 'codeUpdata2');
-    }
-
-    /**
-     * 更新代码的执行部分
-     * @param $timer_id
-     * @param $dir
-     */
-    private function codeUpdateCall($timer_id, $dir)
-    {
-        global $last_mtime;
-        // recursive traversal directory
-        $dir_iterator = new \RecursiveDirectoryIterator($dir);
-        $iterator = new \RecursiveIteratorIterator($dir_iterator);
-        foreach ($iterator as $file) {
-            if (substr($file, -1) != '.') {
-                if (substr($file, -3) == 'php') {
-                    // 只检查php文件
-                    // 检查时间
-                    $getMTime = $file->getMTime();
-                    if ($last_mtime < $getMTime) {
-                        $last_mtime = time();
-                        echo $file . " ---|lasttime :$last_mtime and getMTime:$getMTime update and reload \n";
-                        echo "关闭系统!自动重启!";
-                        $this->swoole_server->shutdown();
-                        break;
-                    }
-                }
-            }
-        }
+        $this->swoole_server->task('codeUpdata');
     }
 
 

@@ -23,6 +23,11 @@ class Server extends Base
     private $app;
     private $logo;
     protected $name = 'Server';
+    private $d_option = [
+        'task_worker_num' => 4,
+        'open_eof_split' => true, //打开EOF检测
+        'package_eof' => PACKAGE_EOF, //设置EOF
+    ];
 
 
     /**
@@ -42,7 +47,7 @@ class Server extends Base
         $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
         parent::__construct($this->swoole_server);
         # 设置运行参数
-        $this->swoole_server->set($option);
+        $this->swoole_server->set(array_merge($this->d_option, $option));
         $this->task = new  Task($this->swoole_server);
         $this->work = new Work($this->swoole_server);
         $this->app = new App($this->swoole_server);

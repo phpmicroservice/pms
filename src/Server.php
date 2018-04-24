@@ -147,10 +147,14 @@ class Server extends Base
         if (!$server->wkinit && !$server->taskworker) {
             $server->wkinit = true;
             # 热更新
+            if (get_envbl('APP_HOT_CODEUPDATE', true)) {
+                \swoole_timer_tick(10000, [$this, 'codeUpdata']);
+            }
+
 
             # 应用初始化
             $this->app->init($server, $worker_id);
-            \swoole_timer_tick(10000, [$this, 'codeUpdata']);
+
         }
 
     }

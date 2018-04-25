@@ -117,6 +117,26 @@ class Dispatcher extends CliDispatcher
                 }
                 break;
             }
+
+            if (!class_exists($handlerClass)) {
+
+                if ($hasEventsManager) {
+                    if ($eventsManager->fire("dispatch:beforeNotFoundHandler", $this) === false) {
+                        continue;
+                    }
+                    if ($this->_finished === false) {
+                        continue;
+                    }
+                }
+                // Try to throw an exception when an action isn't defined on the object
+                $status = $this->{"_throwDispatchException"}("was not found on handler '" . $handlerClass . "'", self::EXCEPTION_ACTION_NOT_FOUND);
+                if ($status === false && $this->_finished === false) {
+                    continue;
+                }
+                break;
+            }
+
+
             $handler = new $handlerClass();
             if ($dConfig->session) {
                 $handler->session = $session;

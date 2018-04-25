@@ -124,11 +124,12 @@ class Register extends Base
         Output::info('ping', 'ping');
         if ($this->reg_status) {
             # 注册完毕进行ping
-            $this->register_client->send_ask('/service/ping', $data);
+            $re = $this->register_client->send_ask('/service/ping', $data);
         } else {
             # 没有注册完毕,先注册
-            $this->register_client->send_ask('/service/reg', $data);
+            $re = $this->register_client->send_ask('/service/reg', $data);
         }
+        output($re, "ping_re");
 
     }
 

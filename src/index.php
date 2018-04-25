@@ -22,6 +22,7 @@ defined('OUTPUT_NOTICE') || define('OUTPUT_NOTICE', boolval(get_env("OUTPUT_NOTI
 defined('OUTPUT_PMS') || define('OUTPUT_PMS', boolval(get_env("OUTPUT_PMS", 1)));# notice级别的输出 的开启
 
 defined('PACKAGE_EOF') || define('PACKAGE_EOF', '_pms_');
+define('START_TIME', time());
 
 echo '项目目录为:' . ROOT_DIR  .',pms目录为:' . PMS_DIR . " \n";
 

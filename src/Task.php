@@ -102,7 +102,7 @@ class Task extends Base
                     $getMTime = $file->getMTime();
                     if ($last_mtime < $getMTime) {
                         $last_mtime = time();
-                        echo $file . " ---|lasttime :$last_mtime and getMTime:$getMTime update and reload \n";
+                        echo $file . " ---|lasttime : " . date('Y-m-d H:i:s', $last_mtime) . "and getMTime: " . date('Y-m-d H:i:s', $getMTime) . " update and reload \n";
                         echo "关闭系统!自动重启!";
                         $this->swoole_server->shutdown();
                         break;

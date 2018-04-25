@@ -3,9 +3,9 @@
 namespace pms;
 
 /**
- * session 实现 储存在gCache
+ * session 实现 储存在sessionCache
  * Class Session
- * @property \Phalcon\Cache\BackendInterface $gCache
+ * @property \Phalcon\Cache\BackendInterface $sessionCache
  * @package pms
  */
 class Session
@@ -17,15 +17,13 @@ class Session
     private $session_id;
     private $session_key;
     private $data;
-    private $gCache;
+    private $sessionCache;
 
     public function __construct($sid, $option = [])
     {
 
-        $this->gCache = \Phalcon\Di::getDefault()->get('gCache');
+        $this->sessionCache = \Phalcon\Di::getDefault()->get('sessionCache');
         $this->option = array_merge($this->option, $option);
-        $this->session_id = $sid;
-        $this->session_key = $this->option['prefix'] . $sid;
         $this->init($sid);
 
     }
@@ -35,8 +33,14 @@ class Session
      */
     public function init($sid)
     {
-        output(get_class($this->gCache), 'session35');
-        $this->data = $this->gCache->get($this->session_key);
+        # 保存之前的session的信息
+        if (!empty($this->data)) {
+            $this->reserve();
+        }
+        $this->session_id = $sid;
+        $this->session_key = $this->option['prefix'] . $sid;
+        $this->data = $this->sessionCache->get($this->session_key);
+        output($this->data, 'session_init');
         if (empty($this->data)) {
             $this->data = [];
         }
@@ -60,7 +64,8 @@ class Session
      */
     public function set($index, $value)
     {
-        return $this->data[$index] = $value;
+        $this->data[$index] = $value;
+        return $this->reserve();
     }
 
     /**
@@ -107,7 +112,7 @@ class Session
     public function destroy()
     {
         $this->data = [];
-        $this->gCache->delete($this->session_key);
+        $this->sessionCache->delete($this->session_key);
     }
 
     /**
@@ -116,7 +121,7 @@ class Session
     public function reserve()
     {
         Output::debug($this->data, 'session_reserve');
-        $this->gCache->save($this->session_key, $this->data, $this->option['lifetime']);
+        $this->sessionCache->save($this->session_key, $this->data, $this->option['lifetime']);
     }
 
     /**
@@ -124,7 +129,7 @@ class Session
      */
     public function update()
     {
-        $this->data = $this->gCache->get($this->session_key);
+        $this->data = $this->sessionCache->get($this->session_key);
     }
 
     /**

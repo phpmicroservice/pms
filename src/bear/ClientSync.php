@@ -91,10 +91,7 @@ class ClientSync extends \pms\Base
     public function send_recv($data)
     {
         $this->send($data);
-        $string = $this->swoole_client->recv();
-        \pms\Output::debug($string, 'send_recv');
-        \pms\Output::debug($this->swoole_client->errCode, 'send_recv_e');
-        return $this->decode($string);
+        return $this->recv();
     }
 
     /**

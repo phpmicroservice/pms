@@ -14,8 +14,6 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
 
     use Validation\Validation;
 
-    protected $lang; #多语言支持-语言文件路径
-    protected $lang_field_prefix = 'model-field';
     protected $rules = []; #验证规则
     protected $rules_ = []; #重复的验证规则
     protected $filter_rule; # 数据过滤规则
@@ -70,15 +68,6 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
     protected function initialize()
     {
 
-        # 加载语言包
-        if ($this->lang) {
-            if (is_file(NOW_LANG_DIR . $this->lang)) {
-                $this->translate->addArray(include NOW_LANG_DIR . $this->lang);
-            } else {
-                throw new \Phalcon\Validation\Exception($this->translate->t('language-pack-file-not-exist', [
-                    'file' => NOW_LANG_DIR . $this->lang]));
-            }
-        }
         if (!empty($this->rules)) {
             $re = $this->analysisRule($this->rules);
             if (is_string($re)) {

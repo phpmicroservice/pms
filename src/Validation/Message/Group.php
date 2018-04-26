@@ -39,4 +39,13 @@ class Group extends \Phalcon\Validation\Message\Group
         return $arr;
     }
 
+    /**
+     * 清空
+     *
+     */
+    public function pruge()
+    {
+        $this->_messages = [];
+    }
+
 }

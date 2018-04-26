@@ -67,7 +67,7 @@ class Dispatcher extends CliDispatcher
 
         }
         $sid = $this->connect->sid;
-        $session_init = !empty($sid);
+        $session_init = !empty($sid) && $dConfig->session;
         if ($session_init) {
             $session = $this->init_session($this->connect);
             $this->session = $session;

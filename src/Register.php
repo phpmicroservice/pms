@@ -129,6 +129,9 @@ class Register extends Base
             # 没有注册完毕,先注册
             $re = $this->register_client->send_ask('/service/reg', $data);
         }
+        if ($re === false) {
+            $this->register_client->start();
+        }
         output($re, "ping_re");
 
     }

@@ -121,6 +121,7 @@ class Session
     public function reserve()
     {
         Output::debug($this->data, 'session_reserve');
+        $this->data['save_time'] = time();
         $this->sessionCache->save($this->session_key, $this->data, $this->option['lifetime']);
     }
 

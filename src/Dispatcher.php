@@ -66,7 +66,9 @@ class Dispatcher extends CliDispatcher
             }
 
         }
-        if ($dConfig->session) {
+        $sid = $this->connect->sid;
+        $session_init = !empty($sid);
+        if ($session_init) {
             $session = $this->init_session($this->connect);
             $this->session = $session;
         }
@@ -138,7 +140,7 @@ class Dispatcher extends CliDispatcher
 
 
             $handler = new $handlerClass();
-            if ($dConfig->session) {
+            if ($session_init) {
                 $handler->session = $session;
             }
 
@@ -343,11 +345,6 @@ class Dispatcher extends CliDispatcher
         # 进行模拟session
         # 读取session_id
         $sid = $connect->sid;
-        if (empty($sid)) {
-            # 没有发送sid
-            $sid = \strtolower(md5(mt_rand(1, 999999) . uniqid() . time()));
-            $connect->send_succee($sid, '初始化sid', '/init_sid');
-        }
         $this->session_id = $sid;
         output($sid, 'sid');
         return new Session($sid);
@@ -355,7 +352,7 @@ class Dispatcher extends CliDispatcher
 
     public function __destruct()
     {
-        if ($this->dConfig->session) {
+        if ($this->session) {
             $this->session->reserve();
         }
     }

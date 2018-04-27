@@ -221,8 +221,7 @@ trait Validation
         } else {
             # 验证器不存在
             throw new \Phalcon\Validation\Exception(
-                $this->translate->t('add_Validator-Validator-not-exist', [
-                    'Validator' => $parameter['name']]));
+                'add Validator Validator not exist :' . $parameter['name']);
         }
     }
 

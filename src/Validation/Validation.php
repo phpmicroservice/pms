@@ -168,12 +168,12 @@ trait Validation
      *              $parameter['min']  最小长度
      *              $parameter['messageMaximum']  提示信息
      *              $parameter['messageMinimum']  提示信息
-     *              $parameter['message']  默认提示信息<存在会替换掉上面的提示>
      */
     public function add_stringLength($name, $parameter)
     {
 
-        $parameter['message'] = $parameter['message'] ?? 'stringLength';
+        $parameter['messageMinimum'] = $parameter['messageMinimum'] ?? 'messageMinimum';
+        $parameter['messageMaximum'] = $parameter['messageMaximum'] ?? 'messageMaximum';
         $this->add(
             $name, new \Phalcon\Validation\Validator\StringLength(
                 $parameter

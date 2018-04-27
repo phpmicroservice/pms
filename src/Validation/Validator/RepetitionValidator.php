@@ -14,6 +14,8 @@ namespace pms\Validation\Validator;
  *
  */
 
+use pms\Mvc\Model;
+
 /**
  * Description of repetition
  * 重复验证
@@ -38,11 +40,9 @@ class RepetitionValidator extends \pms\Validation\Validator
             $obj_true = $obj;
         }
 
-        if (!($obj_true instanceof \core\CoreModel)) {
-            $validation->appendMessage(
-                new \Phalcon\Validation\Message($this->getOption("message"), $attribute, $attribute)
-            );
-            return false;
+        if (!($obj_true instanceof Model)) {
+            $this->type = 'nomodel';
+            return $this->appendMessage($validation, $attribute);
         }
 
         $function_name = $this->getOption("function_name");

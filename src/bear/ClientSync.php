@@ -52,7 +52,7 @@ class ClientSync extends \pms\Base
 
     /**
      * 发送一个请求
-     * @param $router _分隔符
+     * @param $router
      * @param $data
      * @return bool
      */
@@ -93,6 +93,25 @@ class ClientSync extends \pms\Base
         $this->send($data);
         return $this->recv();
     }
+
+    /**
+     * 请求和返回
+     * @param $sername
+     * @param $router
+     * @param $data
+     * @return mixed
+     */
+    public function request_return($sername, $router, $data)
+    {
+        return $t->send_recv([
+            's' => $sername,
+            'r' => '/server/create_array',
+            'd' => $data,
+            'accessKey' => \get_access(get_env($sername . '_APP_SECRET_KEY'), $data, SERVICE_NAME)
+        ]);
+
+    }
+
 
     /**
      * 解码

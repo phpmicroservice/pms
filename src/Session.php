@@ -133,6 +133,27 @@ class Session
         $this->data = $this->sessionCache->get($this->session_key);
     }
 
+    public function offsetExists($key)
+    {
+        return isset($this->data[$key]);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->data[$key] = $value;
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->data[$key];
+    }
+
+    public function offsetUnset($key)
+    {
+        unset($this->data[$key]);
+    }
+
+
     /**
      * Alias: Gets a session variable from an application context
      */
@@ -176,7 +197,6 @@ class Session
     {
         $this->reserve();
     }
-
 
 
 }

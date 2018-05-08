@@ -103,7 +103,7 @@ class ClientSync extends \pms\Base
      */
     public function request_return($sername, $router, $data)
     {
-        return $t->send_recv([
+        return $this->send_recv([
             's' => $sername,
             'r' => '/server/create_array',
             'd' => $data,

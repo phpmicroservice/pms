@@ -14,8 +14,6 @@ namespace pms\Validation\Validator;
  *
  */
 
-use pms\Mvc\Model;
-
 /**
  * Description of repetition
  * 重复验证

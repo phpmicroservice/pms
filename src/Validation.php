@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dongasai
- * Date: 2018/4/16
- * Time: 10:12
- */
+
 
 namespace pms;
 
@@ -16,7 +11,6 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
 
     protected $rules = []; #验证规则
     protected $rules_ = []; #重复的验证规则
-    protected $filter_rule; # 数据过滤规则
 
 
     /**
@@ -36,9 +30,7 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
      */
     public function validate($data = null, $entity = null)
     {
-        if ($this->filter_rule) {
-            $this->setFilters_rule();
-        }
+
         $message = parent::validate($data, $entity);
         if ($message->count()) {
             return false;
@@ -46,12 +38,6 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
         return true;
     }
 
-    private function setFilters_rule()
-    {
-        foreach ($this->filter_rule as $value) {
-            $this->setFilters($value[0], $value[1]);
-        }
-    }
 
     public function getErrorMessages(): string
     {

@@ -105,7 +105,7 @@ class ClientSync extends \pms\Base
     {
         return $this->send_recv([
             's' => $sername,
-            'r' => '/server/create_array',
+            'r' => $router,
             'd' => $data,
             'accessKey' => \get_access(get_env($sername . '_APP_SECRET_KEY'), $data, SERVICE_NAME)
         ]);

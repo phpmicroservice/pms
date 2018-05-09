@@ -168,6 +168,7 @@ trait Validation
      *              $parameter['min']  最小长度
      *              $parameter['messageMaximum']  提示信息
      *              $parameter['messageMinimum']  提示信息
+     *              $parameter['message']  默认提示信息<存在会替换掉上面的提示>
      */
     public function add_stringLength($name, $parameter)
     {
@@ -221,7 +222,8 @@ trait Validation
         } else {
             # 验证器不存在
             throw new \Phalcon\Validation\Exception(
-                'add Validator Validator not exist :' . $parameter['name']);
+                $this->translate->t('add_Validator-Validator-not-exist', [
+                    'Validator' => $parameter['name']]));
         }
     }
 

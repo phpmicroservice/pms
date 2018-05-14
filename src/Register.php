@@ -34,7 +34,7 @@ class Register extends Base
         $this->register_client = new bear\Client($server, $this->client_ip, $this->client_port);
         $this->register_client->onBind('receive', $this);
         $obj = $this;
-        swoole_timer_tick(3000, function ($timeid) use ($obj) {
+        swoole_timer_tick(5000, function ($timeid) use ($obj) {
             # 进行ping
             $obj->ping();
         });

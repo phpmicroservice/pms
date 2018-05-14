@@ -12,7 +12,7 @@ use Phalcon\Filter;
 class FilterTool
 {
     protected $_Filter;
-    protected $_Rules;
+    protected $_Rules = [];
 
     public function __construct()
     {
@@ -25,15 +25,25 @@ class FilterTool
 
     }
 
+
     /**
-     *
-     * @param $data
+     * ����
+     * @param array $data ����,���ô���
+     * @param bool $old �Ƿ���Ҫ������
+     * @return array
      */
-    public function filter(&$data)
+    public function filter(array &$data, $old = false)
     {
-        foreach ($this->_Rules as $field => $filter) {
-            if (isset($data[$field])) $data[$field] = $this->_Filter->sanitize($data[$field], $filter);
+        $newarr = [];
+        foreach ($this->_Rules as $filter1) {
+            $field = $filter1[0];
+            $filter = $filter1[1];
+            if (isset($data[$field])) $newarr[$field] = $this->_Filter->sanitize($data[$field], $filter);
         }
+        if ($old) {
+            $newarr = array_merge($data, $newarr);
+        }
+        $data = $newarr;
         return $data;
     }
 

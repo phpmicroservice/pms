@@ -53,7 +53,7 @@ function output($data, $msg = 'info')
  * @param $data
  * @param $name
  */
-function get_access($secret, $data, $name = '')
+function get_access($secret, &$data, $name = '')
 {
     $data['uniqid58_'] = \funch\Str::rand(8);
     return md5(md5($secret) . md5(serialize(asort($data))) . md5(strtolower($name)));

@@ -18,7 +18,7 @@ function get_env($name, $default = '')
  */
 function get_envbl($name, $default = true)
 {
-    return getenv(strtoupper($name)) === false ? $default : boolval(getenv(strtoupper($name)));
+    return (bool)(getenv(strtoupper($name)) === false ? $default : getenv(strtoupper($name)));
 }
 
 /**

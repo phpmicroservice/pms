@@ -35,23 +35,25 @@ class Output
     }
 
     /**
-     * �������
+     * 输出
      * @param $data
      * @param $message
      */
     public static function output($data, $msg)
     {
-        echo '[' . date('H:i:s') . '][' . $msg . ']';
-        if (is_string($data)) {
-            echo $data;
-        } else {
-            echo var_export($data, true);
+        if (!NO_OUTPUT) {
+            echo '[' . date('H:i:s') . '][' . $msg . ']';
+            if (is_string($data)) {
+                echo $data;
+            } else {
+                echo var_export($data, true);
+            }
+            echo " \n";
         }
-        echo " \n";
     }
 
     /**
-     * �������
+     * 错误的输出
      */
     public static function error($data, $message = 'error')
     {

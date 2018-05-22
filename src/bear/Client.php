@@ -15,15 +15,15 @@ use Phalcon\Events\ManagerInterface;
 class Client extends \pms\Base
 {
     public $swoole_client;
+    public $isConnected = false;
     protected $swoole_server;
+    protected $name = 'Client';
     private $server_ip;
     private $server_port;
     private $option = [
         'open_eof_check' => true, //打开EOF检测
         'package_eof' => PACKAGE_EOF, //设置EOF
     ];
-    protected $name = 'Client';
-    public $isConnected = false;
 
     /**
      * 配置初始化
@@ -39,35 +39,6 @@ class Client extends \pms\Base
         $this->swoole_server = $swoole_server;
         $this->option = array_merge($this->option, $option);
         $this->get_swoole_client();
-    }
-
-
-    /**
-     * 判断链接
-     * @return bool
-     */
-    public function isConnected()
-    {
-        return $this->isConnected;
-    }
-
-
-    /**
-     * 开始,链接服务器
-     */
-    public function start($timeout = 3)
-    {
-        if (!$this->isConnected) {
-            \pms\Output::debug([$this->isConnected, $this->server_ip, $this->server_port], 'client_start');
-            return $this->swoole_client->connect($this->server_ip, $this->server_port, $timeout);
-        }
-        return true;
-
-    }
-
-    public function on($obj)
-    {
-        $this->eventsManager->attach($this->name, $obj);
     }
 
     /**
@@ -88,6 +59,33 @@ class Client extends \pms\Base
         $this->swoole_client->on("close", [$this, 'close']);
         $this->swoole_client->on("bufferFull", [$this, 'bufferFull']);
         $this->swoole_client->on("bufferEmpty", [$this, 'bufferEmpty']);
+    }
+
+    /**
+     * 判断链接
+     * @return bool
+     */
+    public function isConnected()
+    {
+        return $this->isConnected;
+    }
+
+    /**
+     * 开始,链接服务器
+     */
+    public function start($timeout = 3)
+    {
+        if (!$this->isConnected) {
+            \pms\Output::debug([$this->isConnected, $this->server_ip, $this->server_port], 'client_start');
+            return $this->swoole_client->connect($this->server_ip, $this->server_port, $timeout);
+        }
+        return true;
+
+    }
+
+    public function on($obj)
+    {
+        $this->eventsManager->attach($this->name, $obj);
     }
 
     /**
@@ -116,6 +114,20 @@ class Client extends \pms\Base
     }
 
     /**
+     * 发送一个请求
+     * @param $router _分隔符
+     * @param $data
+     * @return bool
+     */
+    public function send_ask($router, $data)
+    {
+        return $this->send([
+            'r' => $router,
+            'd' => $data
+        ]);
+    }
+
+    /**
      * 发送数据
      * @param $data
      */
@@ -132,42 +144,6 @@ class Client extends \pms\Base
     }
 
     /**
-     * 发送一个请求
-     * @param $router _分隔符
-     * @param $data
-     * @return bool
-     */
-    public function send_ask($router, $data)
-    {
-        return $this->send([
-            'r' => $router,
-            'd' => $data
-        ]);
-    }
-
-    /**
-     * 发送并接受返回
-     * @param $data
-     */
-    public function send_recv($data)
-    {
-        $this->send($data);
-        $string = $this->swoole_client->recv();
-        \pms\Output::debug($string, 'send_recv');
-        \pms\Output::debug($this->swoole_client->errCode, 'send_recv_e');
-        return $this->decode($string);
-    }
-
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($string): array
-    {
-        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
-    }
-
-    /**
      * 编码
      * @param array $data
      * @return string
@@ -176,7 +152,6 @@ class Client extends \pms\Base
     {
         return \swoole_serialize::pack($data) . PACKAGE_EOF;
     }
-
 
     /**
      * 链接成功
@@ -188,7 +163,6 @@ class Client extends \pms\Base
         echo "Client connect \n";
         $this->eventsManager->fire($this->name . ":connect", $this, $client);
     }
-
 
     /**
      * 收到值,真实
@@ -206,7 +180,6 @@ class Client extends \pms\Base
 
     }
 
-
     /**
      * 收到值,解码可用的
      * @param $value
@@ -216,6 +189,15 @@ class Client extends \pms\Base
         $data = $this->decode($value);
         \pms\Output::debug($data, 'client_receive' . $this->name);
         $this->eventsManager->fire($this->name . ":receive", $this, $data);
+    }
+
+    /**
+     * 解码
+     * @param $string
+     */
+    private function decode($string): array
+    {
+        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
     }
 
     /**

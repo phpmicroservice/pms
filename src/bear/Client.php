@@ -153,7 +153,6 @@ class Client extends \pms\Base
         return \swoole_serialize::pack($data) . PACKAGE_EOF;
     }
 
-
     /**
      * 链接成功
      * @param \swoole_client $client
@@ -164,7 +163,6 @@ class Client extends \pms\Base
         echo "Client connect \n";
         $this->eventsManager->fire($this->name . ":connect", $this, $client);
     }
-
 
     /**
      * 收到值,真实
@@ -181,7 +179,6 @@ class Client extends \pms\Base
         }
 
     }
-
 
     /**
      * 收到值,解码可用的

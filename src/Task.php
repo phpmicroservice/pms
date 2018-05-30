@@ -23,9 +23,7 @@ class Task extends Base
     {
         output($data, 'onTask');
         $this->eventsManager->fire($this->name . ':onTask', $this, [$task_id, $src_worker_id, $data]);
-        if ($data == 'codeUpdata') {
-            $this->codeUpdata();
-        }
+
     }
 
     /**
@@ -68,49 +66,7 @@ class Task extends Base
     }
 
 
-    /**
-     * 重新加载
-     * @param $dir
-     */
-    public function codeUpdata()
-    {
-        $array = $this->dConfig->codeUpdata;
-        output(ROOT_DIR, 'codeUpdata');
-        foreach ($array as $dir) {
-            $this->codeUpdateCall(ROOT_DIR . $dir);
-        }
-        output(ROOT_DIR, 'codeUpdata2');
-        $this->swoole_server->finish('codeUpdata');
-    }
 
-    /**
-     * 更新代码的执行部分
-     * @param $timer_id
-     * @param $dir
-     */
-    private function codeUpdateCall($dir)
-    {
-        static $last_mtime = START_TIME;
-        // recursive traversal directory
-        $dir_iterator = new \RecursiveDirectoryIterator($dir);
-        $iterator = new \RecursiveIteratorIterator($dir_iterator);
-        foreach ($iterator as $file) {
-            if (substr($file, -1) != '.') {
-                if ($file->getExtension() == 'php') {
-                    // 只检查php文件
-                    // 检查时间
-                    $getMTime = $file->getMTime();
-                    if ($last_mtime < $getMTime) {
-                        $last_mtime = time();
-                        echo $file . " ---|lasttime : " . date('Y-m-d H:i:s', $last_mtime) . "and getMTime: " . date('Y-m-d H:i:s', $getMTime) . " update and reload \n";
-                        echo "关闭系统!自动重启!";
-                        $this->swoole_server->shutdown();
-                        break;
-                    }
-                }
-            }
-        }
-    }
 
 
 }

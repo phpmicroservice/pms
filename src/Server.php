@@ -18,11 +18,12 @@ class Server extends Base
 {
     public $swoole_server;
     public $channel;
+    protected $name = 'Server';
+    protected $inotify_fd;
     private $task;
     private $work;
     private $app;
-    private $logo;
-    protected $name = 'Server';
+    private $logo;# 热更新用
     private $d_option = [
         'task_worker_num' => 4,
         'open_eof_split' => true, //打开EOF检测
@@ -59,31 +60,6 @@ class Server extends Base
         $this->swoole_server->channel = new \Swoole\Channel(1024 * 1024 * 128);# 128M
     }
 
-
-    /**
-     * 启动服务
-     */
-    public function start()
-    {
-
-        $this->eventsManager->fire($this->name . ':beforeStart', $this, $this->swoole_server);
-        $this->swoole_server->start();
-    }
-
-    /**
-     * 处理连接回调
-     */
-    private function tcpCall()
-    {
-        # 设置连接回调
-        $this->swoole_server->on('Connect', [$this->app, 'onConnect']);
-        $this->swoole_server->on('Receive', [$this->app, 'onReceive']);
-        $this->swoole_server->on('Packet', [$this->app, 'onPacket']);
-        $this->swoole_server->on('Close', [$this->app, 'onClose']);
-        $this->swoole_server->on('BufferEmpty', [$this->app, 'onBufferEmpty']);
-        $this->swoole_server->on('BufferFull', [$this->app, 'onBufferFull']);
-    }
-
     /**
      * 处理进程回调
      */
@@ -110,6 +86,30 @@ class Server extends Base
         $this->swoole_server->on('ManagerStart', [$this, 'onManagerStart']);
         # 管理进程结束
         $this->swoole_server->on('ManagerStop', [$this, 'onManagerStop']);
+    }
+
+    /**
+     * 处理连接回调
+     */
+    private function tcpCall()
+    {
+        # 设置连接回调
+        $this->swoole_server->on('Connect', [$this->app, 'onConnect']);
+        $this->swoole_server->on('Receive', [$this->app, 'onReceive']);
+        $this->swoole_server->on('Packet', [$this->app, 'onPacket']);
+        $this->swoole_server->on('Close', [$this->app, 'onClose']);
+        $this->swoole_server->on('BufferEmpty', [$this->app, 'onBufferEmpty']);
+        $this->swoole_server->on('BufferFull', [$this->app, 'onBufferFull']);
+    }
+
+    /**
+     * 启动服务
+     */
+    public function start()
+    {
+
+        $this->eventsManager->fire($this->name . ':beforeStart', $this, $this->swoole_server);
+        $this->swoole_server->start();
     }
 
     /**
@@ -148,8 +148,9 @@ class Server extends Base
             $server->wkinit = true;
             # 热更新
             if (get_envbl('APP_CODEUPDATE', true)) {
-                \swoole_timer_tick(10000, [$this, 'codeUpdata']);
+                $this->codeUpdata();
             }
+
             # 应用初始化
             $this->app->init($server, $worker_id);
 
@@ -157,6 +158,54 @@ class Server extends Base
 
     }
 
+    /**
+     * 重新加载
+     * @param $dir
+     */
+    public function codeUpdata()
+    {
+        $array = $this->dConfig->codeUpdata;
+        output(ROOT_DIR, 'codeUpdata');
+
+        // 初始化inotify句柄
+        $this->inotify_fd = inotify_init();
+        // 设置为非阻塞
+        stream_set_blocking($this->inotify_fd, 0);
+
+
+        foreach ($array as $dir) {
+            $this->codeUpdateCall(ROOT_DIR . $dir);
+        }
+        //加入到swoole的事件循环中
+        $re = swoole_event_add($this->inotify_fd, [$this, 'inotify_reload']);
+        output($re, 230);
+    }
+
+    /**
+     * 更新代码的执行部分
+     * @param $timer_id
+     * @param $dir
+     */
+    private function codeUpdateCall($dir)
+    {
+        // 监控的目录，默认是Applications
+        $monitor_dir = realpath($dir);
+
+        // 递归遍历目录里面的文件
+        $dir_iterator = new \RecursiveDirectoryIterator($monitor_dir);
+        $iterator = new \RecursiveIteratorIterator($dir_iterator);
+        foreach ($iterator as $file) {
+            output(pathinfo($file), 222);
+            // 只监控php文件
+            if (pathinfo($file, PATHINFO_EXTENSION) != 'php') {
+                continue;
+            }
+            // 把文件加入inotify监控，这里只监控了IN_MODIFY文件更新事件
+            $wd = inotify_add_watch($this->inotify_fd, $file, IN_MODIFY);
+        }
+
+
+    }
 
     /**
      * 准备判断事件,可以再这个事件内判断应用是否准备完毕
@@ -180,14 +229,16 @@ class Server extends Base
 
     }
 
-
-    /**
-     * 重新加载
-     * @param $dir
-     */
-    public function codeUpdata()
+    public function inotify_reload()
     {
-        $this->swoole_server->task('codeUpdata');
+        $events = inotify_read($this->inotify_fd);
+        if ($events) {
+            foreach ($events as $event) {
+                echo "inotify Event :" . var_export($event, 1) . "\n";
+                echo "关闭系统!自动重启!";
+                $this->swoole_server->shutdown();
+            }
+        }
     }
 
 

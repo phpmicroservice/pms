@@ -40,51 +40,20 @@ class Session
         $this->session_id = $sid;
         $this->session_key = $this->option['prefix'] . $sid;
         $this->data = $this->sessionCache->get($this->session_key);
-        output($this->data, 'session_init');
+        Output::debug($this->data, 'session_init');
         if (empty($this->data)) {
             $this->data = [];
         }
     }
 
     /**
-     * 获取内容
-     * @param $index
-     * @param null $default
-     * @return null
+     * 储存
      */
-    public function get($index, $default = null)
+    public function reserve()
     {
-        return $this->data[$index] ?? $default;
-    }
-
-    /**
-     * 设置内容
-     * @param $index
-     * @param $value
-     */
-    public function set($index, $value)
-    {
-        $this->data[$index] = $value;
-        return $this->reserve();
-    }
-
-    /**
-     * 判断索引是否存在
-     * @param $index
-     * @return bool
-     */
-    public function has($index)
-    {
-        return isset($this->data[$index]);
-    }
-
-    /**
-     * 移除一个索引
-     * @param $index
-     */
-    public function remove($index)
-    {
-        unset($this->data[$index]);
+        Output::debug($this->data, 'session_reserve');
+        $this->data['save_time'] = time();
+        $this->sessionCache->save($this->session_key, $this->data, $this->option['lifetime']);
     }
 
     /**
@@ -116,16 +85,6 @@ class Session
     }
 
     /**
-     * 储存
-     */
-    public function reserve()
-    {
-        Output::debug($this->data, 'session_reserve');
-        $this->data['save_time'] = time();
-        $this->sessionCache->save($this->session_key, $this->data, $this->option['lifetime']);
-    }
-
-    /**
      * 更新数据
      */
     public function update()
@@ -153,7 +112,6 @@ class Session
         unset($this->data[$key]);
     }
 
-
     /**
      * Alias: Gets a session variable from an application context
      */
@@ -171,11 +129,43 @@ class Session
     }
 
     /**
+     * 获取内容
+     * @param $index
+     * @param null $default
+     * @return null
+     */
+    public function get($index, $default = null)
+    {
+        return $this->data[$index] ?? $default;
+    }
+
+    /**
+     * 设置内容
+     * @param $index
+     * @param $value
+     */
+    public function set($index, $value)
+    {
+        $this->data[$index] = $value;
+        return $this->reserve();
+    }
+
+    /**
      * Alias: Check whether a session variable is set in an application context
      */
     public function __isset(string $index)
     {
         return $this->has($index);
+    }
+
+    /**
+     * 判断索引是否存在
+     * @param $index
+     * @return bool
+     */
+    public function has($index)
+    {
+        return isset($this->data[$index]);
     }
 
     /**
@@ -188,6 +178,15 @@ class Session
     public function __unset(string $index)
     {
         $this->remove($index);
+    }
+
+    /**
+     * 移除一个索引
+     * @param $index
+     */
+    public function remove($index)
+    {
+        unset($this->data[$index]);
     }
 
     /**

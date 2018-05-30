@@ -43,7 +43,7 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
     {
         $messages = '';
         foreach (parent::getMessages() as $message) {
-            $messages .= $message->getMessage() . '<br />';
+            $messages .= $message->getMessage() . ' ';
         }
         return $messages;
     }
@@ -91,6 +91,19 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
     //获取所有的 错误信息
 
     /**
+     * Appends a message to the messages list
+     */
+    public function appendMessage(\Phalcon\Validation\MessageInterface $message): Validation
+    {
+        if ($this->_messages) {
+            $messages = new Validation\Message\Group();
+        }
+        $messages->appendMessage($message);
+        $this->_messages = $messages;
+        return $this;
+    }
+
+    /**
      *
      * 重复的验证规则解析
      */
@@ -109,18 +122,5 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
                 }
             }
         }
-    }
-
-    /**
-     * Appends a message to the messages list
-     */
-    public function appendMessage(\Phalcon\Validation\MessageInterface $message): Validation
-    {
-        if ($this->_messages) {
-            $messages = new Validation\Message\Group();
-        }
-        $messages->appendMessage($message);
-        $this->_messages = $messages;
-        return $this;
     }
 }

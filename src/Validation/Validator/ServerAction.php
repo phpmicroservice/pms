@@ -44,13 +44,8 @@ class ServerAction extends Validator
             return $this->appendMessage($validation, $attribute);
         }
 
-        $re = $this->proxyCS->send_recv([
-            's' => $sername,
-            'r' => $actionname,
-            'd' => $data,
-            'accessKey' => \get_access(get_env($sername . '_APP_SECRET_KEY'), $data, SERVICE_NAME)
-        ]);
-
+        $re = $this->proxyCS->request_return($sername, $actionname, $data);
+        output([$re, $sername, $actionname, $data], 'ServerAction');
         if ($re === false || $re['e']) {
             # 请求遇到错误!
             $this->type = 'request_error';

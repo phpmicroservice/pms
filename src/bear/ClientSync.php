@@ -30,7 +30,7 @@ class ClientSync extends \pms\Base
     {
         $this->server_ip = $ip;
         $this->server_port = $port;
-
+        output([$ip, $port], 'ClientSync');
         $this->swoole_client = new \Swoole\Client(SWOOLE_SOCK_TCP);
         $this->swoole_client->set($this->option);
         if (!$this->swoole_client->connect($this->server_ip, $this->server_port, $timeout)) {
@@ -84,6 +84,15 @@ class ClientSync extends \pms\Base
         return \swoole_serialize::pack($data) . PACKAGE_EOF;
     }
 
+    public function ask_recv($server, $router, $data)
+    {
+        return $this->send_recv([
+            's' => $server,
+            'r' => $router,
+            'd' => $data
+        ]);
+    }
+
     /**
      * 发送并接受返回
      * @param $data
@@ -92,6 +101,28 @@ class ClientSync extends \pms\Base
     {
         $this->send($data);
         return $this->recv();
+    }
+
+    /**
+     * 接收数据
+     * @return array
+     */
+    public function recv()
+    {
+        $string = $this->swoole_client->recv();
+        \pms\Output::debug($this->swoole_client->errCode, 'send_recv_e');
+        $data2 = $this->decode($string);
+        \pms\Output::debug($data2, 'recvs');
+        return $data2;
+    }
+
+    /**
+     * 解码
+     * @param $string
+     */
+    private function decode($string): array
+    {
+        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
     }
 
     /**
@@ -107,31 +138,9 @@ class ClientSync extends \pms\Base
             's' => $sername,
             'r' => $router,
             'd' => $data,
-            'accessKey' => \get_access(get_env($sername . '_APP_SECRET_KEY'), $data, SERVICE_NAME)
+            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, SERVICE_NAME)
         ]);
 
-    }
-
-
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($string): array
-    {
-        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
-    }
-
-    /**
-     * 接收数据
-     * @return array
-     */
-    public function recv()
-    {
-        $string = $this->swoole_client->recv();
-        \pms\Output::debug($string, 'send_recv');
-        \pms\Output::debug($this->swoole_client->errCode, 'send_recv_e');
-        return $this->decode($string);
     }
 
     /**

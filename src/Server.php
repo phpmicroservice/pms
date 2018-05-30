@@ -148,7 +148,11 @@ class Server extends Base
             $server->wkinit = true;
             # 热更新
             if (get_envbl('APP_CODEUPDATE', true)) {
-                $this->codeUpdata();
+                if (get_envbl('codeUpdata_inotify', false)) {
+                    $this->codeUpdata_inotify();
+                } else {
+                    \swoole_timer_tick(10000, [$this, 'codeUpdata']);
+                }
             }
 
             # 应用初始化
@@ -159,11 +163,13 @@ class Server extends Base
     }
 
     /**
-     * 重新加载
+     * 代码热更新inotify 版本
      * @param $dir
      */
-    public function codeUpdata()
+    public function codeUpdata_inotify()
     {
+
+
         $array = $this->dConfig->codeUpdata;
         output(ROOT_DIR, 'codeUpdata');
 
@@ -227,6 +233,15 @@ class Server extends Base
         \pms\Output::debug('readySucceed', 'readySucceed');
         $this->eventsManager->fire($this->name . ':readySucceed', $this, $this->swoole_server);
 
+    }
+
+    /**
+     * 代码热更新
+     * @param $dir
+     */
+    public function codeUpdata()
+    {
+        $this->swoole_server->task('codeUpdata');
     }
 
     public function inotify_reload()

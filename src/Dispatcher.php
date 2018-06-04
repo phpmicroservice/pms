@@ -27,6 +27,16 @@ class Dispatcher extends CliDispatcher
     public $connect;
     public $session;
 
+
+    /**
+     * 设置连接对象
+     * @param Counnect $connect
+     */
+    public function setConnect(bear\Counnect $connect)
+    {
+        $this->connect = $connect;
+    }
+
     /**
      * Process the results of the router by calling into the appropriate controller action(s)
      * including any routing data or injected parameters.
@@ -91,12 +101,10 @@ class Dispatcher extends CliDispatcher
             $this->_resolveEmptyProperties();
 
             if ($hasEventsManager) {
-
                 // Calling "dispatch:beforeDispatch" event
                 if ($eventsManager->fire("dispatch:beforeDispatch", $this) === false || $this->_finished === false) {
                     continue;
                 }
-
             }
 
             $handlerClass = $this->getHandlerClass();
@@ -112,16 +120,8 @@ class Dispatcher extends CliDispatcher
 
             // If the service can be loaded we throw an exception
             # 如果服务不可以加载，我们抛出一个异常。
-            if (!$hasService) {
-                $status = $this->{"_throwDispatchException"}($handlerClass . " handler class cannot be loaded", self::EXCEPTION_HANDLER_NOT_FOUND);
-                if ($status === false && $this->_finished === false) {
-                    continue;
-                }
-                break;
-            }
 
-            if (!class_exists($handlerClass)) {
-
+            if (!class_exists($handlerClass) || !$hasService) {
                 if ($hasEventsManager) {
                     if ($eventsManager->fire("dispatch:beforeNotFoundHandler", $this) === false) {
                         continue;
@@ -197,7 +197,8 @@ class Dispatcher extends CliDispatcher
 
                 break;
             }
-
+            # 设置连接对象
+            $handler->connect = $this->connect;
             // 为了确保initialize（）被调用，我们将销毁当前的handlerClass
             // 如果发生错误，并且我们继续从该容器中取出，则从DI容器中取出。 这个
             // 是必要的，因为在实例的检索和执行之间是不相容的
@@ -205,7 +206,6 @@ class Dispatcher extends CliDispatcher
             // 在beforeExecuteRoute之前放置initialize（），这将解决这个问题。 但是，为了保持后代，并保持一致性，我们将确保默认和记录的行为正常工作。
 
             if ($hasEventsManager) {
-
                 // Calling "dispatch:beforeExecuteRoute" event
                 if ($eventsManager->fire("dispatch:beforeExecuteRoute", $handler) === false || $this->_finished === false) {
 
@@ -355,6 +355,7 @@ class Dispatcher extends CliDispatcher
         if ($this->session) {
             $this->session->reserve();
         }
+        output('销毁调度器', '__destruct');
     }
 
 }

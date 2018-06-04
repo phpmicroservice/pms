@@ -23,7 +23,8 @@ class Controller extends \Phalcon\Di\Injectable
 
     }
 
-    // 初始化事件
+
+// 初始化事件
     public function initialize()
     {
     }

@@ -2,7 +2,11 @@
 
 namespace pms;
 
+use Phalcon\Events\Event;
 use Phalcon\Events\ManagerInterface;
+use Phalcon\Exception;
+use Phalcon\Cli\Dispatcher\Exception as DispatchException;
+
 
 /**
  * App类,主管应用的产生调度
@@ -10,8 +14,8 @@ use Phalcon\Events\ManagerInterface;
 class App extends Base
 {
 
-    private $config_init;
     protected $name = 'App';
+    private $config_init;
 
     public function init(\Swoole\Server $server)
     {
@@ -49,25 +53,6 @@ class App extends Base
     }
 
     /**
-     * 解码
-     * @param $string
-     */
-    private function decode($string): array
-    {
-        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
-    }
-
-    /**
-     * 编码
-     * @param array $data
-     * @return string
-     */
-    private function encode(array $data): string
-    {
-        return \swoole_serialize::pack($data) . PACKAGE_EOF;
-    }
-
-    /**
      * 数据接受的回调,信息已经处理
      * @param $server
      * @param $fd
@@ -86,14 +71,7 @@ class App extends Base
         $dispatcher->setDi($this->di);
         $dispatcher->setActionSuffix('');
         $dispatcher->setTaskSuffix('');
-
-        $this->eventsManager->attach('dispatch:beforeDispatchLoop', function ($Event, $dispatch) use ($connect) {
-            $dispatch->connect = $connect;
-        });
-
-        $this->eventsManager->attach('dispatch:beforeExecuteRoute', function ($Event, $handle, $app) use ($connect) {
-            $handle->connect = $connect;
-        });
+        $dispatcher->setConnect($connect);
         $dispatcher->setEventsManager($this->eventsManager);
         output([
             'n' => $router->getNamespaceName(),
@@ -110,6 +88,14 @@ class App extends Base
 
     }
 
+    /**
+     * 解码
+     * @param $string
+     */
+    private function decode($string): array
+    {
+        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
+    }
 
     /**
      * upd 收到数据
@@ -121,7 +107,6 @@ class App extends Base
     {
         $this->eventsManager->fire($this->name . ":onPacket", $this, [$data, $client_info]);
     }
-
 
     /**
      * 当缓存区达到最高水位时触发此事件。
@@ -143,7 +128,6 @@ class App extends Base
         $this->eventsManager->fire($this->name . ":onBufferEmpty", $this, $fd);
     }
 
-
     /**
      * 链接关闭 的回调函数
      * @param \Swoole\Server $server
@@ -155,5 +139,15 @@ class App extends Base
         output([$fd, $reactor_id], 'close');
         $this->eventsManager->fire($this->name . ":onClose", $this, [$fd, $reactor_id]);
 
+    }
+
+    /**
+     * 编码
+     * @param array $data
+     * @return string
+     */
+    private function encode(array $data): string
+    {
+        return \swoole_serialize::pack($data) . PACKAGE_EOF;
     }
 }

@@ -9,7 +9,7 @@ use pms\Validation\Validator;
  * Class ServerAction
  *
  * @option=[
- *    "server_action"=>"f服务名字 "
+ *    "server_action"=>"服务名字@路由地址"
  * ]
  * @property \pms\bear\ClientSync $proxyCS
  * @package app\validator

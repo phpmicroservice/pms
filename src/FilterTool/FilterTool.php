@@ -27,12 +27,12 @@ class FilterTool
 
 
     /**
-     * ����
-     * @param array $data ����,���ô���
-     * @param bool $old �Ƿ���Ҫ������
+     * 过滤数据
+     * @param array $data 原始数据
+     * @param bool $old 是否合并旧数据?
      * @return array
      */
-    public function filter(array &$data, $old = false)
+    public function filter(array &$data, bool $old = false)
     {
         $newarr = [];
         foreach ($this->_Rules as $filter1) {

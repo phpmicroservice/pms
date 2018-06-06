@@ -1,8 +1,6 @@
 <?php
 
-
 namespace pms;
-
 
 class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwareInterface
 {
@@ -43,7 +41,7 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
     {
         $messages = '';
         foreach (parent::getMessages() as $message) {
-            $messages .= $message->getMessage() . ' ';
+            $messages .= $message->getMessage() . ' & ';
         }
         return $messages;
     }

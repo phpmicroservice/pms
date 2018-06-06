@@ -28,6 +28,12 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
      */
     public function validate($data = null, $entity = null)
     {
+        output($data, 'validation_data');
+        if (method_exists($this, "beforeValidation1")) {
+            if ($this->beforeValidation1($data) === false) {
+                return false;
+            }
+        }
 
         $message = parent::validate($data, $entity);
         if ($message->count()) {
@@ -37,13 +43,13 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
     }
 
 
-    public function getErrorMessages(): string
+    public function getErrorMessages($prefix = ''): string
     {
         $messages = '';
         foreach (parent::getMessages() as $message) {
-            $messages .= $message->getMessage() . ' & ';
+            $messages .= $prefix . $message->getField() . '-' . $message->getType() . '-' . $message->getMessage() . ' & ';
         }
-        return $messages;
+        return trim($messages, ' & ');
     }
 
     /**

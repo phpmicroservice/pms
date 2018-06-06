@@ -53,7 +53,7 @@ class ServerAction extends Validator
         }
         if (!$re['d']) {
             # 返回结果是false
-            $this->type = $this->message;
+            $this->type = $this->message ? $this->message : 'data';
             return $this->appendMessage($validation, $attribute);
         }
         return true;

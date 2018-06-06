@@ -2,12 +2,16 @@
 
 namespace pms\Validation\Validator;
 
-use core\CoreModel;
-
 
 /**
- * 状态判断
- * Class whereValidator
+ * 状态判断 判断数据是否是期望的数据
+ * Class StatusValidator
+ * model 模型名字
+ * by 根据那个字段(数据库)
+ * by_index 根绝那个值(数据)
+ * status 键值对 [ 要验证的状态的数据库字段 => 期望的状态值 ]
+ *
+ * 存在与期望值不一样的即验证不通过
  * @package pms\Validation\Validator
  */
 class StatusValidator extends \pms\Validation\Validator
@@ -22,9 +26,7 @@ class StatusValidator extends \pms\Validation\Validator
     {
         $model_name = $this->getOption('model', null);
         if (is_string($model_name)) {
-
         } else {
-
             $this->type = 'model';
             return $this->appendMessage($validation, $attribute);
         }
@@ -38,13 +40,12 @@ class StatusValidator extends \pms\Validation\Validator
             return $this->appendMessage($validation, $attribute);
         }
         $status = $this->getOption('status', []);
+
         foreach ($status as $status_key => $status_val) {
             $m_value = $model_info->$status_key;
-            $d_vcal = $validation->getValue($status_val);
-            if ($m_value == $d_vcal) {
-                return true;
+            if ($m_value == $status_val) {
             } else {
-
+                output([$m_value, $status_val], 'status');
                 $this->type = "key-" . $status_key;
                 return $this->appendMessage($validation, $attribute);
             }

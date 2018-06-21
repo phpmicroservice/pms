@@ -12,10 +12,10 @@ class Counnect
 {
     public $swoole_server;
     public $request;
+    protected $name = 'Counnect';
     private $fd;
     private $reactor_id;
     private $passing = false;
-    protected $name = 'Counnect';
 
     public function __construct(\swoole_server $server, int $fd, int $reactor_id, array $data)
     {
@@ -58,19 +58,6 @@ class Counnect
     }
 
     /**
-     * 想客户端发送数据
-     * @param array $data
-     */
-    private function send(array $data)
-    {
-        if ($this->passing) {
-            $data['p'] = $this->passing;
-        }
-        $data['f']=SERVICE_NAME;
-        return $this->swoole_server->send($this->fd, \swoole_serialize::pack($data) . PACKAGE_EOF);
-    }
-
-    /**
      * 发送一个错误的消息
      * @param $m 错误消息
      * @param array $d 错误数据
@@ -89,14 +76,36 @@ class Counnect
     }
 
     /**
+     * 获取路由
+     * @return mixed
+     */
+    public function getRouter()
+    {
+        return $this->request['r'];
+    }
+
+    /**
+     * 想客户端发送数据
+     * @param array $data
+     */
+    private function send(array $data)
+    {
+        if ($this->passing) {
+            $data['p'] = $this->passing;
+        }
+        $data['f'] = strtolower(SERVICE_NAME);
+        return $this->swoole_server->send($this->fd, \swoole_serialize::pack($data) . PACKAGE_EOF);
+    }
+
+    /**
      * 发送一个请求
      * @param $router
      * @param $data
      * @return bool
      */
-    public function send_ask($router,$data)
+    public function send_ask($router, $data)
     {
-        return $this->send( [
+        return $this->send([
             'r' => $router,
             'd' => $data
         ]);
@@ -116,15 +125,6 @@ class Counnect
             't' => empty($t) ? $this->getRouter() : $t
         ];
         return $this->send($data);
-    }
-
-    /**
-     * 获取路由
-     * @return mixed
-     */
-    public function getRouter()
-    {
-        return $this->request['r'];
     }
 
     /**

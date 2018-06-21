@@ -70,7 +70,7 @@ class ClientSync extends \pms\Base
      */
     public function send(array $data)
     {
-        $data['f'] = $data['f'] ?? SERVICE_NAME;
+        $data['f'] = $data['f'] ?? strtolower(SERVICE_NAME);
         return $this->swoole_client->send($this->encode($data));
     }
 
@@ -138,7 +138,7 @@ class ClientSync extends \pms\Base
             's' => $sername,
             'r' => $router,
             'd' => $data,
-            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, SERVICE_NAME)
+            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
         ]);
 
     }

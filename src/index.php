@@ -4,13 +4,22 @@
 # 设置php常用配置
 date_default_timezone_set("PRC");
 # 加载函数库
-require __DIR__.'/function.php';
+require __DIR__ . '/function.php';
 # 设置 常量
-defined('SERVICE_NAME') || define('SERVICE_NAME', ROOT_DIR . '/runtime/');# 设置服务器名字
 
 defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
 define('PMS_DIR', __DIR__);
-defined('SERVICE_NAME') || define('SERVICE_NAME', ROOT_DIR);# 设置服务器名字
+# 设置服务器名字
+if (!defined('SERVICE_NAME')) {
+    if (defined('APP_SERVICE_NAME')) {
+        define('SERVICE_NAME', APP_SERVICE_NAME);
+    } else {
+        define('SERVICE_NAME', get_env('APP_SERVICE_NAME', uniqid()));
+    }
+}
+echo "SERVICE_NAME : " . SERVICE_NAME . " \n";
+
+
 defined('RUNTIME_DIR') || define('RUNTIME_DIR', ROOT_DIR . '/runtime/');# 运行目录
 defined('CACHE_DIR') || define('CACHE_DIR', ROOT_DIR . '/runtime/cache/');# 缓存目录
 defined('APP_DEBUG') || define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启
@@ -23,11 +32,10 @@ defined('OUTPUT_PMS') || define('OUTPUT_PMS', get_envbl("OUTPUT_PMS", 1));# noti
 defined('NO_OUTPUT') || define('NO_OUTPUT', get_envbl("NO_OUTPUT", 1));# notice级别的输出 的开启
 
 
-
 defined('PACKAGE_EOF') || define('PACKAGE_EOF', '_pms_');
 define('START_TIME', time());
 
-echo '项目目录为:' . ROOT_DIR  .',pms目录为:' . PMS_DIR . " \n";
+echo '项目目录为:' . ROOT_DIR . ',pms目录为:' . PMS_DIR . " \n";
 
 # 服务的地址和端口
 if (empty(get_env("APP_HOST_IP"))) {

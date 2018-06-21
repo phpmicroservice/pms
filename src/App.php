@@ -29,6 +29,38 @@ class App extends Base
 
     }
 
+
+    /**
+     * http请求收到
+     */
+    public function onRequest(\swoole_http_request $request, \swoole_http_response $response)
+    {
+        output([$request->get, $request->server, $request->post]);
+
+        require ROOT_DIR . '/app/di.php';
+        //require ROOT_DIR . '/config/services.php';
+        $application = new \Phalcon\Mvc\Application();
+        require ROOT_DIR . "/app/modules.php";
+        $application->setDI($di);
+        try {
+
+            $re = $application->handle($request->server['request_uri']);
+            if ($di['response'] instanceof \Phalcon\Http\Response) {
+                output([$di['response']->getHeaders(), $di['response']->getStatusCode(),
+                    strlen($di['response']->getContent()), $di['response']->getCookies()]);
+            }
+
+            $response->status($di['response']->getStatusCode());
+            $response->end($di['response']->getContent());
+            //$response->header($re->getHeaders());
+        } catch (\Exception $e) {
+            $response->end($di['response']->getContent());
+
+        }
+
+    }
+
+
     /**
      * 产生链接的回调函数
      */

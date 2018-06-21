@@ -14,18 +14,15 @@ use Phalcon\Events\ManagerInterface;
  * @property \Swoole\Server $swoole_server;
  * @package pms
  */
-class Server extends Base
+class HttpServer extends Base
 {
     public $swoole_server;
     public $channel;
-    protected $name = 'Server';
-    protected $inotify_fd;
-    private $task;
-    private $work;
+    protected $name = 'HttpServer';
     private $app;
     private $logo;# 热更新用
     private $d_option = [
-        'task_worker_num' => 4,
+        'task_worker_num' => 2,
         'open_eof_split' => true, //打开EOF检测
         'package_eof' => PACKAGE_EOF, //设置EOF
     ];
@@ -40,15 +37,20 @@ class Server extends Base
      * @param $tcp
      * @param array $option
      */
-    public function __construct($ip, $port, $mode, $tcp, $option = [])
+    public function __construct($ip, $port, $option = [])
     {
 //        $this->logo = require 'logo.php';
         # 加载依赖注入
         require ROOT_DIR . '/app/di.php';
-        $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
+        $this->gCache->save('WKINIT', 0);
+        $this->swoole_server = new \Swoole\Http\Server($ip, $port);
+        $this->swoole_server->set([
+            'enable_static_handler' => true,
+            'document_root' => PUBLIC_PATH
+        ]);
+        $this->swoole_server->set(array_merge($this->d_option, $option));
         parent::__construct($this->swoole_server);
         # 设置运行参数
-        $this->swoole_server->set(array_merge($this->d_option, $option));
         $this->task = new  Task($this->swoole_server);
         $this->work = new Work($this->swoole_server);
         $this->app = new App($this->swoole_server);
@@ -56,8 +58,7 @@ class Server extends Base
         $this->workCall();
         # 注册链接回调函数
         $this->tcpCall();
-        $this->swoole_server->wkinit = false;
-        $this->swoole_server->channel = new \Swoole\Channel(1024 * 1024 * 128);# 128M
+
     }
 
     /**
@@ -65,27 +66,15 @@ class Server extends Base
      */
     private function workCall()
     {
-
+        #任务相关
         $this->swoole_server->on('Task', [$this->task, 'onTask']);
         $this->swoole_server->on('Finish', [$this->work, 'onFinish']);
+
+
         # 主进程启动
         $this->swoole_server->on('Start', [$this, 'onStart']);
-        # 正常关闭
-        $this->swoole_server->on('Shutdown', [$this, 'onShutdown']);
         # Work/Task进程 启动
         $this->swoole_server->on('WorkerStart', [$this, 'onWorkerStart']);
-        # work进程停止
-        $this->swoole_server->on('WorkerStop', [$this->work, 'onWorkerStop']);
-        # work 进程退出
-        $this->swoole_server->on('WorkerExit', [$this->work, 'onWorkerExit']);
-        # 进程出错 work/task
-        $this->swoole_server->on('WorkerError', [$this, 'onWorkerError']);
-        # 收到管道消息
-        $this->swoole_server->on('PipeMessage', [$this, 'onPipeMessage']);
-        # 管理进程开启
-        $this->swoole_server->on('ManagerStart', [$this, 'onManagerStart']);
-        # 管理进程结束
-        $this->swoole_server->on('ManagerStop', [$this, 'onManagerStop']);
     }
 
     /**
@@ -94,12 +83,8 @@ class Server extends Base
     private function tcpCall()
     {
         # 设置连接回调
-        $this->swoole_server->on('Connect', [$this->app, 'onConnect']);
-        $this->swoole_server->on('Receive', [$this->app, 'onReceive']);
-        $this->swoole_server->on('Packet', [$this->app, 'onPacket']);
-        $this->swoole_server->on('Close', [$this->app, 'onClose']);
-        $this->swoole_server->on('BufferEmpty', [$this->app, 'onBufferEmpty']);
-        $this->swoole_server->on('BufferFull', [$this->app, 'onBufferFull']);
+        $this->swoole_server->on('Request', [$this->app, 'onRequest']);
+
     }
 
     /**
@@ -124,12 +109,13 @@ class Server extends Base
     }
 
     /**
-     *
-     * 此事件在Worker进程/Task进程启动时发生。
-     * 这里创建的对象可以在进程生命周期内使用
+     * 工作进程启动
+     * @param \Swoole\Server $server
+     * @param int $worker_id
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
+
         output('WorkerStart', 'onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';
@@ -143,7 +129,6 @@ class Server extends Base
             # 准备判断事件
             \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
-
         if (!$this->gCache->get('WKINIT') && !$server->taskworker) {
             output(133);
             $this->gCache->save('WKINIT', 1);
@@ -160,6 +145,7 @@ class Server extends Base
             $this->app->init($server, $worker_id);
 
         }
+
     }
 
     /**
@@ -209,8 +195,6 @@ class Server extends Base
             // 把文件加入inotify监控，这里只监控了IN_MODIFY文件更新事件
             $wd = inotify_add_watch($this->inotify_fd, $file, IN_MODIFY);
         }
-
-
     }
 
     /**
@@ -235,15 +219,6 @@ class Server extends Base
 
     }
 
-    /**
-     * 代码热更新
-     * @param $dir
-     */
-    public function codeUpdata()
-    {
-        $this->swoole_server->task('codeUpdata');
-    }
-
     public function inotify_reload()
     {
         $events = inotify_read($this->inotify_fd);
@@ -256,68 +231,14 @@ class Server extends Base
         }
     }
 
-
     /**
-     * 此事件在Server正常结束时发生
+     * 代码热更新
+     * @param $dir
      */
-    public function onShutdown(\Swoole\Server $server)
+    public function codeUpdata()
     {
-        output('onShutdown');
-        $this->eventsManager->fire($this->name . ':onShutdown', $this, $server);
-    }
-
-    /**
-     * 当工作进程收到由 sendMessage 发送的管道消息时会触发onPipeMessage事件。
-     * @param \Swoole\Server $server
-     * @param int $src_worker_id
-     * @param mixed $message
-     */
-    public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message)
-    {
-        $this->eventsManager->fire($this->name . ':onPipeMessage', $this, [$src_worker_id, $message]);
-        if ($server->taskworker) {
-            $this->task->onPipeMessage($server, $src_worker_id, $message);
-        } else {
-            $this->work->onPipeMessage($server, $src_worker_id, $message);
-        }
-    }
-
-    /**
-     * 当worker/task_worker进程发生异常后会在Manager进程内回调此函数。
-     * @param \Swoole\Server $server
-     * @param int $worker_id 是异常进程的编号
-     * @param int $worker_pid 异常进程的ID
-     * @param int $exit_code 退出的状态码，范围是 1 ～255
-     * @param int $signal 进程退出的信号
-     */
-    public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
-    {
-        return 1;
-        if ($server->taskworker) {
-            $this->task->onWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal);
-        } else {
-            $this->work->onWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal);
-        }
+        $this->swoole_server->task('codeUpdata');
     }
 
 
-    /**
-     * 当管理进程启动时调用它
-     * @param \Swoole\Server $server
-     */
-    public function onManagerStart(\Swoole\Server $server)
-    {
-        output('on ManagerStart');
-        $this->eventsManager->fire($this->name . ':onManagerStart', $this, $server);
-    }
-
-    /**
-     * 当管理进程结束时调用它
-     * @param \Swoole\Server $server
-     */
-    public function onManagerStop(\Swoole\Server $server)
-    {
-        output('on onManagerStop');
-        $this->eventsManager->fire($this->name . ':onManagerStop', $this, $server);
-    }
 }

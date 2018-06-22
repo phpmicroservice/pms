@@ -47,6 +47,7 @@ class Server extends Base
         require ROOT_DIR . '/app/di.php';
         $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
         parent::__construct($this->swoole_server);
+        $this->gCache->save('WKINIT', 0);
         # 设置运行参数
         $this->swoole_server->set(array_merge($this->d_option, $option));
         $this->task = new  Task($this->swoole_server);

@@ -11,12 +11,16 @@ defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
 define('PMS_DIR', __DIR__);
 # 设置服务器名字
 if (!defined('SERVICE_NAME')) {
-    if (defined('APP_SERVICE_NAME')) {
-        define('SERVICE_NAME', APP_SERVICE_NAME);
+    if (getenv('APP_SERVICE_NAME')) {
+        define('SERVICE_NAME', get_env('APP_SERVICE_NAME'));
     } else {
-        define('SERVICE_NAME', get_env('APP_SERVICE_NAME', uniqid()));
+        if (defined('APP_SERVICE_NAME')) {
+            define('SERVICE_NAME', APP_SERVICE_NAME);
+        }
+
     }
 }
+
 echo "SERVICE_NAME : " . SERVICE_NAME . " \n";
 
 

@@ -20,8 +20,13 @@ if (!defined('SERVICE_NAME')) {
 
     }
 }
+if (defined('SERVICE_NAME')) {
+    echo "SERVICE_NAME : " . SERVICE_NAME . " \n";
+} else {
+    echo "SERVICE_NAME : " . SERVICE_NAME . " \n";
+    exit();
+}
 
-echo "SERVICE_NAME : " . SERVICE_NAME . " \n";
 
 
 defined('RUNTIME_DIR') || define('RUNTIME_DIR', ROOT_DIR . '/runtime/');# 运行目录

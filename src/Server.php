@@ -42,12 +42,12 @@ class Server extends Base
      */
     public function __construct($ip, $port, $mode, $tcp, $option = [])
     {
-//        $this->logo = require 'logo.php';
+//      $this->logo = require 'logo.php';
         # 加载依赖注入
         require ROOT_DIR . '/app/di.php';
         $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
         parent::__construct($this->swoole_server);
-        $this->gCache->save('WKINIT', 0);
+        $this->gCache->save('WKINIT' . RUN_UNIQID, 0);
         # 设置运行参数
         $this->swoole_server->set(array_merge($this->d_option, $option));
         $this->task = new  Task($this->swoole_server);
@@ -145,9 +145,9 @@ class Server extends Base
             \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
 
-        if (!$this->gCache->get('WKINIT') && !$server->taskworker) {
+        if (!$this->gCache->get('WKINIT' . RUN_UNIQID) && !$server->taskworker) {
             output(133);
-            $this->gCache->save('WKINIT', 1);
+            $this->gCache->save('WKINIT' . RUN_UNIQID, 1);
             # 热更新
             if (get_envbl('APP_CODEUPDATE', true)) {
                 if (get_envbl('codeUpdata_inotify', false)) {

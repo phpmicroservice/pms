@@ -43,7 +43,7 @@ defined('NO_OUTPUT') || define('NO_OUTPUT', get_envbl("NO_OUTPUT", 1));# notice�
 
 defined('PACKAGE_EOF') || define('PACKAGE_EOF', '_pms_');
 define('START_TIME', time());
-
+defined('RUN_UNIQID') || define('RUN_UNIQID', uniqid());
 echo '项目目录为:' . ROOT_DIR . ',pms目录为:' . PMS_DIR . " \n";
 
 # 服务的地址和端口

@@ -60,3 +60,5 @@ if (empty(get_env("APP_HOST_PORT"))) {
     $host_port = get_env("APP_HOST_PORT");
 }
 define('APP_HOST_PORT', $host_port);
+
+echo '项目的访问地址为:' . APP_HOST_IP . ':' . APP_HOST_PORT . " \n";

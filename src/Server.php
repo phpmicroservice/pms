@@ -47,7 +47,7 @@ class Server extends Base
         require ROOT_DIR . '/app/di.php';
         $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
         parent::__construct($this->swoole_server);
-        $this->gCache->save('WKINIT' . RUN_UNIQID, 0);
+        $this->Cache->save('WKINIT', 0);
         # 设置运行参数
         $this->swoole_server->set(array_merge($this->d_option, $option));
         $this->task = new  Task($this->swoole_server);
@@ -134,7 +134,6 @@ class Server extends Base
         output('WorkerStart', 'onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';
-
         $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $server);
         if ($server->taskworker) {
             #task
@@ -145,9 +144,9 @@ class Server extends Base
             \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
 
-        if (!$this->gCache->get('WKINIT' . RUN_UNIQID) && !$server->taskworker) {
+        if (!$this->Cache->get('WKINIT') && !$server->taskworker) {
             output(133);
-            $this->gCache->save('WKINIT' . RUN_UNIQID, 1);
+            $this->Cache->save('WKINIT', 1);
             # 热更新
             if (get_envbl('APP_CODEUPDATE', true)) {
                 if (get_envbl('codeUpdata_inotify', false)) {

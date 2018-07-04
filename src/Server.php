@@ -149,7 +149,7 @@ class Server extends Base
             $this->cache->save('WKINIT', 1);
             # 热更新
             if (get_envbl('APP_CODEUPDATE', true)) {
-                if (get_envbl('codeUpdata_inotify', false)) {
+                if (get_envbl('CODEUPDATA_INOTIFY', false)) {
                     $this->codeUpdata_inotify();
                 } else {
                     \swoole_timer_tick(10000, [$this, 'codeUpdata']);

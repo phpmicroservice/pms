@@ -37,6 +37,16 @@ class Dispatcher extends CliDispatcher
         $this->connect = $connect;
     }
 
+
+    /**
+     * 设置连接对象
+     * @param Counnect $connect
+     */
+    public function setServer(\swoole\server $swoole_server)
+    {
+        $this->swoole_server = $swoole_server;
+    }
+
     /**
      * Process the results of the router by calling into the appropriate controller action(s)
      * including any routing data or injected parameters.
@@ -139,11 +149,10 @@ class Dispatcher extends CliDispatcher
             }
 
 
-            $handler = new $handlerClass();
+            $handler = new $handlerClass($this->swoole_server);
             if ($session_init) {
                 $handler->session = $session;
             }
-
             $wasFresh = true;
 
             // Handlers must be only objects

@@ -10,7 +10,7 @@ namespace pms;
  */
 class Task extends Base
 {
-    protected $name='Task';
+    protected $name = 'Task';
 
     /**
      * 在task_worker进程内被调用
@@ -26,6 +26,17 @@ class Task extends Base
         if ($data == 'codeUpdata') {
             $this->codeUpdata();
         }
+        if (is_array($data)) {
+            //数组的数据是要进行任务类调用
+            $name = $data['name'] ? $data['name'] : $data[0];
+            $class_name = 'app\\task\\' . ucfirst($name);
+            $handel = new $class_name($server,$data);
+            $handel->setTaskId($task_id);
+            $handel->setWorkId($src_worker_id);
+            return $handel->execute();
+        }
+
+
     }
 
     /**
@@ -81,7 +92,7 @@ class Task extends Base
     public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message)
     {
         output('onPipeMessage in task:');
-        $this->eventsManager->fire($this->name.':onPipeMessage', $this, [$src_worker_id, $message]);
+        $this->eventsManager->fire($this->name . ':onPipeMessage', $this, [$src_worker_id, $message]);
 
     }
 
@@ -94,7 +105,7 @@ class Task extends Base
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
         output($worker_id, 'onWorkerStart in task');
-        $this->eventsManager->fire($this->name.':onWorkerStart', $this, $worker_id);
+        $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $worker_id);
     }
 
     /**

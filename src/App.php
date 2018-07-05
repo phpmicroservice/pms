@@ -104,6 +104,7 @@ class App extends Base
         $dispatcher->setActionSuffix('');
         $dispatcher->setTaskSuffix('');
         $dispatcher->setConnect($connect);
+        $dispatcher->setServer($server);
         $dispatcher->setEventsManager($this->eventsManager);
         output([
             'n' => $router->getNamespaceName(),

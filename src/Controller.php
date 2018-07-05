@@ -10,6 +10,7 @@ use \pms\bear\Counnect;
  * @property \pms\bear\Counnect $connect
  * @property \pms\Session $session
  * @property \Phalcon\Config $dConfig
+ * @property \Swoole\Server $swoole_server;
  * @package pms
  */
 class Controller extends \Phalcon\Di\Injectable
@@ -18,9 +19,9 @@ class Controller extends \Phalcon\Di\Injectable
     public $connect;
     public $session;
 
-    public function __construct()
+    final public function __construct(\Swoole\Server $swoole_server)
     {
-
+        $this->swoole_server=$swoole_server;
     }
 
 

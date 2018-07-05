@@ -99,7 +99,11 @@ class ClientSync extends \pms\Base
      */
     public function send_recv($data)
     {
-        $this->send($data);
+
+        $re = $this->send($data);
+        if (!$re) {
+            return $re;
+        }
         return $this->recv();
     }
 
@@ -120,7 +124,7 @@ class ClientSync extends \pms\Base
      * 解码
      * @param $string
      */
-    private function decode($string): array
+    private function decode($string)
     {
         return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
     }

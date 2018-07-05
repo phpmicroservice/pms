@@ -145,7 +145,7 @@ class Server extends Base
         }
 
         if (!$this->cache->get('WKINIT') && !$server->taskworker) {
-            output(133);
+            output('init');
             $this->cache->save('WKINIT', 1);
             # 热更新
             if (get_envbl('APP_CODEUPDATE', true)) {

@@ -131,7 +131,7 @@ class ClientSync extends \pms\Base
     }
 
     /**
-     * 请求和返回
+     * 请求和返回,自动加秘钥
      * @param $sername
      * @param $router
      * @param $data
@@ -145,7 +145,23 @@ class ClientSync extends \pms\Base
             'd' => $data,
             'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
         ]);
+    }
 
+    /**
+     * 请求,自动加秘钥
+     * @param $sername
+     * @param $router
+     * @param $data
+     * @return mixed
+     */
+    public function request($sername, $router, $data)
+    {
+        return $this->send([
+            's' => $sername,
+            'r' => $router,
+            'd' => $data,
+            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
+        ]);
     }
 
     /**

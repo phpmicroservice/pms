@@ -187,7 +187,6 @@ class HttpServer extends Base
         $dir_iterator = new \RecursiveDirectoryIterator($monitor_dir);
         $iterator = new \RecursiveIteratorIterator($dir_iterator);
         foreach ($iterator as $file) {
-            output(pathinfo($file), 222);
             // 只监控php文件
             if (pathinfo($file, PATHINFO_EXTENSION) != 'php') {
                 continue;

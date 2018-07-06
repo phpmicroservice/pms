@@ -40,7 +40,6 @@ class Task
         $this->src_worker_id = $src_worker_id;
     }
 
-
     /**
      * 执行方法
      * @return mixed
@@ -68,6 +67,24 @@ class Task
         $data['task_id'] = $this->task_id;
         $data['time'] = $endFinishTime - $startFinishTime;
         return $data;
+    }
+
+    /**
+     * 获取任务的数据,并非传给swoole的真是数据
+     * @return mixed
+     */
+    protected function getData()
+    {
+        return $this->trueData['data']??$this->trueData[1];
+    }
+
+    /**
+     * 获取任务的name
+     * @return mixed
+     */
+    protected function getName()
+    {
+        return $this->trueData['name']??$this->trueData[0];
     }
 
 }

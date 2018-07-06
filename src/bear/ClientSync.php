@@ -56,9 +56,10 @@ class ClientSync extends \pms\Base
      * @param $data
      * @return bool
      */
-    public function send_ask($router, $data)
+    public function send_ask($server, $router, $data)
     {
         return $this->send([
+            's' => $server,
             'r' => $router,
             'd' => $data
         ]);

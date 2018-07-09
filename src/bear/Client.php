@@ -115,13 +115,14 @@ class Client extends \pms\Base
 
     /**
      * 发送一个请求
-     * @param $router _分隔符
+     * @param $router
      * @param $data
      * @return bool
      */
-    public function send_ask($router, $data)
+    public function send_ask($server, $router, $data)
     {
         return $this->send([
+            's' => $server,
             'r' => $router,
             'd' => $data
         ]);

@@ -144,7 +144,7 @@ class Server extends Base
             \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
 
-        if (!$this->cache->get('WKINIT') && !$server->taskworker) {
+        if ($worker_id > 4 && !$server->taskworker && !$this->cache->get('WKINIT')) {
             output('init');
             $this->cache->save('WKINIT', 1);
             # 热更新

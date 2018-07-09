@@ -58,30 +58,18 @@ class Counnect
     }
 
     /**
-     * 发送一个错误的消息
-     * @param $m 错误消息
-     * @param array $d 错误数据
-     * @param int $e 错误代码
-     * @param int $t 类型,路由
+     * 发送一个请求
+     * @param $router
+     * @param $data
+     * @return bool
      */
-    public function send_error($m, $d = [], $e = 1, $t = '')
+    public function send_ask($server, $router, $data)
     {
-        $data = [
-            'm' => $m,
-            'd' => $d,
-            'e' => $e,
-            't' => empty($t) ? $this->getRouter() : $t
-        ];
-        return $this->send($data);
-    }
-
-    /**
-     * 获取路由
-     * @return mixed
-     */
-    public function getRouter()
-    {
-        return $this->request['r'];
+        return $this->send([
+            's' => $server,
+            'r' => $router,
+            'd' => $data
+        ]);
     }
 
     /**
@@ -98,20 +86,6 @@ class Counnect
     }
 
     /**
-     * 发送一个请求
-     * @param $router
-     * @param $data
-     * @return bool
-     */
-    public function send_ask($router, $data)
-    {
-        return $this->send([
-            'r' => $router,
-            'd' => $data
-        ]);
-    }
-
-    /**
      * 发送一个成功
      * @param $m 消息
      * @param array $d 数据
@@ -122,6 +96,34 @@ class Counnect
         $data = [
             'm' => $m,
             'd' => $d,
+            'e' => 0,
+            't' => empty($t) ? $this->getRouter() : $t
+        ];
+        return $this->send($data);
+    }
+
+    /**
+     * 获取路由
+     * @return mixed
+     */
+    public function getRouter()
+    {
+        return $this->request['r'];
+    }
+
+    /**
+     * 发送一个错误的消息
+     * @param $m 错误消息
+     * @param array $d 错误数据
+     * @param int $e 错误代码
+     * @param int $t 类型,路由
+     */
+    public function send_error($m, $d = [], $e = 1, $t = '')
+    {
+        $data = [
+            'm' => $m,
+            'd' => $d,
+            'e' => $e,
             't' => empty($t) ? $this->getRouter() : $t
         ];
         return $this->send($data);

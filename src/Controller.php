@@ -11,6 +11,7 @@ use \pms\bear\Counnect;
  * @property \pms\Session $session
  * @property \Phalcon\Config $dConfig
  * @property \Swoole\Server $swoole_server;
+ * @property \Phalcon\Logger\AdapterInterface $logger
  * @package pms
  */
 class Controller extends \Phalcon\Di\Injectable

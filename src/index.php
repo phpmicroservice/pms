@@ -34,7 +34,7 @@ if (!is_dir(RUNTIME_DIR)) mkdir(RUNTIME_DIR, 775, true);
 defined('CACHE_DIR') || define('CACHE_DIR', RUNTIME_DIR . '/cache/');# 缓存目录
 if (!is_dir(CACHE_DIR)) mkdir(CACHE_DIR, 775, true);
 defined('LOG_DIR') || define('LOG_DIR', RUNTIME_DIR . 'log/');# 日志目录
-if (!is_dir(LOG_DIR)) mkdir(LOG_DIR, 775, true);
+if (!is_dir(LOG_DIR)) mkdir(LOG_DIR, 777, true);
 defined('APP_DEBUG') || define('APP_DEBUG', boolval(get_env("APP_DEBUG", 1)));# debug 的开启
 # 输出级别定义
 defined('OUTPUT_ERROR') || define('OUTPUT_ERROR', get_envbl("OUTPUT_ERROR", 1));# error级别的输出 的开启

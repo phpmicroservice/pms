@@ -42,6 +42,10 @@ class Server extends Base
      */
     public function __construct($ip, $port, $mode, $tcp, $option = [])
     {
+
+        $this->d_option['reactor_num'] = swoole_cpu_num() * ($option['reactor_num_mulriple']??2);
+        $this->d_option['worker_num'] = swoole_cpu_num() * ($option['worker_num_mulriple']??4);
+        $this->d_option['task_worker_num'] = swoole_cpu_num() * ($option['task_worker_num_mulriple']??16);
 //      $this->logo = require 'logo.php';
         # 加载依赖注入
         require ROOT_DIR . '/app/di.php';
@@ -131,10 +135,6 @@ class Server extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        $this->d_option['reactor_num'] = swoole_cpu_num() * 2;
-        $this->d_option['worker_num'] = swoole_cpu_num() * 4;
-        $this->d_option['task_worker_num'] = swoole_cpu_num() * 16;
-
         output('WorkerStart', 'onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';

@@ -20,7 +20,7 @@ class TxTask extends Task
             # 不存在xid 就是新发起的xa事务,需要请求tm进行事务创建
             $re = $proxyCS->request_return('tm',
                 '/service/create', [
-                    'server' => 'cms',
+                    'server' => SERVICE_NAME,
                 ]);
 
             if (!is_array($re) || $re['e'] || empty($re['d']['xid'])) {

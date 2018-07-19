@@ -55,8 +55,8 @@ function output($data, $msg = 'info')
  */
 function get_access($secret, &$data, $name = '')
 {
-    $data['uniqid58_'] = \funch\Str::rand(8);
-    return md5(md5($secret) . md5(serialize(asort($data))) . md5(strtolower($name)));
+    $data['uniqid58_'] = mt_rand(1000000, 99999999);
+    return md5($secret . md5(serialize(asort($data))) . md5(strtolower($name)));
 }
 
 
@@ -71,4 +71,15 @@ function get_access($secret, &$data, $name = '')
 function verify_access($accessKey, $secret, $data, $name = '')
 {
     return hash_equals(get_access($secret, $data, $name), $accessKey);
+}
+
+/**
+ * 获取子秘钥
+ * @param $accessKey 主密钥
+ * @param $name 子秘钥的名字
+ * @return string
+ */
+function sub_access($accessKey, $name)
+{
+    return hash('sha1', md5(md5($accessKey) . md5($name) . $accessKey) . $accessKey . $name);
 }

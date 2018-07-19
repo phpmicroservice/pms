@@ -3,9 +3,66 @@
 namespace pms\Task;
 
 
-class TxTask extends Task
+class TxTask
 {
     protected $dependency_data = [];
+    protected $swoole_server;
+    protected $trueData;
+    protected $data;
+    protected $task_id;
+    protected $src_worker_id;
+
+
+    public function __construct($swoole_server, $data)
+    {
+        $this->swoole_server = $swoole_server;
+        $this->trueData = $data;
+        $this->data = $data['data'] ? $data['data'] : $data[0];
+    }
+
+    /**
+     * 设置任务进程id
+     * @param $task_id
+     */
+    public function setTaskId($task_id)
+    {
+        $this->task_id = $task_id;
+    }
+
+    /**
+     * 设置任务进程id
+     * @param $task_id
+     */
+    public function setWorkId($src_worker_id)
+    {
+        $this->src_worker_id = $src_worker_id;
+    }
+
+    /**
+     * 执行方法
+     * @return mixed
+     */
+    final public function execute()
+    {
+        $startTime = microtime(true);
+        $re = $this->run();
+        $endTime = microtime(true);
+        $data = $this->trueData;
+        if ($re !== true) {
+            $tmdata = [
+                'xid' => $this->getXid(),
+                'server' => SERVICE_NAME
+            ];
+            $proxyCS = $this->getProxyCS();
+            $re56 = $proxyCS->request_return('tm', '/service/get_mes', $tmdata);
+            $data['message'] = $re56['d'];
+        }
+
+        $data['re'] = $re;
+        $data['task_id'] = $this->task_id;
+        $data['time'] = $endTime - $startTime;
+        return $data;
+    }
 
     public function run()
     {
@@ -27,7 +84,7 @@ class TxTask extends Task
                 # 通知事务协调器 依赖完成的过程出错!
                 # 出错的逻辑
                 $logger->info('task-AdemoTx-create: 创建全局事务失败! ' . var_export($re, true));
-                return false;
+                return '创建全局事务失败! ';
             }
 
             $this->trueData['xid'] = $re['d']['xid'];
@@ -45,7 +102,7 @@ class TxTask extends Task
 
         if (!$this->dependency()) {
             $logger->info('task-AdemoTx-add: 处理依赖失败');
-            return false;
+            return "处理依赖失败!";
         }
         # 处理依赖完成
         $re = $this->getProxyCS()->request_return('tm', '/service/dependency', $tmdata);
@@ -53,15 +110,20 @@ class TxTask extends Task
             # 通知事务协调器 依赖完成的过程出错!
             # 出错的逻辑
             $logger->info('task-AdemoTx-dependency: 处理依赖失败');
-            return false;
+            return "附加业务处理失败!";
         }
         # 启动事务
         $re = $db->query("XA START " . "'$gtrid','$bqual'");
 
+        $logicre = $this->logic();
+        if ($logicre !== true) {
 
-        if (!$this->logic()) {
             $logger->info('task-AdemoTx-logic: 业务逻辑失败 - ' . var_export($this->trueData));
             $db->query('XA END ' . "'$gtrid','$bqual'");
+            $tmdata['ems'] = [
+                'm' => $logicre,
+                't' => 'logic'
+            ];
             # 保存失败,直接通知事务协调器,事务不能继续
             $re = $this->getProxyCS()->request_return('tm', '/service/rollback', $tmdata);
             if (!is_array($re) || !$re['e']) {
@@ -72,7 +134,7 @@ class TxTask extends Task
             # 不管咋地这个事务都得回滚
             # 事务自动回滚
             $db->query('XA ROLLBACK ' . "'$gtrid','$bqual'");
-            return false;
+            return $logicre;
             #
         }
         $db->query('XA END ' . "'$gtrid','$bqual'");
@@ -84,8 +146,12 @@ class TxTask extends Task
             # 自动回滚
             $db->query('XA ROLLBACK ' . "'$gtrid','$bqual'");
             # 通知事务协调器 我要回滚了
+            $tmdata['ems'] = [
+                'm' => 'error',
+                't' => 'end'
+            ];
             $re72 = $this->getProxyCS()->request_return('tm', '/service/rollback', $tmdata);
-            return false;
+            return "本地事务END出错!";
 
         } else {
             # 成功的通知了 事务协调器
@@ -100,7 +166,7 @@ class TxTask extends Task
                 # 要回滚的逻辑
                 $logger->info('task-AdemoTx-PREPARE: 准备提交失败');
                 $db->query('XA ROLLBACK ' . "'$gtrid','$bqual'");
-                return false;
+                return "提交出错!";
             }
             # 进行提交
             $db->query('XA COMMIT ' . "'$gtrid','$bqual'");
@@ -109,8 +175,12 @@ class TxTask extends Task
         } catch (\PDOException $e) {
             $logger->info('task-AdemoTx-PDOException: 异常的失败.' . $e->getMessage());
             $db->query('XA ROLLBACK ' . "'$gtrid','$bqual'");
+            $tmdata['ems'] = [
+                'm' => $e->getMessage(),
+                't' => 'commit'
+            ];
             $re = $this->getProxyCS()->request_return('tm', '/service/rollback', $tmdata);
-            return false;
+            return "数据库异常:" . $e->getMessage();
         }
         return true;
     }
@@ -143,7 +213,7 @@ class TxTask extends Task
         $tmdata['data'] = $this->dependency_data;
         $re = $this->getProxyCS()->request_return('tm', '/service/add', $tmdata);
         if (!is_array($re) || $re['e']) {
-            return false;
+            return "附属业务失败!!";
         }
         return true;
     }
@@ -153,14 +223,49 @@ class TxTask extends Task
 
     }
 
-    protected function logic(): bool
+    protected function logic()
     {
         return false;
+    }
+
+    protected function getXid()
+    {
+        return $this->trueData['xid'];
+    }
+
+    final  public function finish()
+    {
+        $startFinishTime = microtime(true);
+        $re = $this->end();
+        $endFinishTime = microtime(true);
+        $data = $this->trueData;
+        $data['re'] = $re;
+        $data['task_id'] = $this->task_id;
+        $data['time'] = $endFinishTime - $startFinishTime;
+        return $data;
     }
 
     public function end()
     {
 
+    }
+
+    /**
+     * 获取任务的数据,并非传给swoole的真是数据
+     * @return mixed
+     */
+    protected function getData()
+    {
+        return $this->trueData['data']??$this->trueData[1];
+    }
+
+    /**
+     * 获取任务的name
+     * @return mixed
+     */
+    protected function getName()
+    {
+        return $this->trueData['name']??$this->trueData[0];
     }
 
     /**

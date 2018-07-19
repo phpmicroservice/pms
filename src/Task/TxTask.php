@@ -133,7 +133,7 @@ class TxTask extends Task
     /**
      * 处理依赖
      */
-    private function dependency()
+    protected function dependency()
     {
         $this->b_dependenc();
         $tmdata = [

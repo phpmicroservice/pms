@@ -245,7 +245,7 @@ trait Validation
     /**
      * 增加一个事务验证 transaction
      */
-    public function add_transaction($name = '')
+    public function add_transaction($name = '', $parameter = [])
     {
         $parameter['message'] = $parameter['message'] ?? 'transaction';
         $this->add($name, new \pms\Validation\Validator\transactionValidator());

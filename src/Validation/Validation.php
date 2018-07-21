@@ -222,7 +222,7 @@ trait Validation
         } else {
             # 验证器不存在
             throw new \Phalcon\Validation\Exception(
-                'add_Validator-Validator-not-exist', 500);
+                'add_Validator-Validator-not-exist:' . $parameter['name'], 500);
         }
     }
 

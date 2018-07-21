@@ -17,11 +17,12 @@ class App extends Base
     protected $name = 'App';
     private $config_init;
 
-    public function init(\Swoole\Server $server)
+    public function init(\Swoole\Server $server, $worker_id)
     {
 
         if ($this->dConfig->server_reg) {
             # 进行服务注册
+            $server->default_table->set('server_reg_worker_id', ['data' => $worker_id]);
             $this->config_init = new Register($server);
             $this->config_init->ping();
         }

@@ -3,6 +3,7 @@
 namespace pms;
 
 use Phalcon\Events\ManagerInterface;
+use Swoole\Table;
 
 /**
  * 服务启动
@@ -51,7 +52,7 @@ class Server extends Base
         require ROOT_DIR . '/app/di.php';
         $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
         parent::__construct($this->swoole_server);
-        $this->cache->save('WKINIT', 0);
+
         # 设置运行参数
         $this->swoole_server->set(array_merge($this->d_option, $option));
         $this->task = new  Task($this->swoole_server);
@@ -61,8 +62,10 @@ class Server extends Base
         $this->workCall();
         # 注册链接回调函数
         $this->tcpCall();
-        $this->swoole_server->wkinit = false;
-        $this->swoole_server->channel = new \Swoole\Channel(1024 * 1024 * 128);# 128M
+        # 这是通过swoole表格功能做一个简单的表,他们的具有原子性的
+        $this->swoole_server->default_table = new \Swoole\Table(1024, 0.2);#1024行
+        $this->swoole_server->default_table->column('data', Table::TYPE_INT, 4);
+        $this->swoole_server->default_table->create();
     }
 
     /**
@@ -123,6 +126,7 @@ class Server extends Base
      */
     public function onStart(\Swoole\Server $server)
     {
+        $this->swoole_server->default_table->set('WKINIT', ['data' => 0]);
         echo $this->logo;
         output('onStart');
         $this->eventsManager->fire($this->name . ':onStart', $this, $server);
@@ -148,22 +152,33 @@ class Server extends Base
             \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
 
-        if (!$server->taskworker && !$this->cache->get('WKINIT')) {
-            output('init');
-            $this->cache->save('WKINIT', 1);
-            # 热更新
-            if (get_envbl('APP_CODEUPDATE', true)) {
-                if (get_envbl('CODEUPDATA_INOTIFY', false)) {
-                    $this->codeUpdata_inotify();
-                } else {
-                    \swoole_timer_tick(10000, [$this, 'codeUpdata']);
-                }
-            }
-
-            # 应用初始化
-            $this->app->init($server, $worker_id);
-
+        if (!$server->taskworker && !$server->default_table->get('WKINIT', 'data')) {
+            $server->default_table->set('WKINIT', ['data' => 1]);
+            $server->default_table->set('initapp_worker_id', ['data' => $worker_id]);
+            $this->initapp($server, $worker_id);
         }
+    }
+
+
+    /**
+     * 初始化APP
+     * @param $server
+     * @param $worker_id
+     */
+    private function initapp($server, $worker_id)
+    {
+        output('init');
+        # 热更新
+        if (get_envbl('APP_CODEUPDATE', true)) {
+            if (get_envbl('CODEUPDATA_INOTIFY', false)) {
+                $this->codeUpdata_inotify();
+            } else {
+                \swoole_timer_tick(10000, [$this, 'codeUpdata']);
+            }
+        }
+
+        # 应用初始化
+        $this->app->init($server, $worker_id);
     }
 
     /**
@@ -296,7 +311,11 @@ class Server extends Base
      */
     public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {
-        return 1;
+        output('onWorkerError');
+        if ($server->default_table->get('initapp_worker_id', 'data') === $worker_id) {
+            # 初始化进程出错了
+            $server->stop($worker_id, true);
+        }
         if ($server->taskworker) {
             $this->task->onWorkerError($server, $worker_id, $worker_pid, $exit_code, $signal);
         } else {

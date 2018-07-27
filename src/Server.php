@@ -44,9 +44,9 @@ class Server extends Base
     public function __construct($ip, $port, $mode, $tcp, $option = [])
     {
 
-        $this->d_option['reactor_num'] = swoole_cpu_num() * ($option['reactor_num_mulriple']??2);
-        $this->d_option['worker_num'] = swoole_cpu_num() * ($option['worker_num_mulriple']??4);
-        $this->d_option['task_worker_num'] = swoole_cpu_num() * ($option['task_worker_num_mulriple']??16);
+        $this->d_option['reactor_num'] = swoole_cpu_num() * ($option['reactor_num_mulriple']??1);
+        $this->d_option['worker_num'] = swoole_cpu_num() * ($option['worker_num_mulriple']??2);
+        $this->d_option['task_worker_num'] = swoole_cpu_num() * ($option['task_worker_num_mulriple']??4);
 //      $this->logo = require 'logo.php';
         # 加载依赖注入
         require ROOT_DIR . '/app/di.php';

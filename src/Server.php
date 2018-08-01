@@ -314,6 +314,7 @@ class Server extends Base
         output('onWorkerError');
         if ($server->default_table->get('initapp_worker_id', 'data') === $worker_id) {
             # 初始化进程出错了
+            $server->default_table->set('WKINIT', ['data' => 0]);
             $server->stop($worker_id, true);
         }
         if ($server->taskworker) {

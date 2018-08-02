@@ -55,7 +55,18 @@ class TxTask
             ];
             $proxyCS = $this->getProxyCS();
             $re56 = $proxyCS->request_return('tm', '/service/get_mes', $tmdata);
-            $data['message'] = $re56['d'];
+            if (!$re56) {
+
+            } else {
+                $mes = '';
+                foreach ($re56['d'] as $value) {
+                    $mes .= $value['type'] . '-' .
+                        $value['message'] .
+                        '-' . $value['code'] .
+                        '-' . $value['server'] . ' & ';
+                }
+            }
+            $data['message'] = trim($mes, ' & ');
         }
 
         $data['re'] = $re;

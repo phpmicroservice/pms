@@ -115,10 +115,20 @@ class ClientSync extends \pms\Base
     public function recv()
     {
         $string = $this->swoole_client->recv();
-        \pms\Output::debug($this->swoole_client->errCode, 'send_recv_e');
-        $data2 = $this->decode($string);
-        \pms\Output::debug($data2, 'recvs');
-        return $data2;
+        if($string ===false){
+            $data2=[
+                'e'=>504,
+                'm'=>'gateway_timeout'
+            ];
+            \pms\Output::debug($data2, 'recvs');
+            return $data2;
+        }else{
+            \pms\Output::debug($this->swoole_client->errCode, 'send_recv_e');
+            $data2 = $this->decode($string);
+            \pms\Output::debug($data2, 'recvs');
+            return $data2;
+        }
+
     }
 
     /**

@@ -21,9 +21,9 @@ class Server extends Base
     public $channel;
     protected $name = 'Server';
     protected $inotify_fd;
-    private $task;
-    private $work;
-    private $app;
+    public $task;
+    public $work;
+    public $app;
     private $logo;# 热更新用
     private $d_option = [
         'task_worker_num' => 4,

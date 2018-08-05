@@ -40,6 +40,18 @@ class Controller extends \Phalcon\Di\Injectable
 
     }
 
+    /**
+     * 获取数据
+     * @param $pa
+     */
+    public function getData($name = '', $defind = null)
+    {
+        $d = $this->connect->getData();
+        if ($name) {
+            return $d[$name] ?? $defind;
+        }
+        return $d;
+    }
 
     /**
      * 西沟函数

@@ -46,6 +46,7 @@ class Task
      */
     final public function execute()
     {
+        \Phalcon\Di::getDefault()->get('db')->connect();
         $startTime = microtime(true);
         $re = $this->run();
         $endTime = microtime(true);
@@ -54,6 +55,7 @@ class Task
         $data['re'] = $re;
         $data['task_id'] = $this->task_id;
         $data['time'] = $endTime - $startTime;
+        \Phalcon\Di::getDefault()->get('db')->close();
         return $data;
     }
 

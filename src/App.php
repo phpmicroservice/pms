@@ -24,7 +24,6 @@ class App extends Base
             # 进行服务注册
             $server->default_table->set('server_reg_worker_id', ['data' => $worker_id]);
             $this->config_init = new Register($server);
-            $this->config_init->ping();
         }
         $this->eventsManager->fire($this->name . ":init", $this, $server);
 

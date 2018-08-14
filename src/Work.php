@@ -56,7 +56,7 @@ class Work extends Base
     {
         output($worker_id, 'onWorkerStart in work');
         $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $worker_id);
-        $this->swoole_server->tick(3600000,function($se,$fd){
+        $server->tick(3600000,function(){
             # SHOW ENGINES;
             var_dump(['SHOW ENGINES',$fd]);
             $db=\Phalcon\Di::getDefault()->get('db');

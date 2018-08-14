@@ -220,7 +220,6 @@ class Dispatcher extends CliDispatcher
 
                     continue;
                 }
-
             }
 
             if (method_exists($handler, "beforeExecuteRoute")) {

@@ -21,9 +21,9 @@
   ],
   "require": {
     "phpmicroservice/funch": "0.*",
-    "ext-swoole": ">=2.1",
-    "ext-phalcon": "3.1.*",
-    "php": ">7.1"
+    "ext-swoole": "4.*",
+    "ext-phalcon": "3.4.*",
+    "php": ">7.2"
   },
   "require-dev": {
     "eaglewu/swoole-ide-helper": "dev-master@dev"

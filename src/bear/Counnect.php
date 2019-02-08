@@ -82,7 +82,7 @@ class Counnect
             $data['p'] = $this->passing;
         }
         $data['f'] = strtolower(SERVICE_NAME);
-        return $this->swoole_server->send($this->fd, \swoole_serialize::pack($data) . PACKAGE_EOF);
+        return $this->swoole_server->send($this->fd, \swSerialize::pack($data) . PACKAGE_EOF);
     }
 
     /**

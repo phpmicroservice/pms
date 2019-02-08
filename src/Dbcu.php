@@ -37,6 +37,7 @@ class Dbcu extends \Phalcon\Di\Injectable
                 foreach ($fields as $field) {
                     $dropFields[] = $field->getName();
                 }
+                # 遍历修改字段
                 foreach ($table['field']['columns'] as $column) {
                     $save = false;
                     $fieldName = $column->getName();
@@ -74,10 +75,12 @@ class Dbcu extends \Phalcon\Di\Injectable
                 $this->dealIndex($indexes, $referenceIndexList, $primaryKey, $tableName, $schemaName, $dealPrimary);
 
                 continue;
+            } else {
+                #不存在某个表
+                $this->createTable($tableName, $table);
             }
 
-            #不存在某个表
-            $this->createTable($tableName, $table);
+            
         }
         var_dump('数据库处理结束');
     }

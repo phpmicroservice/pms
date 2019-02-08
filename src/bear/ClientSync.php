@@ -82,7 +82,7 @@ class ClientSync extends \pms\Base
      */
     private function encode(array $data): string
     {
-        return \swoole_serialize::pack($data) . PACKAGE_EOF;
+        return \swSerialize::pack($data) . PACKAGE_EOF;
     }
 
     public function ask_recv($server, $router, $data)
@@ -137,7 +137,7 @@ class ClientSync extends \pms\Base
      */
     private function decode($string)
     {
-        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
+        return \swSerialize::unpack(rtrim($string, PACKAGE_EOF));
     }
 
     /**

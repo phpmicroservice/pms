@@ -127,7 +127,7 @@ class App extends Base
      */
     private function decode($string): array
     {
-        return \swoole_serialize::unpack(rtrim($string, PACKAGE_EOF));
+        return \swSerialize::unpack(rtrim($string, PACKAGE_EOF));
     }
 
     /**
@@ -181,6 +181,6 @@ class App extends Base
      */
     private function encode(array $data): string
     {
-        return \swoole_serialize::pack($data) . PACKAGE_EOF;
+        return \swSerialize::pack($data) . PACKAGE_EOF;
     }
 }

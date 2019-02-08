@@ -23,6 +23,7 @@
     "phpmicroservice/funch": "0.*",
     "ext-swoole": "4.*",
     "ext-phalcon": "3.4.*",
+    "ext-swoole_serialize": "0.1.*",
     "php": ">7.2"
   },
   "require-dev": {

@@ -27,7 +27,8 @@
     "php": ">7.2"
   },
   "require-dev": {
-    "eaglewu/swoole-ide-helper": "dev-master@dev"
+    "eaglewu/swoole-ide-helper": "dev-master@dev",
+    "phalcon/ide-stubs": "v3.4.*"
   },
   "autoload": {
     "psr-4": {

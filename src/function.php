@@ -1,4 +1,7 @@
 <?php
+
+namespace pms;
+
 /**
  * 获取环境变量的方法
  * @param $name

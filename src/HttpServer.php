@@ -2,6 +2,8 @@
 
 namespace pms;
 
+require_once 'index.php';
+
 use Phalcon\Events\ManagerInterface;
 
 /**
@@ -21,11 +23,7 @@ class HttpServer extends Base
     protected $name = 'HttpServer';
     private $app;
     private $logo;# 热更新用
-    private $d_option = [
-        'task_worker_num' => 2,
-        'open_eof_split' => true, //打开EOF检测
-        'package_eof' => PACKAGE_EOF, //设置EOF
-    ];
+    private $d_option = SD_OPTION;
 
 
     /**

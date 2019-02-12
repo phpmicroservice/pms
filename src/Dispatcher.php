@@ -102,7 +102,7 @@ class Dispatcher extends CliDispatcher
             $numberDispatches++;
 
             // Throw an exception after 256 consecutive forwards
-            if (numberDispatches == 256) {
+            if ($numberDispatches == 256) {
                 $this->{"_throwDispatchException"}("Dispatcher has detected a cyclic routing causing stability problems", self::$EXCEPTION_CYCLIC_ROUTING);
                 break;
             }
@@ -254,7 +254,7 @@ class Dispatcher extends CliDispatcher
 
             // Calling afterBinding
             if ($hasEventsManager) {
-                if ($eventsManager->fire("dispatch:afterBinding", this) === false) {
+                if ($eventsManager->fire("dispatch:afterBinding", $this) === false) {
                     continue;
                 }
 

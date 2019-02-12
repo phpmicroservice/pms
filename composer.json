@@ -33,9 +33,6 @@
   "autoload": {
     "psr-4": {
       "pms\\": "src/"
-    },
-    "files": [
-      "src/index.php"
-    ]
+    }
   }
 }

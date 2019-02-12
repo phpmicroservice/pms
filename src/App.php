@@ -66,21 +66,17 @@ class App extends Base
      */
     public function onConnect(\Swoole\Server $server, int $fd, int $reactorId)
     {
-        output([$fd, $reactorId], 'connect');
         $this->eventsManager->fire($this->name . ":onConnect", $this, [$fd, $reactorId]);
     }
 
     /**
      * 数据接收 回调函数
      */
-    public function onReceive(\Swoole\Server $server, int $fd, int $reactor_id, string $data)
+    public function onReceive(\Swoole\Server $server, int $fd, int $reactor_id, string $data_string)
     {
         $this->eventsManager->fire($this->name . ":onReceive", $this, [$fd, $reactor_id, $data]);
-        //output($data, 'onReceive');
-        $data_arr = explode(PACKAGE_EOF, rtrim($data, PACKAGE_EOF));
-        foreach ($data_arr as $value) {
-            $this->receive($server, $fd, $reactor_id, $value);
-        }
+        $data = $this->decode($data_string);
+        $this->receive($server, $fd, $reactor_id, $data);
 
     }
 
@@ -91,11 +87,9 @@ class App extends Base
      * @param $reactor_id
      * @param $data
      */
-    private function receive($server, $fd, $reactor_id, $string)
+    private function receive($server, $fd, $reactor_id, $data)
     {
         $this->eventsManager->fire($this->name . ":receive", $this, [$fd, $reactor_id, $string]);
-        $data = $this->decode($string);
-        output($data, 'receive');
         $connect = new bear\Counnect($server, $fd, $reactor_id, $data);
         $router = $this->di->get('router');
         $router->handle($connect->getRouter());
@@ -125,9 +119,11 @@ class App extends Base
      * 解码
      * @param $string
      */
-    private function decode($string): array
+    private function decode($data): array
     {
-        return \swSerialize::unpack(rtrim($string, PACKAGE_EOF));
+        $length = unpack("N", $data)[1];
+        $msg = substr($data, -$length);
+        return \pms\Serialize::unpack($msg);
     }
 
     /**
@@ -181,6 +177,8 @@ class App extends Base
      */
     private function encode(array $data): string
     {
-        return \swSerialize::pack($data) . PACKAGE_EOF;
+        $msg_normal = \pms\Serialize::pack($data);
+        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
+        return $msg_length;
     }
 }

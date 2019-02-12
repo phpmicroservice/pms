@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dongasai
- * Date: 2018/4/25
- * Time: 14:26
- */
 
 namespace pms\bear;
-
 
 class ClientSync extends \pms\Base
 {
@@ -18,10 +11,7 @@ class ClientSync extends \pms\Base
     protected $name = 'Client';
     private $server_ip;
     private $server_port;
-    private $option = [
-        'open_eof_check' => true, //打开EOF检测
-        'package_eof' => PACKAGE_EOF, //设置EOF
-    ];
+    private $option = SD_OPTION;
 
     /**
      * 配置初始化
@@ -82,7 +72,9 @@ class ClientSync extends \pms\Base
      */
     private function encode(array $data): string
     {
-        return \swSerialize::pack($data) . PACKAGE_EOF;
+        $msg_normal = \pms\Serialize::pack($data);
+        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
+        return $msg_length;
     }
 
     public function ask_recv($server, $router, $data)
@@ -135,9 +127,11 @@ class ClientSync extends \pms\Base
      * 解码
      * @param $string
      */
-    private function decode($string)
+    private function decode($data)
     {
-        return \swSerialize::unpack(rtrim($string, PACKAGE_EOF));
+        $length = unpack("N", $data)[1];
+        $msg = substr($data, -$length);
+        return \pms\Serialize::unpack($msg);
     }
 
     /**
@@ -194,7 +188,6 @@ class ClientSync extends \pms\Base
     public function receive_true(\swoole_client $client, $data)
     {
         $this->eventsManager->fire($this->name . ":receive_true", $this, $data);
-        \pms\Output::debug('内容不展示', '客户端收到消息' . $this->name);
         $data_arr = explode(PACKAGE_EOF, rtrim($data, PACKAGE_EOF));
         foreach ($data_arr as $value) {
             $this->receive($value);
@@ -210,7 +203,6 @@ class ClientSync extends \pms\Base
     private function receive($value)
     {
         $data = $this->decode($value);
-        \pms\Output::debug($data, 'client_receive' . $this->name);
         $this->eventsManager->fire($this->name . ":receive", $this, $data);
     }
 

@@ -20,10 +20,7 @@ class Client extends \pms\Base
     protected $name = 'Client';
     private $server_ip;
     private $server_port;
-    private $option = [
-        'open_eof_check' => true, //打开EOF检测
-        'package_eof' => PACKAGE_EOF, //设置EOF
-    ];
+    private $option = SD_OPTION;
 
     /**
      * 配置初始化
@@ -151,7 +148,9 @@ class Client extends \pms\Base
      */
     private function encode(array $data): string
     {
-        return \swSerialize::pack($data) . PACKAGE_EOF;
+        $msg_normal = \pms\Serialize::pack($data);
+        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
+        return $msg_length;
     }
 
     /**
@@ -170,14 +169,13 @@ class Client extends \pms\Base
      * @param \swoole_client $cli
      * @param $data
      */
-    public function receive_true(\swoole_client $client, $data)
+    public function receive_true(\swoole_client $client, $data_string)
     {
-        $this->eventsManager->fire($this->name . ":receive_true", $this, $data);
-        \pms\Output::debug('内容不展示', '客户端收到消息' . $this->name);
-        $data_arr = explode(PACKAGE_EOF, rtrim($data, PACKAGE_EOF));
-        foreach ($data_arr as $value) {
-            $this->receive($value);
-        }
+        $this->eventsManager->fire($this->name . ":receive_true", $this, $data_string);
+        $data = $this->decode($data_string);
+        $this->receive($data);
+
+        
 
     }
 
@@ -185,9 +183,8 @@ class Client extends \pms\Base
      * 收到值,解码可用的
      * @param $value
      */
-    private function receive($value)
+    private function receive($data)
     {
-        $data = $this->decode($value);
         \pms\Output::debug($data, 'client_receive' . $this->name);
         $this->eventsManager->fire($this->name . ":receive", $this, $data);
     }
@@ -196,9 +193,11 @@ class Client extends \pms\Base
      * 解码
      * @param $string
      */
-    private function decode($string): array
+    private function decode($data): array
     {
-        return \swSerialize::unpack(rtrim($string, PACKAGE_EOF));
+        $length = unpack("N", $data)[1];
+        $msg = substr($data, -$length);
+        return \pms\Serialize::unpack($msg);
     }
 
     /**

@@ -82,7 +82,19 @@ class Counnect
             $data['p'] = $this->passing;
         }
         $data['f'] = strtolower(SERVICE_NAME);
-        return $this->swoole_server->send($this->fd, \swSerialize::pack($data) . PACKAGE_EOF);
+        return $this->swoole_server->send($this->fd, $this->encode($data));
+    }
+
+    /**
+     * 编码
+     * @param array $data
+     * @return string
+     */
+    private function encode(array $data): string
+    {
+        $msg_normal = \pms\Serialize::pack($data);
+        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
+        return $msg_length;
     }
 
     /**

@@ -28,7 +28,6 @@ if (defined('SERVICE_NAME')) {
 }
 
 
-
 defined('RUNTIME_DIR') || define('RUNTIME_DIR', ROOT_DIR . '/runtime/');# 运行目录
 if (!is_dir(RUNTIME_DIR)) mkdir(RUNTIME_DIR, 775, true);
 defined('CACHE_DIR') || define('CACHE_DIR', RUNTIME_DIR . '/cache/');# 缓存目录
@@ -44,8 +43,13 @@ defined('OUTPUT_NOTICE') || define('OUTPUT_NOTICE', get_envbl("OUTPUT_NOTICE", 1
 defined('OUTPUT_PMS') || define('OUTPUT_PMS', get_envbl("OUTPUT_PMS", 1));# notice级别的输出 的开启
 defined('NO_OUTPUT') || define('NO_OUTPUT', get_envbl("NO_OUTPUT", 1));# notice级别的输出 的开启
 
+defined('SD_OPTION', ['open_length_check' => true,
+    'package_max_length' => 83886080,
+    'package_length_type' => 'N',
+    'package_length_offset' => 0,
+    'package_body_offset' => 4,]);
 
-defined('PACKAGE_EOF') || define('PACKAGE_EOF', '_pms_');
+
 define('START_TIME', time());
 defined('RUN_UNIQID') || define('RUN_UNIQID', uniqid());
 echo '项目目录为:' . ROOT_DIR . ',pms目录为:' . PMS_DIR . " \n";

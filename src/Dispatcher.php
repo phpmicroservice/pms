@@ -354,7 +354,7 @@ class Dispatcher extends CliDispatcher
         # 读取session_id
         $sid = $connect->sid;
         $this->session_id = $sid;
-        output($sid, 'sid');
+        \pms\output($sid, 'sid');
         return new Session($sid);
     }
 
@@ -363,7 +363,7 @@ class Dispatcher extends CliDispatcher
         if ($this->session) {
             $this->session->reserve();
         }
-        output('销毁调度器', '__destruct');
+        \pms\output('销毁调度器', '__destruct');
     }
 
 }

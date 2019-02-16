@@ -35,7 +35,7 @@ class App extends Base
      */
     public function onRequest(\swoole_http_request $request, \swoole_http_response $response)
     {
-        output([$request->get, $request->server, $request->post]);
+        \pms\output([$request->get, $request->server, $request->post]);
 
         require ROOT_DIR . '/app/di.php';
         //require ROOT_DIR . '/config/services.php';
@@ -46,7 +46,7 @@ class App extends Base
 
             $re = $application->handle($request->server['request_uri']);
             if ($di['response'] instanceof \Phalcon\Http\Response) {
-                output([$di['response']->getHeaders(), $di['response']->getStatusCode(),
+                \pms\output([$di['response']->getHeaders(), $di['response']->getStatusCode(),
                     strlen($di['response']->getContent()), $di['response']->getCookies()]);
             }
 
@@ -100,7 +100,7 @@ class App extends Base
         $dispatcher->setConnect($connect);
         $dispatcher->setServer($server);
         $dispatcher->setEventsManager($this->eventsManager);
-        output([
+        \pms\output([
             'n' => $router->getNamespaceName(),
             'c' => $router->getControllerName(),
             'a' => $router->getActionName(),
@@ -165,7 +165,7 @@ class App extends Base
      */
     public function onClose(\Swoole\Server $server, int $fd, int $reactor_id)
     {
-        output([$fd, $reactor_id], 'close');
+        \pms\output([$fd, $reactor_id], 'close');
         $this->eventsManager->fire($this->name . ":onClose", $this, [$fd, $reactor_id]);
 
     }

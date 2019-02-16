@@ -126,7 +126,7 @@ class Server extends Base
     {
         $this->swoole_server->default_table->set('WKINIT', ['data' => 0]);
         echo $this->logo;
-        output('onStart');
+        \pms\output('onStart');
         $this->eventsManager->fire($this->name . ':onStart', $this, $server);
     }
 
@@ -137,7 +137,7 @@ class Server extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        output('WorkerStart', 'onWorkerStart');
+        \pms\output('WorkerStart', 'onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';
         $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $server);
@@ -165,7 +165,7 @@ class Server extends Base
      */
     private function initapp($server, $worker_id)
     {
-        output('init');
+        \pms\output('init');
         # 热更新
         if (get_envbl('APP_CODEUPDATE', true)) {
             if (get_envbl('CODEUPDATA_INOTIFY', false)) {
@@ -188,7 +188,7 @@ class Server extends Base
 
 
         $array = $this->dConfig->codeUpdata;
-        output(ROOT_DIR, 'codeUpdata');
+        \pms\output(ROOT_DIR, 'codeUpdata');
 
         // 初始化inotify句柄
         $this->inotify_fd = inotify_init();
@@ -201,7 +201,7 @@ class Server extends Base
         }
         //加入到swoole的事件循环中
         $re = swoole_event_add($this->inotify_fd, [$this, 'inotify_reload']);
-        output($re, 230);
+        \pms\output($re, 230);
     }
 
     /**
@@ -279,7 +279,7 @@ class Server extends Base
      */
     public function onShutdown(\Swoole\Server $server)
     {
-        output('onShutdown');
+        \pms\output('onShutdown');
         $this->eventsManager->fire($this->name . ':onShutdown', $this, $server);
     }
 
@@ -309,7 +309,7 @@ class Server extends Base
      */
     public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {
-        output('onWorkerError');
+        \pms\output('onWorkerError');
         if ($server->default_table->get('initapp_worker_id', 'data') === $worker_id) {
             # 初始化进程出错了
             $server->default_table->set('WKINIT', ['data' => 0]);
@@ -329,7 +329,7 @@ class Server extends Base
      */
     public function onManagerStart(\Swoole\Server $server)
     {
-        output('on ManagerStart');
+        \pms\output('on ManagerStart');
         $this->eventsManager->fire($this->name . ':onManagerStart', $this, $server);
     }
 
@@ -339,7 +339,7 @@ class Server extends Base
      */
     public function onManagerStop(\Swoole\Server $server)
     {
-        output('on onManagerStop');
+        \pms\output('on onManagerStop');
         $this->eventsManager->fire($this->name . ':onManagerStop', $this, $server);
     }
 }

@@ -28,7 +28,7 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
      */
     public function validate($data = null, $entity = null)
     {
-        output($data, 'validation_data');
+        \pms\output($data, 'validation_data');
         if (method_exists($this, "beforeValidation1")) {
             if ($this->beforeValidation1($data) === false) {
                 return false;

@@ -21,7 +21,7 @@ class Task extends Base
      */
     public function onTask(\Swoole\Server $server, int $task_id, int $src_worker_id, $data)
     {
-        output($data, 'onTask');
+        \pms\output($data, 'onTask');
         $this->eventsManager->fire($this->name . ':onTask', $this, [$task_id, $src_worker_id, $data]);
         if ($data == 'codeUpdata') {
             $this->codeUpdata();
@@ -46,11 +46,11 @@ class Task extends Base
     public function codeUpdata()
     {
         $array = $this->dConfig->codeUpdata;
-        output(ROOT_DIR, 'codeUpdata');
+        \pms\output(ROOT_DIR, 'codeUpdata');
         foreach ($array as $dir) {
             $this->codeUpdateCall(ROOT_DIR . $dir);
         }
-        output(ROOT_DIR, 'codeUpdata2');
+        \pms\output(ROOT_DIR, 'codeUpdata2');
         $this->swoole_server->finish('codeUpdata');
     }
 
@@ -91,7 +91,7 @@ class Task extends Base
      */
     public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message)
     {
-        output('onPipeMessage in task:');
+        \pms\output('onPipeMessage in task:');
         $this->eventsManager->fire($this->name . ':onPipeMessage', $this, [$src_worker_id, $message]);
 
     }
@@ -104,7 +104,7 @@ class Task extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        output($worker_id, 'onWorkerStart in task');
+        \pms\output($worker_id, 'onWorkerStart in task');
         $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $worker_id);
     }
 
@@ -118,7 +118,7 @@ class Task extends Base
      */
     public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {
-        output('task - onWorkerError');
+        \pms\output('task - onWorkerError');
         return false;
     }
 

@@ -65,7 +65,7 @@ class Register extends Base
         if ($re === false) {
             $this->register_client->start();
         }
-        output($re, "ping_re");
+        \pms\output($re, "ping_re");
 
     }
 

@@ -45,7 +45,7 @@ class ServerAction extends Validator
         }
 
         $re = $this->proxyCS->request_return($sername, $actionname, $data);
-        output([$re, $sername, $actionname, $data], 'ServerAction');
+        \pms\output([$re, $sername, $actionname, $data], 'ServerAction');
         if ($re === false || $re['e']) {
             # 请求遇到错误!
             $this->type = 'request_error';

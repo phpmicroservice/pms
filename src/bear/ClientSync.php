@@ -20,7 +20,7 @@ class ClientSync extends \pms\Base
     {
         $this->server_ip = $ip;
         $this->server_port = $port;
-        output([$ip, $port], 'ClientSync');
+        \pms\output([$ip, $port], 'ClientSync');
         $this->swoole_client = new \Swoole\Client(SWOOLE_SOCK_TCP);
         $this->swoole_client->set($this->option);
         if (!$this->swoole_client->connect($this->server_ip, $this->server_port, $timeout)) {

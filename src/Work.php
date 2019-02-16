@@ -20,7 +20,7 @@ class Work extends Base
      */
     public function onFinish(\Swoole\Server $server, int $task_id, $data)
     {
-        output([$task_id, $data], 'onFinish');
+        \pms\output([$task_id, $data], 'onFinish');
         $this->eventsManager->fire($this->name . ':onFinish', $this, [$task_id, $data]);
         if (is_array($data)) {
             //数组的数据是要进行任务类调用
@@ -41,7 +41,7 @@ class Work extends Base
      */
     public function onPipeMessage(\Swoole\Server $server, int $src_worker_id, mixed $message)
     {
-        output([$src_worker_id, $message], 'onPipeMessage');
+        \pms\output([$src_worker_id, $message], 'onPipeMessage');
         $this->eventsManager->fire($this->name . ':onPipeMessage', $this, [$src_worker_id, $message]);
     }
 
@@ -54,7 +54,7 @@ class Work extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
-        output($worker_id, 'onWorkerStart in work');
+        \pms\output($worker_id, 'onWorkerStart in work');
         $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $worker_id);
         $server->tick(3600000,function(){
             # SHOW ENGINES;
@@ -87,7 +87,7 @@ class Work extends Base
      */
     public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {
-        output('worker - onWorkerError');
+        \pms\output('worker - onWorkerError');
         return 1;
     }
 

@@ -3,8 +3,8 @@
 
 # 设置php常用配置
 date_default_timezone_set("PRC");
-# 加载函数库
-require __DIR__ . '/function.php';
+# 加载函数库 在composer里加载
+
 # 设置 常量
 
 defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
@@ -43,7 +43,7 @@ defined('OUTPUT_NOTICE') || define('OUTPUT_NOTICE', get_envbl("OUTPUT_NOTICE", 1
 defined('OUTPUT_PMS') || define('OUTPUT_PMS', get_envbl("OUTPUT_PMS", 1));# notice级别的输出 的开启
 defined('NO_OUTPUT') || define('NO_OUTPUT', get_envbl("NO_OUTPUT", 1));# notice级别的输出 的开启
 
-defined('SD_OPTION', ['open_length_check' => true,
+define('SD_OPTION', ['open_length_check' => true,
     'package_max_length' => 83886080,
     'package_length_type' => 'N',
     'package_length_offset' => 0,
@@ -59,13 +59,13 @@ if (empty(get_env("APP_HOST_IP"))) {
     $ip_list = swoole_get_local_ip();
     $host_ip = $ip_list['eth0'];
 } else {
-    $host_ip = get_env("APP_HOST_IP");
+    $host_ip = \pms\get_env("APP_HOST_IP");
 }
 define('APP_HOST_IP', $host_ip);
 if (empty(get_env("APP_HOST_PORT"))) {
     $host_port = 9502;
 } else {
-    $host_port = get_env("APP_HOST_PORT");
+    $host_port = \pms\get_env("APP_HOST_PORT");
 }
 define('APP_HOST_PORT', $host_port);
 

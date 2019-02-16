@@ -39,7 +39,7 @@ class Output
      * @param $data
      * @param $message
      */
-    public static function \pms\output($data, $msg)
+    public static function output($data, $msg)
     {
         if (!NO_OUTPUT) {
             echo '[' . date('H:i:s') . '][' . $msg . ']';

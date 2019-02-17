@@ -185,13 +185,11 @@ class ClientSync extends \pms\Base
      * @param \swoole_client $cli
      * @param $data
      */
-    public function receive_true(\swoole_client $client, $data)
+    public function receive_true(\swoole_client $client, $data_string)
     {
-        $this->eventsManager->fire($this->name . ":receive_true", $this, $data);
-        $data_arr = explode(PACKAGE_EOF, rtrim($data, PACKAGE_EOF));
-        foreach ($data_arr as $value) {
-            $this->receive($value);
-        }
+        $this->eventsManager->fire($this->name . ":receive_true", $this, $data_string);
+        $data = $this->decode($data_string);
+        $this->receive($data);
 
     }
 

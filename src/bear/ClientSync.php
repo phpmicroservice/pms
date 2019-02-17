@@ -146,8 +146,8 @@ class ClientSync extends \pms\Base
         return $this->send_recv([
             's' => $sername,
             'r' => $router,
+            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME)),
             'd' => $data,
-            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
         ]);
     }
 
@@ -163,8 +163,9 @@ class ClientSync extends \pms\Base
         return $this->send([
             's' => $sername,
             'r' => $router,
-            'd' => $data,
-            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
+            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME)),
+            'd' => $data
+
         ]);
     }
 

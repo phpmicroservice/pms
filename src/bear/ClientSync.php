@@ -147,7 +147,7 @@ class ClientSync extends \pms\Base
             's' => $sername,
             'r' => $router,
             'd' => $data,
-            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
+            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
         ]);
     }
 
@@ -164,7 +164,7 @@ class ClientSync extends \pms\Base
             's' => $sername,
             'r' => $router,
             'd' => $data,
-            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
+            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
         ]);
     }
 

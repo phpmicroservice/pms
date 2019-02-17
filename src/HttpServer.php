@@ -4,8 +4,6 @@ namespace pms;
 
 require_once 'index.php';
 
-use Phalcon\Events\ManagerInterface;
-
 /**
  * 服务启动
  * Class Server
@@ -131,8 +129,8 @@ class HttpServer extends Base
             \pms\output(133);
             $this->gCache->save('WKINIT', 1);
             # 热更新
-            if (get_envbl('APP_CODEUPDATE', true)) {
-                if (get_envbl('codeUpdata_inotify', false)) {
+            if (\pms\get_envbl('APP_CODEUPDATE', true)) {
+                if (\pms\get_envbl('codeUpdata_inotify', false)) {
                     $this->codeUpdata_inotify();
                 } else {
                     \swoole_timer_tick(10000, [$this, 'codeUpdata']);

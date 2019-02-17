@@ -75,7 +75,7 @@ class Register extends Base
      */
     private function get_key()
     {
-        return md5(md5(get_env('REGISTER_SECRET_KEY')) . md5(strtolower(SERVICE_NAME)));
+        return md5(md5(\pms\get_env('REGISTER_SECRET_KEY')) . md5(strtolower(SERVICE_NAME)));
     }
 
     /**

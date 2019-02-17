@@ -2,12 +2,6 @@
 
 namespace pms;
 
-use Phalcon\Events\Event;
-use Phalcon\Events\ManagerInterface;
-use Phalcon\Exception;
-use Phalcon\Cli\Dispatcher\Exception as DispatchException;
-
-
 /**
  * App类,主管应用的产生调度
  */
@@ -37,7 +31,7 @@ class App extends Base
     {
         \pms\output([$request->get, $request->server, $request->post]);
 
-        require ROOT_DIR . '/app/di.php';
+        require_once ROOT_DIR . '/app/di.php';
         //require ROOT_DIR . '/config/services.php';
         $application = new \Phalcon\Mvc\Application();
         require ROOT_DIR . "/app/modules.php";
@@ -74,7 +68,7 @@ class App extends Base
      */
     public function onReceive(\Swoole\Server $server, int $fd, int $reactor_id, string $data_string)
     {
-        $this->eventsManager->fire($this->name . ":onReceive", $this, [$fd, $reactor_id, $data]);
+        $this->eventsManager->fire($this->name . ":onReceive", $this, [$fd, $reactor_id, $data_string]);
         $data = $this->decode($data_string);
         $this->receive($server, $fd, $reactor_id, $data);
 
@@ -89,7 +83,7 @@ class App extends Base
      */
     private function receive($server, $fd, $reactor_id, $data)
     {
-        $this->eventsManager->fire($this->name . ":receive", $this, [$fd, $reactor_id, $string]);
+        $this->eventsManager->fire($this->name . ":receive", $this, [$fd, $reactor_id, $data]);
         $connect = new bear\Counnect($server, $fd, $reactor_id, $data);
         $router = $this->di->get('router');
         $router->handle($connect->getRouter());

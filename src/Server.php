@@ -167,8 +167,8 @@ class Server extends Base
     {
         \pms\output('init');
         # 热更新
-        if (get_envbl('APP_CODEUPDATE', true)) {
-            if (get_envbl('CODEUPDATA_INOTIFY', false)) {
+        if (\pms\get_envbl('APP_CODEUPDATE', true)) {
+            if (\pms\get_envbl('CODEUPDATA_INOTIFY', false)) {
                 $this->codeUpdata_inotify();
             } else {
                 \swoole_timer_tick(10000, [$this, 'codeUpdata']);

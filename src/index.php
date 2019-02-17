@@ -54,6 +54,7 @@ define('START_TIME', time());
 defined('RUN_UNIQID') || define('RUN_UNIQID', uniqid());
 echo '项目目录为:' . ROOT_DIR . ',pms目录为:' . PMS_DIR . " \n";
 
+
 # 服务的地址和端口
 if (empty(\pms\get_env("APP_HOST_IP"))) {
     $ip_list = \swoole_get_local_ip();

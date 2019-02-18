@@ -58,7 +58,7 @@ function output($data, $msg = 'info')
  */
 function get_access($secret, &$data, $name = '')
 {
-    $data['uniqid58_'] = $data['uniqid58_'] ?? mt_rand(1000000, 99999999);
+    $data['uniqid58_'] = $data['uniqid58_'] ?? mt_rand(1000000, 99999999).uniqid();
     return md5($secret . md5(serialize(asort($data))) . md5(strtolower($name)));
 }
 

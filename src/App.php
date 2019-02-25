@@ -2,6 +2,8 @@
 
 namespace pms;
 
+use Phalcon\Exception;
+
 /**
  * App类,主管应用的产生调度
  */
@@ -9,18 +11,55 @@ class App extends Base
 {
 
     protected $name = 'App';
-    private $config_init;
 
     public function init(\Swoole\Server $server, $worker_id)
     {
+        $this->eventsManager->fire($this->name . ":init", $this, [$server, $worker_id]);
+    }
 
-        if ($this->dConfig->server_reg) {
-            # 进行服务注册
-            $server->default_table->set('server_reg_worker_id', ['data' => $worker_id]);
-            $this->config_init = new Register($server);
+
+    /**
+     * 链接回调
+     * @param \Swoole\WebSocket\Server $server
+     * @param $request
+     */
+    public function onOpen(\Swoole\WebSocket\Server $server, $request)
+    {
+        try {
+            $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+            \pms\Output::output($request, 'open');
+            $console = new \Phalcon\Cli\Console();
+            $console->setArgument();
+            $console->setDI($di);
+            $console->handle([
+                'params' => [
+                    'server' => $server,
+                    'request' => $request
+                ]
+            ]);
+        } catch (Exception $exception) {
+            $server->send();
         }
-        $this->eventsManager->fire($this->name . ":init", $this, $server);
 
+    }
+
+
+    /**
+     * 消息回调
+     * @param \Swoole\WebSocket\Server $server
+     * @param $frame
+     */
+    public function onMessage(\Swoole\WebSocket\Server $server, $frame)
+    {
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        \pms\Output::output($frame, 'open');
+        $console = new \Phalcon\Cli\Console();
+        $console->setDI($di);
+        $console->handle([
+            'params' => [
+                'frame' => $frame
+            ]
+        ]);
     }
 
 
@@ -29,28 +68,6 @@ class App extends Base
      */
     public function onRequest(\swoole_http_request $request, \swoole_http_response $response)
     {
-        \pms\output([$request->get, $request->server, $request->post]);
-
-        require_once ROOT_DIR . '/app/di.php';
-        //require ROOT_DIR . '/config/services.php';
-        $application = new \Phalcon\Mvc\Application();
-        require ROOT_DIR . "/app/modules.php";
-        $application->setDI($di);
-        try {
-
-            $re = $application->handle($request->server['request_uri']);
-            if ($di['response'] instanceof \Phalcon\Http\Response) {
-                \pms\output([$di['response']->getHeaders(), $di['response']->getStatusCode(),
-                    strlen($di['response']->getContent()), $di['response']->getCookies()]);
-            }
-
-            $response->status($di['response']->getStatusCode());
-            $response->end($di['response']->getContent());
-            //$response->header($re->getHeaders());
-        } catch (\Exception $e) {
-            $response->end($di['response']->getContent());
-
-        }
 
     }
 

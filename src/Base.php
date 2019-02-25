@@ -17,11 +17,27 @@ abstract class Base extends \Phalcon\Di\Injectable implements \Phalcon\Events\Ev
 {
     protected $swoole_server;
     protected $name;
+    protected $type = 'tcp';
 
     public function __construct($server)
     {
 //        $this->logo = require 'logo.php';
         $this->swoole_server = $server;
+    }
+
+
+    /**
+     * 设置类型 ['tcp','udp','ws','http']
+     * @param $type
+     */
+    public function setType($type)
+    {
+        $in = ['tcp', 'udp', 'ws', 'http'];
+        if (in_array($type, $in)) {
+            $this->type = $type;
+        } else {
+            throw new \Exception("不合法的类型");
+        }
     }
 
     /**
@@ -37,10 +53,11 @@ abstract class Base extends \Phalcon\Di\Injectable implements \Phalcon\Events\Ev
      * 事件绑定
      * @param $handler
      */
-    public function onBind($event,$handler)
+    public function onBind($event, $handler)
     {
-        $this->eventsManager->attach($this->name.':'.$event,$handler);
+        $this->eventsManager->attach($this->name . ':' . $event, $handler);
     }
+
     /**
      * 设置事件管理器
      * @return  ManagerInterface $eventsManager

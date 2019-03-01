@@ -8,6 +8,8 @@ date_default_timezone_set("PRC");
 # 设置 常量
 
 defined('ROOT_DIR') || exit('constant ROOT_DIR Undefined!');
+defined('ROUTER_INDEX') || define('ROUTER_INDEX', 'r');
+
 define('PMS_DIR', __DIR__);
 # 设置服务器名字
 if (!defined('SERVICE_NAME')) {

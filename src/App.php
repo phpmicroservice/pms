@@ -2,7 +2,10 @@
 
 namespace pms;
 
+use Phalcon\Cli\Router;
+use Phalcon\Cli\Router\Route;
 use Phalcon\Exception;
+use pms\bear\WsCounnect;
 
 /**
  * App类,主管应用的产生调度
@@ -25,20 +28,22 @@ class App extends Base
      */
     public function onOpen(\Swoole\WebSocket\Server $server, $request)
     {
+        \pms\Output::output($request, 'open');
+        $wscounnect = new WsCounnect($server, $request->fd, []);
+        $wscounnect->setRequest($request);
+        $router = $wscounnect->getRouter();
+        $router['params'] = [
+            'counnect' => $wscounnect,
+            'server' => $server
+        ];
         try {
             $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
-            \pms\Output::output($request, 'open');
             $console = new \Phalcon\Cli\Console();
-            $console->setArgument();
             $console->setDI($di);
-            $console->handle([
-                'params' => [
-                    'server' => $server,
-                    'request' => $request
-                ]
-            ]);
+            \pms\Output::output([$router['task'], $router['action']], 'open-params');
+            $console->handle($router);
         } catch (Exception $exception) {
-            $server->send();
+            $wscounnect->send($exception->getMessage());
         }
 
     }
@@ -49,17 +54,27 @@ class App extends Base
      * @param \Swoole\WebSocket\Server $server
      * @param $frame
      */
-    public function onMessage(\Swoole\WebSocket\Server $server, $frame)
+    public function onMessage(\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame)
     {
-        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
-        \pms\Output::output($frame, 'open');
-        $console = new \Phalcon\Cli\Console();
-        $console->setDI($di);
-        $console->handle([
-            'params' => [
-                'frame' => $frame
-            ]
-        ]);
+        $wscounnect = new WsCounnect($server, $frame->fd, $frame->data);
+        $wscounnect->setFrame($frame);
+        \pms\Output::output($frame, 'message');
+        $router = $wscounnect->getRouter();
+        $router['params'] = [
+            'counnect' => $wscounnect,
+            'server' => $server
+        ];
+
+        try {
+            $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+            $console = new \Phalcon\Cli\Console();
+            $console->setDI($di);
+            \pms\Output::output([$router['task'], $router['action']], 'message-params');
+            $console->handle($router);
+        } catch (Exception $exception) {
+            $wscounnect->send($exception->getMessage());
+        }
+
     }
 
 

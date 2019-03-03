@@ -24,8 +24,8 @@ class WsServer extends Base
     public $work;
     public $app;
     protected $name = 'Server';
-    protected $inotify_fd;
-    private $logo;# 热更新用
+    protected $inotify_fd;# 热更新用
+    private $logo;
     private $d_option = SD_OPTION;
 
 
@@ -40,6 +40,7 @@ class WsServer extends Base
      */
     public function __construct($ip, $port, $mode, $tcp, $option = [])
     {
+        $this->logo=include "logo.php";
         $this->d_option['reactor_num'] = \swoole_cpu_num() * ($option['reactor_num_mulriple'] ?? 1);
         $this->d_option['worker_num'] = \swoole_cpu_num() * ($option['worker_num_mulriple'] ?? 2);
         $this->d_option['task_worker_num'] = \swoole_cpu_num() * ($option['task_worker_num_mulriple'] ?? 4);
@@ -49,6 +50,8 @@ class WsServer extends Base
             include_once DI_FILE;
         }
         $this->swoole_server = new \Swoole\WebSocket\Server($ip, $port, $mode, $tcp);
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di->set('server',$this->swoole_server);
         parent::__construct($this->swoole_server);
 
         # 设置运行参数

@@ -28,6 +28,8 @@ class App extends Base
      */
     public function onOpen(\Swoole\WebSocket\Server $server, $request)
     {
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di->set('server', $server);
         \pms\Output::output($request, 'open');
         $wscounnect = new WsCounnect($server, $request->fd, []);
         $wscounnect->setRequest($request);
@@ -37,7 +39,7 @@ class App extends Base
             'server' => $server
         ];
         try {
-            $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
             \pms\Output::output([$router['task'], $router['action']], 'open-params');
@@ -56,6 +58,8 @@ class App extends Base
      */
     public function onMessage(\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame)
     {
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di->set('server', $server);
         $wscounnect = new WsCounnect($server, $frame->fd, $frame->data);
         $wscounnect->setFrame($frame);
         \pms\Output::output($frame, 'message');
@@ -66,7 +70,7 @@ class App extends Base
         ];
 
         try {
-            $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
             \pms\Output::output([$router['task'], $router['action']], 'message-params');

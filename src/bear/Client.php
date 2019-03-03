@@ -174,9 +174,6 @@ class Client extends \pms\Base
         $this->eventsManager->fire($this->name . ":receive_true", $this, $data_string);
         $data = $this->decode($data_string);
         $this->receive($data);
-
-        
-
     }
 
     /**

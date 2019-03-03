@@ -43,7 +43,7 @@ defined('OUTPUT_NOTICE') || define('OUTPUT_NOTICE', \pms\get_envbl("OUTPUT_NOTIC
 defined('OUTPUT_PMS') || define('OUTPUT_PMS', \pms\get_envbl("OUTPUT_PMS", 1));# notice级别的输出 的开启
 defined('NO_OUTPUT') || define('NO_OUTPUT', \pms\get_envbl("NO_OUTPUT", 1));# notice级别的输出 的开启
 
-define('SD_OPTION', ['open_length_check' => true,
+defined('SD_OPTION') || define('SD_OPTION', ['open_length_check' => true,
     'package_max_length' => 83886080,
     'package_length_type' => 'N',
     'package_length_offset' => 0,

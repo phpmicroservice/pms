@@ -28,8 +28,8 @@ class Register extends Base
             $server->shutdown();
         }
 
-        $this->client_ip = get_env('REGISTER_ADDRESS', 'pms_register');
-        $this->client_port = get_env('REGISTER_PORT', '9502');
+        $this->client_ip = \pms\get_env('REGISTER_ADDRESS', 'pms_register');
+        $this->client_port = \pms\get_env('REGISTER_PORT', '9502');
         $this->swoole_server = $server;
         $this->register_client = new bear\Client($server, $this->client_ip, $this->client_port);
         $this->register_client->onBind('receive', $this);
@@ -75,7 +75,7 @@ class Register extends Base
      */
     private function get_key()
     {
-        return md5(md5(get_env('REGISTER_SECRET_KEY')) . md5(strtolower(SERVICE_NAME)));
+        return md5(md5(\pms\get_env('REGISTER_SECRET_KEY')) . md5(strtolower(SERVICE_NAME)));
     }
 
     /**

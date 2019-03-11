@@ -12,7 +12,7 @@ define('PMS_DIR', __DIR__);
 # 设置服务器名字
 if (!defined('SERVICE_NAME')) {
     if (getenv('APP_SERVICE_NAME')) {
-        define('SERVICE_NAME', strtolower(get_env('APP_SERVICE_NAME')));
+        define('SERVICE_NAME', strtolower(\pms\get_env('APP_SERVICE_NAME')));
     } else {
         if (defined('APP_SERVICE_NAME')) {
             define('SERVICE_NAME', strtolower(APP_SERVICE_NAME));

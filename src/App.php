@@ -2,11 +2,10 @@
 
 namespace pms;
 
-use Phalcon\Events\Event;
-use Phalcon\Events\ManagerInterface;
+use Phalcon\Cli\Router;
+use Phalcon\Cli\Router\Route;
 use Phalcon\Exception;
-use Phalcon\Cli\Dispatcher\Exception as DispatchException;
-
+use pms\bear\WsCounnect;
 
 /**
  * App类,主管应用的产生调度
@@ -15,17 +14,70 @@ class App extends Base
 {
 
     protected $name = 'App';
-    private $config_init;
 
     public function init(\Swoole\Server $server, $worker_id)
     {
+        $this->eventsManager->fire($this->name . ":init", $this, [$server, $worker_id]);
+    }
 
-        if ($this->dConfig->server_reg) {
-            # 进行服务注册
-            $server->default_table->set('server_reg_worker_id', ['data' => $worker_id]);
-            $this->config_init = new Register($server);
+
+    /**
+     * 链接回调
+     * @param \Swoole\WebSocket\Server $server
+     * @param $request
+     */
+    public function onOpen(\Swoole\WebSocket\Server $server, $request)
+    {
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di->set('server', $server);
+        \pms\Output::output($request, 'open');
+        $wscounnect = new WsCounnect($server, $request->fd, []);
+        $wscounnect->setRequest($request);
+        $router = $wscounnect->getRouter();
+        $router['params'] = [
+            'counnect' => $wscounnect,
+            'server' => $server
+        ];
+        try {
+
+            $console = new \Phalcon\Cli\Console();
+            $console->setDI($di);
+            \pms\Output::output([$router['task'], $router['action']], 'open-params');
+            $console->handle($router);
+        } catch (Exception $exception) {
+            $wscounnect->send($exception->getMessage());
         }
-        $this->eventsManager->fire($this->name . ":init", $this, $server);
+
+    }
+
+
+    /**
+     * 消息回调
+     * @param \Swoole\WebSocket\Server $server
+     * @param $frame
+     */
+    public function onMessage(\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame)
+    {
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di->set('server', $server);
+        $wscounnect = new WsCounnect($server, $frame->fd, $frame->data);
+        $wscounnect->setFrame($frame);
+        \pms\Output::output($frame, 'message');
+        $router = $wscounnect->getRouter();
+        $router['params'] = [
+            'counnect' => $wscounnect,
+            'server' => $server
+        ];
+
+        try {
+
+            $console = new \Phalcon\Cli\Console();
+            $console->setDI($di);
+            \pms\Output::output([$router['task'], $router['action']], 'message-params');
+            $console->handle($router);
+        } catch (Exception $exception) {
+            $wscounnect->send($exception->getMessage());
+        }
 
     }
 
@@ -35,28 +87,6 @@ class App extends Base
      */
     public function onRequest(\swoole_http_request $request, \swoole_http_response $response)
     {
-        output([$request->get, $request->server, $request->post]);
-
-        require ROOT_DIR . '/app/di.php';
-        //require ROOT_DIR . '/config/services.php';
-        $application = new \Phalcon\Mvc\Application();
-        require ROOT_DIR . "/app/modules.php";
-        $application->setDI($di);
-        try {
-
-            $re = $application->handle($request->server['request_uri']);
-            if ($di['response'] instanceof \Phalcon\Http\Response) {
-                output([$di['response']->getHeaders(), $di['response']->getStatusCode(),
-                    strlen($di['response']->getContent()), $di['response']->getCookies()]);
-            }
-
-            $response->status($di['response']->getStatusCode());
-            $response->end($di['response']->getContent());
-            //$response->header($re->getHeaders());
-        } catch (\Exception $e) {
-            $response->end($di['response']->getContent());
-
-        }
 
     }
 
@@ -74,7 +104,7 @@ class App extends Base
      */
     public function onReceive(\Swoole\Server $server, int $fd, int $reactor_id, string $data_string)
     {
-        $this->eventsManager->fire($this->name . ":onReceive", $this, [$fd, $reactor_id, $data]);
+        $this->eventsManager->fire($this->name . ":onReceive", $this, [$fd, $reactor_id, $data_string]);
         $data = $this->decode($data_string);
         $this->receive($server, $fd, $reactor_id, $data);
 
@@ -89,7 +119,7 @@ class App extends Base
      */
     private function receive($server, $fd, $reactor_id, $data)
     {
-        $this->eventsManager->fire($this->name . ":receive", $this, [$fd, $reactor_id, $string]);
+        $this->eventsManager->fire($this->name . ":receive", $this, [$fd, $reactor_id, $data]);
         $connect = new bear\Counnect($server, $fd, $reactor_id, $data);
         $router = $this->di->get('router');
         $router->handle($connect->getRouter());
@@ -100,7 +130,7 @@ class App extends Base
         $dispatcher->setConnect($connect);
         $dispatcher->setServer($server);
         $dispatcher->setEventsManager($this->eventsManager);
-        output([
+        \pms\output([
             'n' => $router->getNamespaceName(),
             'c' => $router->getControllerName(),
             'a' => $router->getActionName(),
@@ -165,7 +195,7 @@ class App extends Base
      */
     public function onClose(\Swoole\Server $server, int $fd, int $reactor_id)
     {
-        output([$fd, $reactor_id], 'close');
+        \pms\output([$fd, $reactor_id], 'close');
         $this->eventsManager->fire($this->name . ":onClose", $this, [$fd, $reactor_id]);
 
     }

@@ -45,7 +45,7 @@ class StatusValidator extends \pms\Validation\Validator
             $m_value = $model_info->$status_key;
             if ($m_value == $status_val) {
             } else {
-                output([$m_value, $status_val], 'status');
+                \pms\output([$m_value, $status_val], 'status');
                 $this->type = "key-" . $status_key;
                 return $this->appendMessage($validation, $attribute);
             }

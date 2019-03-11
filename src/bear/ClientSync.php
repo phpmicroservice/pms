@@ -20,7 +20,7 @@ class ClientSync extends \pms\Base
     {
         $this->server_ip = $ip;
         $this->server_port = $port;
-        output([$ip, $port], 'ClientSync');
+        \pms\output([$ip, $port], 'ClientSync');
         $this->swoole_client = new \Swoole\Client(SWOOLE_SOCK_TCP);
         $this->swoole_client->set($this->option);
         if (!$this->swoole_client->connect($this->server_ip, $this->server_port, $timeout)) {
@@ -146,8 +146,8 @@ class ClientSync extends \pms\Base
         return $this->send_recv([
             's' => $sername,
             'r' => $router,
+            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME)),
             'd' => $data,
-            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
         ]);
     }
 
@@ -163,8 +163,9 @@ class ClientSync extends \pms\Base
         return $this->send([
             's' => $sername,
             'r' => $router,
-            'd' => $data,
-            'accessKey' => \get_access(get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME))
+            'accessKey' => \pms\get_access(\pms\get_env(strtoupper($sername) . '_APP_SECRET_KEY'), $data, strtolower(SERVICE_NAME)),
+            'd' => $data
+
         ]);
     }
 
@@ -185,13 +186,11 @@ class ClientSync extends \pms\Base
      * @param \swoole_client $cli
      * @param $data
      */
-    public function receive_true(\swoole_client $client, $data)
+    public function receive_true(\swoole_client $client, $data_string)
     {
-        $this->eventsManager->fire($this->name . ":receive_true", $this, $data);
-        $data_arr = explode(PACKAGE_EOF, rtrim($data, PACKAGE_EOF));
-        foreach ($data_arr as $value) {
-            $this->receive($value);
-        }
+        $this->eventsManager->fire($this->name . ":receive_true", $this, $data_string);
+        $data = $this->decode($data_string);
+        $this->receive($data);
 
     }
 

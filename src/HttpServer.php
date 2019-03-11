@@ -4,8 +4,6 @@ namespace pms;
 
 require_once 'index.php';
 
-use Phalcon\Events\ManagerInterface;
-
 /**
  * 服务启动
  * Class Server
@@ -102,7 +100,7 @@ class HttpServer extends Base
     public function onStart(\Swoole\Server $server)
     {
         echo $this->logo;
-        output('onStart');
+        \pms\output('onStart');
         $this->eventsManager->fire($this->name . ':onStart', $this, $server);
     }
 
@@ -114,7 +112,7 @@ class HttpServer extends Base
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
 
-        output('WorkerStart', 'onWorkerStart');
+        \pms\output('WorkerStart', 'onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';
 
@@ -128,11 +126,11 @@ class HttpServer extends Base
             \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
         if (!$this->gCache->get('WKINIT') && !$server->taskworker) {
-            output(133);
+            \pms\output(133);
             $this->gCache->save('WKINIT', 1);
             # 热更新
-            if (get_envbl('APP_CODEUPDATE', true)) {
-                if (get_envbl('codeUpdata_inotify', false)) {
+            if (\pms\get_envbl('APP_CODEUPDATE', true)) {
+                if (\pms\get_envbl('codeUpdata_inotify', false)) {
                     $this->codeUpdata_inotify();
                 } else {
                     \swoole_timer_tick(10000, [$this, 'codeUpdata']);
@@ -155,7 +153,7 @@ class HttpServer extends Base
 
 
         $array = $this->dConfig->codeUpdata;
-        output(ROOT_DIR, 'codeUpdata');
+        \pms\output(ROOT_DIR, 'codeUpdata');
 
         // 初始化inotify句柄
         $this->inotify_fd = inotify_init();
@@ -168,7 +166,7 @@ class HttpServer extends Base
         }
         //加入到swoole的事件循环中
         $re = swoole_event_add($this->inotify_fd, [$this, 'inotify_reload']);
-        output($re, 230);
+        \pms\output($re, 230);
     }
 
     /**

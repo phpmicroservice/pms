@@ -4,11 +4,10 @@ namespace pms;
 
 require_once 'index.php';
 
-use Phalcon\Events\ManagerInterface;
 use Swoole\Table;
 
 /**
- * 服务启动
+ * ws服务
  * Class Server
  * @property \pms\Work $work;
  * @property \pms\Task $task;
@@ -17,16 +16,16 @@ use Swoole\Table;
  * @property \Swoole\Server $swoole_server;
  * @package pms
  */
-class Server extends Base
+class WsServer extends Base
 {
     public $swoole_server;
     public $channel;
-    protected $name = 'Server';
-    protected $inotify_fd;
     public $task;
     public $work;
     public $app;
-    private $logo;# 热更新用
+    protected $name = 'Server';
+    protected $inotify_fd;# 热更新用
+    private $logo;
     private $d_option = SD_OPTION;
 
 
@@ -41,13 +40,18 @@ class Server extends Base
      */
     public function __construct($ip, $port, $mode, $tcp, $option = [])
     {
-        $this->d_option['reactor_num'] = swoole_cpu_num() * ($option['reactor_num_mulriple'] ?? 1);
-        $this->d_option['worker_num'] = swoole_cpu_num() * ($option['worker_num_mulriple'] ?? 2);
-        $this->d_option['task_worker_num'] = swoole_cpu_num() * ($option['task_worker_num_mulriple'] ?? 4);
+        $this->logo=include "logo.php";
+        $this->d_option['reactor_num'] = \swoole_cpu_num() * ($option['reactor_num_mulriple'] ?? 1);
+        $this->d_option['worker_num'] = \swoole_cpu_num() * ($option['worker_num_mulriple'] ?? 2);
+        $this->d_option['task_worker_num'] = \swoole_cpu_num() * ($option['task_worker_num_mulriple'] ?? 4);
 //      $this->logo = require 'logo.php';
         # 加载依赖注入
-        require ROOT_DIR . '/app/di.php';
-        $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
+        if (defined("DI_FILE")) {
+            include_once DI_FILE;
+        }
+        $this->swoole_server = new \Swoole\WebSocket\Server($ip, $port, $mode, $tcp);
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di->set('server',$this->swoole_server);
         parent::__construct($this->swoole_server);
 
         # 设置运行参数
@@ -55,10 +59,11 @@ class Server extends Base
         $this->task = new  Task($this->swoole_server);
         $this->work = new Work($this->swoole_server);
         $this->app = new App($this->swoole_server);
+        $this->app->setType('ws');
         # 注册进程回调函数
         $this->workCall();
         # 注册链接回调函数
-        $this->tcpCall();
+        $this->appCall();
         # 这是通过swoole表格功能做一个简单的表,他们的具有原子性的
         $this->swoole_server->default_table = new \Swoole\Table(1024, 0.2);#1024行
         $this->swoole_server->default_table->column('data', Table::TYPE_INT, 4);
@@ -97,15 +102,12 @@ class Server extends Base
     /**
      * 处理连接回调
      */
-    private function tcpCall()
+    private function appCall()
     {
         # 设置连接回调
-        $this->swoole_server->on('Connect', [$this->app, 'onConnect']);
-        $this->swoole_server->on('Receive', [$this->app, 'onReceive']);
-        $this->swoole_server->on('Packet', [$this->app, 'onPacket']);
-        $this->swoole_server->on('Close', [$this->app, 'onClose']);
-        $this->swoole_server->on('BufferEmpty', [$this->app, 'onBufferEmpty']);
-        $this->swoole_server->on('BufferFull', [$this->app, 'onBufferFull']);
+        $this->swoole_server->on('open', [$this->app, 'onOpen']);
+        $this->swoole_server->on('message', [$this->app, 'onMessage']);
+        $this->swoole_server->on('close', [$this->app, 'onClose']);
     }
 
     /**

@@ -2,7 +2,13 @@
 
 namespace pms\bear;
 
-class ClientSync extends \pms\Base
+
+/**
+ * 客户端,同步
+ * Class ClientSync
+ * @package pms\bear
+ */
+class ClientSync
 {
 
     public $swoole_client;

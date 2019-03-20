@@ -6,6 +6,7 @@ use Phalcon\Cli\Router;
 use Phalcon\Cli\Router\Route;
 use Phalcon\Exception;
 use pms\bear\WsCounnect;
+use pms\Params\Ws;
 
 /**
  * App类,主管应用的产生调度
@@ -28,18 +29,16 @@ class App extends Base
      */
     public function onOpen(\Swoole\WebSocket\Server $server, $request)
     {
-        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
         $di->set('server', $server);
         \pms\Output::output($request, 'open');
         $wscounnect = new WsCounnect($server, $request->fd, []);
+        $wscounnect->open();
+        $wscounnect->analysisRouter('/open');
         $wscounnect->setRequest($request);
         $router = $wscounnect->getRouter();
-        $router['params'] = [
-            'counnect' => $wscounnect,
-            'server' => $server
-        ];
+        $router['params'] = [$wscounnect, $server];
         try {
-
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
             \pms\Output::output([$router['task'], $router['action']], 'open-params');
@@ -62,21 +61,16 @@ class App extends Base
         $di->set('server', $server);
         $wscounnect = new WsCounnect($server, $frame->fd, $frame->data);
         $wscounnect->setFrame($frame);
-        \pms\Output::output($frame, 'message');
+        \pms\Output::output($frame, 'message2');
         $router = $wscounnect->getRouter();
-        $router['params'] = [
-            'counnect' => $wscounnect,
-            'server' => $server
-        ];
-
+        $router['params'] = [$wscounnect, $server];
         try {
-
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
             \pms\Output::output([$router['task'], $router['action']], 'message-params');
             $console->handle($router);
         } catch (Exception $exception) {
-            $wscounnect->send($exception->getMessage());
+            $wscounnect->send($exception->getTrace());
         }
 
     }
@@ -195,10 +189,36 @@ class App extends Base
      */
     public function onClose(\Swoole\Server $server, int $fd, int $reactor_id)
     {
-        \pms\output([$fd, $reactor_id], 'close');
+        $info = $server->getClientInfo($fd);
+        if (isset($info['websocket_status'])) {
+            $this->wsClose($server, $fd, $reactor_id);
+        }
         $this->eventsManager->fire($this->name . ":onClose", $this, [$fd, $reactor_id]);
-
     }
+
+    /**
+     * ws客户端关闭
+     */
+    private function wsClose($server, int $fd, int $reactor_id)
+    {
+        $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
+        $di->set('server', $server);
+        \pms\Output::output($request, 'close');
+        $wscounnect = new WsCounnect($server, $fd, []);
+        $wscounnect->analysisRouter('/close');
+        $router = $wscounnect->getRouter();
+        $router['params'] = [$wscounnect, $server];
+        try {
+            $console = new \Phalcon\Cli\Console();
+            $console->setDI($di);
+            \pms\Output::output([$router['task'], $router['action']], 'close-params');
+            $console->handle($router);
+        } catch (Exception $exception) {
+            echo $exception->getMessage();
+            $wscounnect->send([$exception->getTrace()]);
+        }
+    }
+
 
     /**
      * 编码

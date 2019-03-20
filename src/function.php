@@ -47,7 +47,7 @@ function env_exist(array $list = [])
  */
 function output($data, $msg = 'info')
 {
-    \pms\Output::debug($data, $msg);
+    \pms\Output::output($data, $msg);
 }
 
 /**

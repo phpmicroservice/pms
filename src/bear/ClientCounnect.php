@@ -7,84 +7,37 @@ use function pms\output;
 use Swoole\WebSocket\Frame;
 
 /**
- * Ws链接对象
- * Class WsCounnect
- * @property \Swoole\WebSocket\Server $swoole_server
+ * 客户端链接对象
+ * Class ClientCounnect
+ * @property \Swoole\Client $swoole_client
  * @property \Phalcon\Mvc\Router $router
  * @property \Phalcon\Cache\BackendInterface $cache
  * @package pms\bear
  */
-class WsCounnect
+class ClientCounnect
 {
-    public $swoole_server;
-    protected $name = 'WsCounnect';
+
+    public $swoole_client;
+    protected $name = 'ClientCounnect';
     private $request;
     private $frame;
     private $data;
     private $router;
     private $fd;
 
-    public function __construct(\Swoole\WebSocket\Server $server, int $fd, $data)
+    public function __construct(\Swoole\Client $client, $data)
     {
 //        echo "创建一个链接对象 \n";
-        $this->swoole_server = $server;
+        $this->swoole_client = $client;
         $this->fd = $fd;
         if (!empty($data)) {
-            $this->data = $this->decode($data);
+            $this->data = $data;
         }
         $this->cache = \Phalcon\Di\FactoryDefault\Cli::getDefault()->getShared('cache');
-
-        $this->analysisRouter();
     }
 
     /**
-     * 打开链接
-     */
-    public function open()
-    {
-        $this->resetInterference();
-    }
-
-    /**
-     * 获取干扰符
-     * @return mixed|string|null
-     */
-    public function getInterference()
-    {
-        $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd, 15552000);
-        if (empty($interference)) {
-            return $this->resetInterference();
-        }
-        return $interference;
-
-
-    }
-
-    /**
-     * 重置干扰符,保存干扰符关系
-     * @return string
-     */
-    public function resetInterference()
-    {
-        $interference = uniqid() . mt_rand(11111111, 99999999);
-        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference, 15552000);
-        return $interference;
-    }
-
-
-
-
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($msg)
-    {
-        return \pms\Serialize::unpack($msg);
-    }
-
-    /**
-     *
+     * 解析路由
      */
     public function analysisRouter($router = null)
     {
@@ -105,26 +58,6 @@ class WsCounnect
         return $this->data[ROUTER_INDEX] ?? '/';
     }
 
-
-
-    /**
-     * 获取 $frame
-     * @param $frame
-     */
-    public function getFrame(): Frame
-    {
-        return $this->frame;
-    }
-
-    /**
-     * 设置 $frame
-     * @param $frame
-     */
-    public function setFrame($frame)
-    {
-        $this->frame = $frame;
-    }
-
     /**
      * @param $name
      * @return mixed|null
@@ -132,14 +65,6 @@ class WsCounnect
     public function __get($name)
     {
         return $this->request[$name] ?? null;
-    }
-
-    /**
-     * 获取fd_id
-     */
-    public function getFd()
-    {
-        return $this->fd;
     }
 
     /**
@@ -151,7 +76,6 @@ class WsCounnect
         return $this->data;
     }
 
-
     /**
      * 获取内容
      */
@@ -161,43 +85,12 @@ class WsCounnect
     }
 
     /**
-     * 获取请求信息
-     * @return mixed
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * 设置请求信息
-     * @param $request
-     * @return mixed
-     */
-    public function setRequest(\Swoole\Http\Request $request)
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * 获取链接标识符
-     * @return string
-     */
-    public function getSid()
-    {
-        return md5(RUN_UNIQID . $this->getInterference() . $this->fd) . $this->fd;
-    }
-
-
-    /**
      * 想客户端发送数据
      * @param array $data
      */
     public function send($data)
     {
-
-
-        return $this->swoole_server->push($this->fd, $this->encode($data));
+        return $this->swoole_client->send($this->encode($data));
     }
 
     /**
@@ -233,12 +126,20 @@ class WsCounnect
 
     }
 
-
     /**
      * 销毁一个链接对象
      */
     public function __destruct()
     {
         \pms\Output::debug('销毁一个链接对象');
+    }
+
+    /**
+     * 解码
+     * @param $string
+     */
+    private function decode($msg)
+    {
+        return \pms\Serialize::unpack($msg);
     }
 }

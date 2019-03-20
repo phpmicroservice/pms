@@ -12,7 +12,8 @@ class Session
 {
     private $option = [
         'lifetime' => 600,
-        'prefix' => 'session_'
+        'prefix' => 'session_',
+        'service' => 'cache'
     ];
     private $session_id;
     private $session_key;
@@ -21,14 +22,14 @@ class Session
 
     public function __construct($sid, $option = [])
     {
-
-        $this->sessionCache = \Phalcon\Di::getDefault()->get('sessionCache');
         $this->option = array_merge($this->option, $option);
+        $this->sessionCache = \Phalcon\Di::getDefault()->get($this->option['service']);
         $this->init($sid);
 
     }
 
     /**
+     * 初始化
      * @param $sid
      */
     public function init($sid)
@@ -40,7 +41,7 @@ class Session
         $this->session_id = $sid;
         $this->session_key = $this->option['prefix'] . $sid;
         $this->data = $this->sessionCache->get($this->session_key);
-        Output::debug($this->data, 'session_init');
+
         if (empty($this->data)) {
             $this->data = [];
         }
@@ -51,7 +52,7 @@ class Session
      */
     public function reserve()
     {
-        Output::debug($this->data, 'session_reserve');
+
         $this->data['save_time'] = time();
         $this->sessionCache->save($this->session_key, $this->data, $this->option['lifetime']);
     }

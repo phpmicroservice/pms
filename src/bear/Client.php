@@ -166,16 +166,21 @@ class Client
     }
 
 
+
     /**
-     * 客户端发送数据
-     * @param array $data
+     * 发送数据
+     * @param $data
      */
-    public function send($data)
+    public function send(array $data)
     {
-        if ($this->isConnected) {
+        if (!$this->isConnected) {
+            return false;
+        } else {
+            $data['f'] = $data['f'] ?? strtolower(SERVICE_NAME);
+            $this->eventsManager->fire($this->name . ":beforeSend", $this, $data);
             return $this->swoole_client->send($this->encode($data));
         }
-        return false;
+
     }
 
     /**
@@ -183,11 +188,24 @@ class Client
      * @param array $data
      * @return string
      */
-    private function encode($data): string
+    private function encode(array $data): string
     {
         $msg_normal = \pms\Serialize::pack($data);
-        return $msg_normal;
+        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
+        return $msg_length;
     }
+
+    /**
+     * 解码
+     * @param $string
+     */
+    private function decode($data): array
+    {
+        $length = unpack("N", $data)[1];
+        $msg = substr($data, -$length);
+        return \pms\Serialize::unpack($msg);
+    }
+
 
 
 

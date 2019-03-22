@@ -4,72 +4,41 @@ namespace pms;
 
 require_once 'index.php';
 
-use Phalcon\Events\ManagerInterface;
 use Swoole\Table;
 
 /**
- * 服务启动
- * Class Server
- * @property \pms\Work $work;
- * @property \pms\Task $task;
- * @property \pms\App $app;
- * @property \Swoole\Channel $channel;
- * @property \Swoole\Server $swoole_server;
+ * Class Base
+ * @property \Phalcon\Cache\BackendInterface $cache
+ * @property \Phalcon\Cache\BackendInterface $gCache
+ * @property \Phalcon\Config $config
+ * @property \Phalcon\Config $dConfig
+ * @property \Swoole\Server $swoole_server
  * @package pms
  */
 class Server extends Base
 {
-    public $swoole_server;
-    public $channel;
+
+    protected $swoole_server;
     protected $name = 'Server';
-    protected $inotify_fd;
+    protected $type = 'tcp';
+    public $channel;
     public $task;
     public $work;
     public $app;
-    private $logo;# 热更新用
-    private $d_option = SD_OPTION;
+    protected $inotify_fd; # 热更新用
+    protected $logo;
+    protected $d_option = SD_OPTION;
 
-
-    /**
-     * 初始化
-     * Server constructor.
-     * @param $ip
-     * @param $port
-     * @param $mode
-     * @param $tcp
-     * @param array $option
-     */
-    public function __construct($ip, $port, $mode, $tcp, $option = [])
+    public function __construct($server)
     {
-        $this->d_option['reactor_num'] = swoole_cpu_num() * ($option['reactor_num_mulriple'] ?? 1);
-        $this->d_option['worker_num'] = swoole_cpu_num() * ($option['worker_num_mulriple'] ?? 2);
-        $this->d_option['task_worker_num'] = swoole_cpu_num() * ($option['task_worker_num_mulriple'] ?? 4);
-//      $this->logo = require 'logo.php';
-        # 加载依赖注入
-        require ROOT_DIR . '/app/di.php';
-        $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
-        parent::__construct($this->swoole_server);
-
-        # 设置运行参数
-        $this->swoole_server->set(array_merge($this->d_option, $option));
-        $this->task = new  Task($this->swoole_server);
-        $this->work = new Work($this->swoole_server);
-        $this->app = new App($this->swoole_server);
-        # 注册进程回调函数
-        $this->workCall();
-        # 注册链接回调函数
-        $this->tcpCall();
-        # 这是通过swoole表格功能做一个简单的表,他们的具有原子性的
-        $this->swoole_server->default_table = new \Swoole\Table(1024, 0.2);#1024行
-        $this->swoole_server->default_table->column('data', Table::TYPE_INT, 4);
-        $this->swoole_server->default_table->create();
+//        $this->logo = require 'logo.php';
+        $this->swoole_server = $server;
     }
-
 
     /**
      * 处理进程回调
      */
-    private function workCall()
+    protected function workCall()
     {
 
         $this->swoole_server->on('Task', [$this->task, 'onTask']);
@@ -95,17 +64,14 @@ class Server extends Base
     }
 
     /**
-     * 处理连接回调
+     * 创建表格
      */
-    private function tcpCall()
+    protected function createTable()
     {
-        # 设置连接回调
-        $this->swoole_server->on('Connect', [$this->app, 'onConnect']);
-        $this->swoole_server->on('Receive', [$this->app, 'onReceive']);
-        $this->swoole_server->on('Packet', [$this->app, 'onPacket']);
-        $this->swoole_server->on('Close', [$this->app, 'onClose']);
-        $this->swoole_server->on('BufferEmpty', [$this->app, 'onBufferEmpty']);
-        $this->swoole_server->on('BufferFull', [$this->app, 'onBufferFull']);
+        # 这是通过swoole表格功能做一个简单的表,他们的具有原子性的
+        $this->swoole_server->default_table = new \Swoole\Table(1024, 0.2); #1024行
+        $this->swoole_server->default_table->column('data', Table::TYPE_INT, 4);
+        $this->swoole_server->default_table->create();
     }
 
     /**
@@ -157,13 +123,12 @@ class Server extends Base
         }
     }
 
-
     /**
      * 初始化APP
      * @param $server
      * @param $worker_id
      */
-    private function initapp($server, $worker_id)
+    protected function initapp($server, $worker_id)
     {
         \pms\output('init');
         # 热更新
@@ -209,7 +174,7 @@ class Server extends Base
      * @param $timer_id
      * @param $dir
      */
-    private function codeUpdateCall($dir)
+    public function codeUpdateCall($dir)
     {
         // 监控的目录，默认是Applications
         $monitor_dir = realpath($dir);
@@ -226,8 +191,6 @@ class Server extends Base
             // 把文件加入inotify监控，这里只监控了IN_MODIFY文件更新事件
             $wd = inotify_add_watch($this->inotify_fd, $file, IN_MODIFY);
         }
-
-
     }
 
     /**
@@ -249,7 +212,6 @@ class Server extends Base
     {
         \pms\Output::debug('readySucceed', 'readySucceed');
         $this->eventsManager->fire($this->name . ':readySucceed', $this, $this->swoole_server);
-
     }
 
     /**
@@ -272,7 +234,6 @@ class Server extends Base
             }
         }
     }
-
 
     /**
      * 此事件在Server正常结束时发生
@@ -322,7 +283,6 @@ class Server extends Base
         }
     }
 
-
     /**
      * 当管理进程启动时调用它
      * @param \Swoole\Server $server
@@ -341,5 +301,19 @@ class Server extends Base
     {
         \pms\output('on onManagerStop');
         $this->eventsManager->fire($this->name . ':onManagerStop', $this, $server);
+    }
+
+    /**
+     * 设置类型 ['tcp','udp','ws','http']
+     * @param $type
+     */
+    public function setType($type)
+    {
+        $in = ['tcp', 'udp', 'ws', 'http'];
+        if (in_array($type, $in)) {
+            $this->type = $type;
+        } else {
+            throw new \Exception("不合法的类型");
+        }
     }
 }

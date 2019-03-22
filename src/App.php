@@ -2,11 +2,9 @@
 
 namespace pms;
 
-use Phalcon\Cli\Router;
-use Phalcon\Cli\Router\Route;
 use Phalcon\Exception;
 use pms\bear\WsCounnect;
-use pms\Params\Ws;
+
 
 /**
  * App类,主管应用的产生调度
@@ -18,7 +16,7 @@ class App extends Base
 
     public function init(\Swoole\Server $server, $worker_id)
     {
-        $this->eventsManager->fire($this->name . ":init", $this, [$server, $worker_id]);
+        $this->eventsManager->fire($this->name . ":init", $this, $server);
     }
 
 
@@ -113,29 +111,19 @@ class App extends Base
      */
     private function receive($server, $fd, $reactor_id, $data)
     {
-        $this->eventsManager->fire($this->name . ":receive", $this, [$fd, $reactor_id, $data]);
-        $connect = new bear\Counnect($server, $fd, $reactor_id, $data);
-        $router = $this->di->get('router');
-        $router->handle($connect->getRouter());
-        $dispatcher = new \pms\Dispatcher();
-        $dispatcher->setDi($this->di);
-        $dispatcher->setActionSuffix('');
-        $dispatcher->setTaskSuffix('');
-        $dispatcher->setConnect($connect);
-        $dispatcher->setServer($server);
-        $dispatcher->setEventsManager($this->eventsManager);
-        \pms\output([
-            'n' => $router->getNamespaceName(),
-            'c' => $router->getControllerName(),
-            'a' => $router->getActionName(),
-            'm' => $router->getModuleName(),
-        ], 'handel');
-        $dispatcher->setDefaultNamespace($router->getNamespaceName());
-        $dispatcher->setTaskName($router->getControllerName());
-        $dispatcher->setActionName($router->getActionName());
-        $dispatcher->setModuleName($router->getModuleName());
-        $dispatcher->setParams($router->getParams());
-        $handle = $dispatcher->dispatch();
+         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di->set('server', $server);
+        $counnect = new bear\Counnect($server, $fd,$reactor_id ,$data);
+        $router = $counnect->getRouter();
+        $router['params'] = [$counnect, $server];
+        try {
+            $console = new \Phalcon\Cli\Console();
+            $console->setDI($di);
+            \pms\Output::output([$router['task'], $router['action']], 'message-params');
+            $console->handle($router);
+        } catch (Exception $exception) {
+            $wscounnect->send($exception->getTrace());
+        }
 
     }
 

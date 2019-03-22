@@ -3,7 +3,7 @@
 namespace pms\bear;
 
 /**
- * 链接对象
+ * TCP 链接对象
  * Class Counnect
  * @property \swoole_server $swoole_server
  * @package pms
@@ -15,19 +15,91 @@ class Counnect
     protected $name = 'Counnect';
     private $fd;
     private $reactor_id;
-    private $passing = false;
 
-    public function __construct(\swoole_server $server, int $fd, int $reactor_id, array $data)
+    public function __construct(\Swoole\Server $server, int $fd, int $reactor_id, array $data)
     {
 //        echo "创建一个链接对象 \n";
         $this->swoole_server = $server;
         $this->fd = $fd;
-        $this->reactor_id = $reactor_id;
-        $this->request = $data;
-        if (isset($data['p'])) {
-            $this->passing = $this->request['p'];
+        if (!empty($data)) {
+            $this->data = $data;
+            $this->request= $this->data['d'];
         }
+        $this->cache = \Phalcon\Di\FactoryDefault\Cli::getDefault()->getShared('cache');
+
+        $this->analysisRouter();
     }
+
+    /**
+     * 打开链接
+     */
+    public function open()
+    {
+        $this->resetInterference();
+    }
+
+    /**
+     * 获取干扰符
+     * @return mixed|string|null
+     */
+    public function getInterference()
+    {
+        $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd, 15552000);
+        if (empty($interference)) {
+            return $this->resetInterference();
+        }
+        return $interference;
+
+
+    }
+
+    /**
+     * 重置干扰符,保存干扰符关系
+     * @return string
+     */
+    public function resetInterference()
+    {
+        $interference = uniqid() . mt_rand(11111111, 99999999);
+        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference, 15552000);
+        return $interference;
+    }
+
+
+
+
+    /**
+     * 解码
+     * @param $string
+     */
+    private function decode($msg)
+    {
+        return \pms\Serialize::unpack($msg);
+    }
+
+    /**
+     *
+     */
+    public function analysisRouter($router = null)
+    {
+        $this->router = \Phalcon\Di::getDefault()->get('router2');
+        if ($router) {
+            $this->router->handle($router);
+        } else {
+            $this->router->handle($this->getRouterString());
+        }
+
+    }
+
+    /**
+     * 获取路由字符串
+     */
+    public function getRouterString()
+    {
+        return $this->data[ROUTER_INDEX] ?? '/';
+    }
+
+
+
 
     /**
      * @param $name
@@ -51,37 +123,33 @@ class Counnect
      * 获取数据
      * @return mixed
      */
-    public function getData()
+    public function getData($index = null)
     {
-
-        return $this->request['d'];
+        if ($index) {
+            return $this->data[$index] ?? null;
+        }
+        return $this->data;
     }
 
+
     /**
-     * 发送一个请求
-     * @param $router
-     * @param $data
-     * @return bool
+     * 获取内容
      */
-    public function send_ask($server, $router, $data)
+    public function getContent($index = null)
     {
-        return $this->send([
-            's' => $server,
-            'r' => $router,
-            'd' => $data
-        ]);
+        if ($index) {
+            return $this->data['d'][$index] ?? null;
+        }
+        return $this->data['d'];
     }
 
     /**
      * 想客户端发送数据
      * @param array $data
      */
-    private function send(array $data)
+    public function send(array $data)
     {
-        if ($this->passing) {
-            $data['p'] = $this->passing;
-        }
-        $data['f'] = strtolower(SERVICE_NAME);
+        
         return $this->swoole_server->send($this->fd, $this->encode($data));
     }
 
@@ -97,48 +165,27 @@ class Counnect
         return $msg_length;
     }
 
-    /**
-     * 发送一个成功
-     * @param $m 消息
-     * @param array $d 数据
-     * @param int $t 类型
-     */
-    public function send_succee($d = [], $m = '成功', $t = '')
-    {
-        $data = [
-            'm' => $m,
-            'd' => $d,
-            'e' => 0,
-            't' => empty($t) ? $this->getRouter() : $t
-        ];
-        return $this->send($data);
-    }
-
-    /**
+   
+      /**
      * 获取路由
      * @return mixed
      */
-    public function getRouter()
+    public function getRouter($model = 'cli'): array
     {
-        return $this->request['r'];
-    }
+        if ($model == 'cli') {
+            return [
+                'module' => $this->router->getModuleName(),
+                'task' => $this->router->getControllerName(),
+                'action' => $this->router->getActionName()
+            ];
+        } else {
+            return [
+                'module' => $this->router->getModuleName(),
+                'controller' => $this->router->getControllerName(),
+                'action' => $this->router->getActionName()
+            ];
+        }
 
-    /**
-     * 发送一个错误的消息
-     * @param $m 错误消息
-     * @param array $d 错误数据
-     * @param int $e 错误代码
-     * @param int $t 类型,路由
-     */
-    public function send_error($m, $d = [], $e = 1, $t = '')
-    {
-        $data = [
-            'm' => $m,
-            'd' => $d,
-            'e' => $e,
-            't' => empty($t) ? $this->getRouter() : $t
-        ];
-        return $this->send($data);
     }
 
     /**

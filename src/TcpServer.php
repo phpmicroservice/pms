@@ -2,11 +2,8 @@
 
 namespace pms;
 
-require_once 'index.php';
-
-
 /**
- * ws服务
+ * tcp服务
  * Class Server
  * @property \pms\Work $work;
  * @property \pms\Task $task;
@@ -15,7 +12,8 @@ require_once 'index.php';
  * @property \Swoole\Server $swoole_server;
  * @package pms
  */
-class WsServer extends Base {
+class TcpServer extends Server
+{
 
     /**
      * 初始化
@@ -26,18 +24,23 @@ class WsServer extends Base {
      * @param $tcp
      * @param array $option
      */
-    public function __construct($ip, $port, $mode, $tcp, $option = []) {
+    public function __construct($ip, $port, $mode, $tcp, $option = [])
+    {
         $this->logo = include "logo.php";
         $this->d_option['reactor_num'] = \swoole_cpu_num() * ($option['reactor_num_mulriple'] ?? 1);
         $this->d_option['worker_num'] = \swoole_cpu_num() * ($option['worker_num_mulriple'] ?? 2);
         $this->d_option['task_worker_num'] = \swoole_cpu_num() * ($option['task_worker_num_mulriple'] ?? 4);
         # 加载依赖注入
         if (defined("DI_FILE")) {
+             Output::output(DI_FILE, 'DI_FILE');
             include_once DI_FILE;
+        } else {
+            throw new \Phalcon\Exception("undefined constant DI_FILE");
         }
-        $this->swoole_server = new \Swoole\WebSocket\Server($ip, $port, $mode, $tcp);
+        $this->swoole_server = new \Swoole\Server($ip, $port, $mode, $tcp);
         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
-        $di->set('server', $this->swoole_server);
+       
+        $di->setShared('server', $this->swoole_server);
         parent::__construct($this->swoole_server);
 
         # 设置运行参数
@@ -45,22 +48,25 @@ class WsServer extends Base {
         $this->task = new Task($this->swoole_server);
         $this->work = new Work($this->swoole_server);
         $this->app = new App($this->swoole_server);
-        $this->app->setType('ws');
         # 注册进程回调函数
         $this->workCall();
         # 注册链接回调函数
-        $this->wsCall();
+        $this->tcpCall();
         $this->createTable();
     }
 
     /**
      * 处理连接回调
      */
-    private function wsCall() {
+    private function tcpCall()
+    {
         # 设置连接回调
-        $this->swoole_server->on('open', [$this->app, 'onOpen']);
-        $this->swoole_server->on('message', [$this->app, 'onMessage']);
-        $this->swoole_server->on('close', [$this->app, 'onClose']);
+        $this->swoole_server->on('Connect', [$this->app, 'onConnect']);
+        $this->swoole_server->on('Receive', [$this->app, 'onReceive']);
+        $this->swoole_server->on('Packet', [$this->app, 'onPacket']);
+        $this->swoole_server->on('Close', [$this->app, 'onClose']);
+        $this->swoole_server->on('BufferEmpty', [$this->app, 'onBufferEmpty']);
+        $this->swoole_server->on('BufferFull', [$this->app, 'onBufferFull']);
     }
 
 }

@@ -59,7 +59,7 @@ class Task extends Base
      * @param $timer_id
      * @param $dir
      */
-    private function codeUpdateCall($dir)
+    protected function codeUpdateCall($dir)
     {
         static $last_mtime = START_TIME;
         // recursive traversal directory

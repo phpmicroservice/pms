@@ -20,12 +20,12 @@ class Session
     private $data;
     private $sessionCache;
 
-    public function __construct($sid, $option = [])
+    public function __construct(string $sid, $option = [])
     {
+
         $this->option = array_merge($this->option, $option);
         $this->sessionCache = \Phalcon\Di::getDefault()->get($this->option['service']);
         $this->init($sid);
-
     }
 
     /**

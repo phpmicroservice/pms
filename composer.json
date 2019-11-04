@@ -20,10 +20,9 @@
     }
   ],
   "require": {
-    "php": ">7.2",
+    "php": ">=7.2",
     "ext-swoole": "4.*",
     "ext-phalcon": "3.4.*",
-    "ext-swoole_serialize": "0.1.*",
     "phpmicroservice/funch": "0.*"
   },
   "require-dev": {

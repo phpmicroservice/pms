@@ -35,13 +35,15 @@ if (!is_dir(RUNTIME_DIR)) mkdir(RUNTIME_DIR, 775, true);
 
 
 defined('APP_DEBUG') || define('APP_DEBUG', boolval(\pms\get_env("APP_DEBUG", 1)));# debug 的开启
+
 # 输出级别定义
 defined('OUTPUT_ERROR') || define('OUTPUT_ERROR', \pms\get_envbl("OUTPUT_ERROR", 1));# error级别的输出 的开启
 defined('OUTPUT_INFO') || define('OUTPUT_INFO', \pms\get_envbl("OUTPUT_INFO", 1));# error级别的输出 的开启
 defined('OUTPUT_APP') || define('OUTPUT_APP', \pms\get_envbl("OUTPUT_APP", 1));# APP级别的输出 的开启
 defined('OUTPUT_NOTICE') || define('OUTPUT_NOTICE', \pms\get_envbl("OUTPUT_NOTICE", 1));# notice级别的输出 的开启
 defined('OUTPUT_PMS') || define('OUTPUT_PMS', \pms\get_envbl("OUTPUT_PMS", 1));# notice级别的输出 的开启
-defined('NO_OUTPUT') || define('NO_OUTPUT', \pms\get_envbl("NO_OUTPUT", 1));# notice级别的输出 的开启
+defined('NO_OUTPUT') || define('NO_OUTPUT', \pms\get_envbl("NO_OUTPUT", 0));# notice级别的输出 的开启
+
 
 defined('SD_OPTION') || define('SD_OPTION', ['open_length_check' => true,
     'package_max_length' => 83886080,
@@ -70,5 +72,3 @@ if (empty(\pms\get_env("APP_HOST_PORT"))) {
 }
 define('APP_HOST_PORT', $host_port);
 
-echo '项目的访问地址为:' . APP_HOST_IP . ':' . APP_HOST_PORT . " \n";
-echo '当前PHP的版本为:' . PHP_VERSION . ' ,Phalcon版本为:' . \Phalcon\Version::get() . '  ,Swoole的版本为:' . \swoole_version() . " \n";

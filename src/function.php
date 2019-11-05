@@ -101,3 +101,22 @@ function sub_access($accessKey, $name)
         md5(substr(md5($accessKey), 10) . $accessKey) .
         substr(md5($accessKey . $name), 10));
 }
+
+
+/**
+ * 获取hash 排序,拼接串,拼接key,url格式化,md5
+ * @param $resource
+ * @return string
+ */
+function getHash(array $resource, string $sign): string
+{
+    $chuan = '';
+    ksort($resource);
+    foreach ($resource as $k => $v) {
+        $chuan .= '&' . $k . '=' . $v;
+    }
+    $chuan = trim($chuan, '&');
+    $chuan = $chuan . '&key=' . $sign;
+    return md5(urlencode($chuan));
+
+}

@@ -4,32 +4,32 @@ namespace pms;
 
 class Output
 {
-    public static $DEBUG = 2;
-    public static $INFO = 1;
+    public static $PMS = -1;
     public static $ERROR = 0;
+    public static $INFO = 1;
+    public static $DEBUG = 2;
     public static $APP = 3;
     public static $NOTICE = 4;
-    public static $PMS = -1;
 
     public static function out($data, $message, $lv = 2)
     {
-        if ($lv == 0 && OUTPUT_ERROR) {
+        if ($lv == 0) {
             self::output($data, $message);
         }
-        if ($lv == 1 && OUTPUT_INFO) {
+        if ($lv == 1) {
             self::output($data, $message);
         }
 
-        if ($lv == 2 && APP_DEBUG) {
+        if ($lv == 2) {
             self::output($data, $message);
         }
-        if ($lv == 3 && OUTPUT_APP) {
+        if ($lv == 3) {
             self::output($data, $message);
         }
-        if ($lv == 4 && OUTPUT_NOTICE) {
+        if ($lv == 4) {
             self::output($data, $message);
         }
-        if ($lv == -1 && OUTPUT_PMS) {
+        if ($lv == -1) {
             self::output($data, $message);
         }
     }

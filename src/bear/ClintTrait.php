@@ -25,31 +25,7 @@ trait ClintTrait
         $data['f'] = $data['f'] ?? strtolower(SERVICE_NAME);
         return $this->swoole_client->send($this->encode($data));
     }
-
-    /**
-     * 编码
-     * @param array $data
-     * @return string
-     */
-    private function encode(array $data): string
-    {
-        $msg_normal = \pms\Serialize::pack($data);
-        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
-        return $msg_length;
-    }
-
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($data): array
-    {
-        $length = unpack("N", $data)[1];
-        $msg = substr($data, -$length);
-        echo $msg;
-        return \pms\Serialize::unpack($msg);
-    }
-
+    
 
     public function ask_recv($server, $router, $data)
     {
@@ -108,5 +84,39 @@ trait ClintTrait
         ]);
     }
 
+    /**
+     * 发送一个错误的消息
+     * @param $m 错误消息
+     * @param array $d 错误数据
+     * @param int $e 错误代码
+     * @param int $t 类型,路由
+     */
+    public function send_error($m, $d = [], $e = 1, $t = '')
+    {
+        $data = [
+            'm' => $m,
+            'd' => $d,
+            'e' => $e,
+            't' => empty($t) ? $this->getRouter() : $t
+        ];
+        return $this->send($data);
+    }
+
+    /**
+     * 发送一个成功
+     * @param $m 消息
+     * @param array $d 数据
+     * @param int $t 类型
+     */
+    public function send_succee($d = [], $m = '成功', $t = '')
+    {
+        $data = [
+            'm' => $m,
+            'd' => $d,
+            'e' => 0,
+            't' => empty($t) ? $this->getRouter() : $t
+        ];
+        return $this->send($data);
+    }
 
 }

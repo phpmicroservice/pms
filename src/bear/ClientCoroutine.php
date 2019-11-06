@@ -3,6 +3,8 @@
 namespace pms\bear;
 
 
+use pms\Serialize\SerializeTrait;
+
 /**
  * 客户端,协程
  * Class ClientCoroutine
@@ -11,6 +13,7 @@ namespace pms\bear;
 class ClientCoroutine
 {
     use ClintTrait;
+    use SerializeTrait;
 
     public $swoole_client;
     public $isConnected = false;

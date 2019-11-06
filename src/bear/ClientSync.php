@@ -3,6 +3,8 @@
 namespace pms\bear;
 
 
+use pms\Serialize\SerializeTrait;
+
 /**
  * 客户端,同步
  * Class ClientSync
@@ -10,6 +12,7 @@ namespace pms\bear;
  */
 class ClientSync
 {
+    use SerializeTrait;
 
     public $swoole_client;
     public $isConnected = false;

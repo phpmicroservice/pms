@@ -3,6 +3,7 @@
 namespace pms\bear;
 
 use Phalcon\Mvc\Router;
+use pms\Serialize\SerializeTrait;
 use function pms\output;
 use Swoole\WebSocket\Frame;
 
@@ -16,6 +17,8 @@ use Swoole\WebSocket\Frame;
  */
 class ClientCounnect
 {
+
+    use SerializeTrait;
 
     public $swoole_client;
     protected $name = 'ClientCounnect';
@@ -93,16 +96,8 @@ class ClientCounnect
         return $this->swoole_client->send($this->encode($data));
     }
 
-    /**
-     * 编码
-     * @param array $data
-     * @return string
-     */
-    private function encode($data): string
-    {
-        $msg_normal = \pms\Serialize::pack($data);
-        return $msg_normal;
-    }
+
+
 
     /**
      * 获取路由
@@ -133,13 +128,5 @@ class ClientCounnect
     {
         \pms\Output::debug('销毁一个链接对象');
     }
-
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($msg)
-    {
-        return \pms\Serialize::unpack($msg);
-    }
+    
 }

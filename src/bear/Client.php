@@ -3,6 +3,7 @@
 namespace pms\bear;
 
 use Phalcon\Events\ManagerInterface;
+use pms\Serialize\SerializeTrait;
 
 /**
  * 客户端 异步
@@ -13,6 +14,7 @@ use Phalcon\Events\ManagerInterface;
 class Client
 {
     use ClintTrait;
+    use SerializeTrait;
     public $swoole_client;
     public $isConnected = false;
     protected $swoole_server;

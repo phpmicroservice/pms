@@ -3,6 +3,7 @@
 namespace pms\bear;
 
 use Phalcon\Mvc\Router;
+use pms\Serialize\SerializeTrait;
 use function pms\output;
 use Swoole\WebSocket\Frame;
 
@@ -16,6 +17,8 @@ use Swoole\WebSocket\Frame;
  */
 class WsCounnect
 {
+    use SerializeTrait;
+
     public $swoole_server;
     protected $name = 'WsCounnect';
     private $request;
@@ -36,75 +39,6 @@ class WsCounnect
 
         $this->analysisRouter();
     }
-
-    /**
-     * 打开链接
-     */
-    public function open()
-    {
-        $this->resetInterference();
-    }
-
-    /**
-     * 获取干扰符
-     * @return mixed|string|null
-     */
-    public function getInterference()
-    {
-        $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd, 15552000);
-        if (empty($interference)) {
-            return $this->resetInterference();
-        }
-        return $interference;
-
-
-    }
-
-    /**
-     * 重置干扰符,保存干扰符关系
-     * @return string
-     */
-    public function resetInterference()
-    {
-        $interference = uniqid() . mt_rand(11111111, 99999999);
-        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference, 15552000);
-        return $interference;
-    }
-
-
-
-
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($msg)
-    {
-        return \pms\Serialize::unpack($msg);
-    }
-
-    /**
-     *
-     */
-    public function analysisRouter($router = null)
-    {
-        $this->router = \Phalcon\Di::getDefault()->get('router2');
-        if ($router) {
-            $this->router->handle($router);
-        } else {
-            $this->router->handle($this->getRouterString());
-        }
-
-    }
-
-    /**
-     * 获取路由字符串
-     */
-    public function getRouterString()
-    {
-        return $this->data[ROUTER_INDEX] ?? '/';
-    }
-
 
 
     /**
@@ -132,32 +66,6 @@ class WsCounnect
     public function __get($name)
     {
         return $this->request[$name] ?? null;
-    }
-
-    /**
-     * 获取fd_id
-     */
-    public function getFd()
-    {
-        return $this->fd;
-    }
-
-    /**
-     * 获取数据
-     * @return mixed
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-
-    /**
-     * 获取内容
-     */
-    public function getContent()
-    {
-        return $this->data['d'];
     }
 
     /**
@@ -195,42 +103,7 @@ class WsCounnect
      */
     public function send($data)
     {
-
-
         return $this->swoole_server->push($this->fd, $this->encode($data));
-    }
-
-    /**
-     * 编码
-     * @param array $data
-     * @return string
-     */
-    private function encode($data): string
-    {
-        $msg_normal = \pms\Serialize::pack($data);
-        return $msg_normal;
-    }
-
-    /**
-     * 获取路由
-     * @return mixed
-     */
-    public function getRouter($model = 'cli'): array
-    {
-        if ($model == 'cli') {
-            return [
-                'module' => $this->router->getModuleName(),
-                'task' => $this->router->getControllerName(),
-                'action' => $this->router->getActionName()
-            ];
-        } else {
-            return [
-                'module' => $this->router->getModuleName(),
-                'controller' => $this->router->getControllerName(),
-                'action' => $this->router->getActionName()
-            ];
-        }
-
     }
 
 

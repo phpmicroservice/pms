@@ -29,6 +29,10 @@
     "eaglewu/swoole-ide-helper": "dev-master@dev",
     "phalcon/ide-stubs": "v3.4.*"
   },
+  "suggest": {
+    "ext-memcached": "*",
+    "ext-pdo": "*"
+  },
   "autoload": {
     "psr-4": {
       "pms\\": "src/"

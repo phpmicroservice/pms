@@ -46,6 +46,7 @@ trait ClintTrait
     {
         $length = unpack("N", $data)[1];
         $msg = substr($data, -$length);
+        echo $msg;
         return \pms\Serialize::unpack($msg);
     }
 

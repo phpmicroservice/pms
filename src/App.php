@@ -191,7 +191,7 @@ class App extends Base
     {
         $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
         $di->set('server', $server);
-        \pms\Output::output($request, 'close');
+
         $wscounnect = new WsCounnect($server, $fd, []);
         $wscounnect->analysisRouter('/close');
         $router = $wscounnect->getRouter();
@@ -199,7 +199,6 @@ class App extends Base
         try {
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
-            \pms\Output::output([$router['task'], $router['action']], 'close-params');
             $console->handle($router);
         } catch (Exception $exception) {
             echo $exception->getMessage();

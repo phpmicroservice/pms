@@ -111,7 +111,7 @@ class App extends Base
      */
     private function receive($server, $fd, $reactor_id, $data)
     {
-         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
         $di->set('server', $server);
         $counnect = new bear\Counnect($server, $fd,$reactor_id ,$data);
         $router = $counnect->getRouter();
@@ -119,7 +119,11 @@ class App extends Base
         try {
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
-            \pms\Output::output([$router['task'], $router['action']], 'message-params');
+            \pms\Output::output([
+                $router['task'],
+                $router['action'],
+                get_class($di->getShared('router'))
+            ], 'message-params');
             $console->handle($router);
         } catch (Exception $exception) {
             $wscounnect->send($exception->getTrace());

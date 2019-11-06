@@ -230,7 +230,7 @@ class Server extends Base
             foreach ($events as $event) {
                 echo "inotify Event :" . var_export($event, 1) . "\n";
                 echo "关闭系统!自动重启!";
-                $this->swoole_server->shutdown();
+                $this->swoole_server->reload();
             }
         }
     }

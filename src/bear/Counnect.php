@@ -13,6 +13,7 @@ use pms\Serialize\SerializeTrait;
 class Counnect
 {
     use SerializeTrait;
+    use CounnectTrait;
     public $swoole_server;
     public $request;
     protected $name = 'Counnect';

@@ -3,7 +3,6 @@
 namespace pms\bear;
 
 use Phalcon\Mvc\Router;
-use pms\Serialize\SerializeTrait;
 use function pms\output;
 use Swoole\WebSocket\Frame;
 
@@ -17,7 +16,7 @@ use Swoole\WebSocket\Frame;
  */
 class WsCounnect
 {
-    use SerializeTrait;
+    use CounnectTrait;
 
     public $swoole_server;
     protected $name = 'WsCounnect';

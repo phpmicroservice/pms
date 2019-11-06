@@ -77,22 +77,4 @@ class ClientCoroutine
 
 
 
-
-
-
-
-    /**
-     * 链接成功
-     * @param \swoole_client $client
-     */
-    public function connect(\swoole_client $client)
-    {
-        $this->isConnected = true;
-        echo "Client connect \n";
-        $this->eventsManager->fire($this->name . ":connect", $this, $client);
-    }
-
-    
-
-
 }

@@ -4,12 +4,13 @@ namespace pms\bear;
 
 
 /**
- * 客户端,同步
- * Class ClientSync
+ * 客户端,协程
+ * Class ClientCoroutine
  * @package pms\bear
  */
-class ClientSync
+class ClientCoroutine
 {
+    use ClintTrait;
 
     public $swoole_client;
     public $isConnected = false;
@@ -26,7 +27,7 @@ class ClientSync
     {
         $this->server_ip = $ip;
         $this->server_port = $port;
-        \pms\output([$ip, $port], 'ClientSync');
+        \pms\output([$ip, $port], 'ClientCoroutine');
         $this->swoole_client = new \Swoole\Client(SWOOLE_SOCK_TCP);
         $this->swoole_client->set($this->option);
         if (!$this->swoole_client->connect($this->server_ip, $this->server_port, $timeout)) {
@@ -45,6 +46,10 @@ class ClientSync
     {
         return $this->isConnected;
     }
+
+
+
+
 
 
     /**
@@ -71,6 +76,11 @@ class ClientSync
     }
 
 
+
+
+
+
+
     /**
      * 链接成功
      * @param \swoole_client $client
@@ -82,8 +92,7 @@ class ClientSync
         $this->eventsManager->fire($this->name . ":connect", $this, $client);
     }
 
-
-
+    
 
 
 }

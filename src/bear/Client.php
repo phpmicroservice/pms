@@ -12,6 +12,7 @@ use Phalcon\Events\ManagerInterface;
  */
 class Client
 {
+    use ClintTrait;
     public $swoole_client;
     public $isConnected = false;
     protected $swoole_server;
@@ -52,14 +53,7 @@ class Client
         $this->swoole_client->on("bufferEmpty", [$this, 'bufferEmpty']);
     }
 
-    /**
-     * 判断链接
-     * @return bool
-     */
-    public function isConnected()
-    {
-        return $this->isConnected;
-    }
+   
 
     /**
      * 开始,链接服务器
@@ -183,28 +177,6 @@ class Client
 
     }
 
-    /**
-     * 编码
-     * @param array $data
-     * @return string
-     */
-    private function encode(array $data): string
-    {
-        $msg_normal = \pms\Serialize::pack($data);
-        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
-        return $msg_length;
-    }
-
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($data): array
-    {
-        $length = unpack("N", $data)[1];
-        $msg = substr($data, -$length);
-        return \pms\Serialize::unpack($msg);
-    }
 
 
 

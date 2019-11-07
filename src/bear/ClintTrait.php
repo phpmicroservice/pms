@@ -13,7 +13,7 @@ trait ClintTrait
      */
     public function isConnected()
     {
-        return $this->isConnected;
+        return $this->swoole_client->isConnected;
     }
 
     /**

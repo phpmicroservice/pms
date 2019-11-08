@@ -4,6 +4,7 @@ namespace pms;
 
 use Phalcon\Exception;
 use pms\bear\WsCounnect;
+use pms\Serialize\SerializeTrait;
 
 
 /**
@@ -11,7 +12,7 @@ use pms\bear\WsCounnect;
  */
 class App extends Base
 {
-
+    use SerializeTrait;
     protected $name = 'App';
 
     public function init(\Swoole\Server $server, $worker_id)
@@ -113,6 +114,7 @@ class App extends Base
     {
         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
         $di->set('server', $server);
+        \pms\Output::output($data, 'message-data');
         $counnect = new bear\Counnect($server, $fd,$reactor_id ,$data);
         $router = $counnect->getRouter();
         $router['params'] = [$counnect, $server];
@@ -131,16 +133,6 @@ class App extends Base
 
     }
 
-    /**
-     * 解码
-     * @param $string
-     */
-    private function decode($data): array
-    {
-        $length = unpack("N", $data)[1];
-        $msg = substr($data, -$length);
-        return \pms\Serialize::unpack($msg);
-    }
 
     /**
      * upd 收到数据
@@ -210,16 +202,5 @@ class App extends Base
         }
     }
 
-
-    /**
-     * 编码
-     * @param array $data
-     * @return string
-     */
-    private function encode(array $data): string
-    {
-        $msg_normal = \pms\Serialize::pack($data);
-        $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;
-        return $msg_length;
-    }
+    
 }

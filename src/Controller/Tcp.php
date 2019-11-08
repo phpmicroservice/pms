@@ -38,4 +38,17 @@ abstract class Tcp extends \Phalcon\Di\Injectable
         return $this->connect->getContent($index);
     }
 
+    /**
+     * 发送到任务
+     * @param $name
+     * @param $data
+     */
+    public function runTask($name,$data)
+    {
+        return $this->server->task([
+            'name'=>$name,
+            'data'=>$data
+        ]);
+    }
+
 }

@@ -4,6 +4,7 @@ namespace pms\bear;
 
 use Phalcon\Events\ManagerInterface;
 use pms\Serialize\SerializeTrait;
+use function pms\output;
 
 /**
  * 客户端 异步,可绑定同步回调函数的
@@ -161,14 +162,12 @@ class Client2 extends \pms\Base
      * @param \swoole_client $cli
      * @param $data
      */
-    public function receive_true(\swoole_client $client, $data)
+    public function receive_true(\swoole_client $client, $data_string)
     {
         $this->eventsManager->fire($this->name . ":receive_true", $this, $data);
-        \pms\Output::debug('内容不展示', '客户端收到消息' . $this->name);
-        $data_arr =$this->decode($data);
-        foreach ($data_arr as $value) {
-            $this->receive($value);
-        }
+        \pms\Output::output($data_string, '客户端收到消息' . $this->name);
+        $this->receive($data_string);
+
 
     }
 
@@ -176,10 +175,10 @@ class Client2 extends \pms\Base
      * 收到值,解码可用的
      * @param $value
      */
-    private function receive($value)
+    private function receive($data_string)
     {
-        $data = $this->decode($value);
-        \pms\Output::debug($data, 'client_receive' . $this->name);
+        $data = $this->decode($data_string);
+        \pms\Output::output($data, 'client_receive' . $this->name);
         $this->eventsManager->fire($this->name . ":receive", $this, $data);
     }
 

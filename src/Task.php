@@ -75,6 +75,7 @@ class Task extends Base
                         $last_mtime = time();
                         echo $file . " ---|lasttime : " . date('Y-m-d H:i:s', $last_mtime) . "and getMTime: " . date('Y-m-d H:i:s', $getMTime) . " update and reload \n";
                         echo "关闭系统!自动重启!";
+                        $this->swoole_server->default_table->set('server-wkinit', ['data' => 0]);
                         $this->swoole_server->reload();
                         break;
                     }

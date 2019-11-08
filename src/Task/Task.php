@@ -48,7 +48,7 @@ class Task
     {
         \Phalcon\Di::getDefault()->get('db')->connect();
         $startTime = microtime(true);
-        $re = $this->run();
+        $re = $this->run($this->trueData);
         $endTime = microtime(true);
 
         $data = $this->trueData;

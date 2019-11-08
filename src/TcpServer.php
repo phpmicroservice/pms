@@ -42,9 +42,10 @@ class TcpServer extends Server
        
         $di->setShared('server', $this->swoole_server);
         parent::__construct($this->swoole_server);
-
+        $this->d_option= array_merge($this->d_option, $option);
+        Output::output($this->d_option, 'd_option');
         # 设置运行参数
-        $this->swoole_server->set(array_merge($this->d_option, $option));
+        $this->swoole_server->set($this->d_option);
         $this->task = new Task($this->swoole_server);
         $this->work = new Work($this->swoole_server);
         $this->app = new App($this->swoole_server);

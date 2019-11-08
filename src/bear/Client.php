@@ -3,7 +3,9 @@
 namespace pms\bear;
 
 use Phalcon\Events\ManagerInterface;
+use pms\Base;
 use pms\Serialize\SerializeTrait;
+use function pms\output;
 
 /**
  * 客户端 异步
@@ -11,7 +13,7 @@ use pms\Serialize\SerializeTrait;
  * @property \swoole_client $swoole_client
  * @package pms\bear
  */
-class Client
+class Client extends Base
 {
     use ClintTrait;
     use SerializeTrait;
@@ -26,12 +28,15 @@ class Client
     /**
      * 配置初始化
      */
-    public function __construct($ip, $port, $option = [], $name = 'client')
+    public function __construct(string $ip, string $port, $option = [], $name = 'client')
     {
+        static $c_n = 1;
+        $c_n++;
+
         $this->name = $name . $c_n;
         $this->server_ip = $ip;
         $this->server_port = $port;
-        $this->option = array_merge($this->option, $option);
+        $this->option = $this->option;
         $this->get_swoole_client();
     }
 
@@ -40,6 +45,7 @@ class Client
      */
     private function get_swoole_client()
     {
+        \pms\Output::info([$this->server_ip,$this->server_port],'get_swoole_client');
         \pms\Output::debug('get_swoole_client');
         if ($this->swoole_client instanceof \Swoole\Client) {
         } else {
@@ -121,6 +127,7 @@ class Client
     public function connect(\swoole_client $client)
     {
         $this->isConnected = true;
+        output([$this->server_ip,$this->server_port],'connect');
         $this->call('connect', $client);
 
     }

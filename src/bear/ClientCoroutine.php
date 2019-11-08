@@ -16,7 +16,6 @@ class ClientCoroutine
     use SerializeTrait;
 
     public $swoole_client;
-    public $isConnected = false;
     protected $swoole_server;
     protected $name = 'Client';
     private $server_ip;
@@ -42,10 +41,7 @@ class ClientCoroutine
     public function connect()
     {
         if (!$this->swoole_client->connect($this->server_ip, $this->server_port, $this->timeout)) {
-            $this->isConnected = false;
             exit("connect failed. Error: {$this->swoole_client->errCode}\n");
-        } else {
-            $this->isConnected = true;
         }
     }
 
@@ -56,7 +52,7 @@ class ClientCoroutine
      */
     public function isConnected()
     {
-        return $this->isConnected;
+        return $this->swoole_client->isConnected();
     }
 
 

@@ -90,7 +90,6 @@ class Server extends Base
      */
     public function onStart(\Swoole\Server $server)
     {
-        $this->swoole_server->default_table->set('WKINIT', ['data' => 0]);
         echo $this->logo;
         \pms\output('onStart');
         $this->eventsManager->fire($this->name . ':onStart', $this, $server);
@@ -116,9 +115,9 @@ class Server extends Base
             \swoole_timer_tick(2000, [$this, 'readyJudge']);
         }
 
-        if (!$server->taskworker && !$server->default_table->get('WKINIT', 'data')) {
-            $server->default_table->set('WKINIT', ['data' => 1]);
-            $server->default_table->set('initapp_worker_id', ['data' => $worker_id]);
+        if (!$server->taskworker && !$server->default_table->get('server-wkinit', 'data')) {
+            $server->default_table->set('server-wkinit', ['data' => 1]);
+            $server->default_table->set('server-initworkerid', ['data' => $worker_id]);
             $this->initapp($server, $worker_id);
         }
     }
@@ -143,6 +142,8 @@ class Server extends Base
         # 应用初始化
         $this->app->init($server, $worker_id);
     }
+
+
 
     /**
      * 代码热更新inotify 版本
@@ -198,7 +199,7 @@ class Server extends Base
      */
     public function readyJudge($time_id)
     {
-        if ($this->dConfig->ready) {
+        if ($this->swoole_server->default_table->get('server-ready', 'data')) {
             swoole_timer_clear($time_id);
             $this->readySucceed();
         }
@@ -206,7 +207,15 @@ class Server extends Base
     }
 
     /**
-     * 准备完成时间
+     * 设置准备好了
+     */
+    public function setReady()
+    {
+        $this->swoole_server->default_table->set('server-ready', ['data' => 1]);
+    }
+
+    /**
+     * 准备完成 事件
      */
     public function readySucceed()
     {

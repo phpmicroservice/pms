@@ -51,7 +51,7 @@ class Counnect
      */
     public function send(array $data)
     {
-
+        \pms\Output::output([$this->fd,$data], 'send-c');
         return $this->swoole_server->send($this->fd, $this->encode($data));
     }
 

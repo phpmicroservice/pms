@@ -114,7 +114,7 @@ class App extends Base
     {
         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
         $di->set('server', $server);
-        \pms\Output::output($data, 'message-data');
+        \pms\Output::output([$fd,$reactor_id,$data], 'message-data');
         $counnect = new bear\Counnect($server, $fd,$reactor_id ,$data);
         $router = $counnect->getRouter();
         $router['params'] = [$counnect, $server];

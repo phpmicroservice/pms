@@ -68,7 +68,7 @@ class Client extends Base
      */
     public function start($timeout = 10)
     {
-        if (!$this->isConnected) {
+        if (!$this->isConnected()) {
             \pms\Output::debug([$this->isConnected, $this->server_ip, $this->server_port], 'client_start');
             return $this->swoole_client->connect($this->server_ip, $this->server_port, $timeout);
         }
@@ -128,7 +128,7 @@ class Client extends Base
     {
         $this->isConnected = true;
         output([$this->server_ip,$this->server_port],'connect');
-        $this->call('connect', $client);
+        $this->call('connect', $client,$this->option);
 
     }
 
@@ -140,6 +140,7 @@ class Client extends Base
      */
     public function receive(\swoole_client $client, $data_string)
     {
+        \pms\Output::output($data_string,'clinet-receive');
         $this->call('receive', $client, $data_string);
     }
 
@@ -153,15 +154,18 @@ class Client extends Base
     {
         $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
         \pms\Output::output($request, $this->name . $event);
-        $counnect = new ClientCounnect($client, []);
+        $counnect = new ClientCounnect($client, $data);
         $url = '/' . $this->name . '/' . $event;
         $counnect->analysisRouter($url);
         $router = $counnect->getRouter();
         $router['params'] = [$counnect, $server];
+        if($router['task'] =='empty' && $router['action'] =='empty'){
+            return false;
+        }
         try {
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
-            \pms\Output::output([$router['task'], $router['action'], $url], $this->name . $event . '-params');
+            \pms\Output::output([$router['task'], $router['action'], $url,$data], $this->name . $event . '-params');
             $console->handle($router);
         } catch (Exception $exception) {
             $counnect->send($exception->getMessage());
@@ -183,11 +187,12 @@ class Client extends Base
             $this->eventsManager->fire($this->name . ":beforeSend", $this, $data);
             return $this->swoole_client->send($this->encode($data));
         }
-
     }
 
-
-
+    public function isConnected()
+    {
+        $this->isConnected;
+    }
 
 
 }

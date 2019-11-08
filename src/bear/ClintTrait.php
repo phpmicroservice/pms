@@ -3,7 +3,12 @@
 
 namespace pms\bear;
 
-
+/**
+ *
+ * Trait ClintTrait
+ * @property-read  \Swoole\Client $swoole_client
+ * @package pms\bear
+ */
 trait ClintTrait
 {
 
@@ -13,7 +18,7 @@ trait ClintTrait
      */
     public function isConnected()
     {
-        return $this->swoole_client->isConnected;
+        return $this->swoole_client->isConnected();
     }
 
     /**

@@ -13,7 +13,7 @@ use pms\Serialize\SerializeTrait;
 class ClientSync
 {
     use SerializeTrait;
-
+    use ClintTrait;
     public $swoole_client;
     public $isConnected = false;
     protected $swoole_server;

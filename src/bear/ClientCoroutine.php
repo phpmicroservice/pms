@@ -41,7 +41,7 @@ class ClientCoroutine
     public function connect()
     {
         if (!$this->swoole_client->connect($this->server_ip, $this->server_port, $this->timeout)) {
-            exit("connect failed. Error: {$this->swoole_client->errCode}\n");
+          throw new \Exception("connect failed. Error: {$this->swoole_client->errCode}\n");
         }
     }
 

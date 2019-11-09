@@ -128,7 +128,7 @@ class App extends Base
             ], 'message-params');
             $console->handle($router);
         } catch (Exception $exception) {
-            $wscounnect->send($exception->getTrace());
+            $counnect->send($exception->getTrace());
         }
 
     }

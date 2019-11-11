@@ -15,18 +15,11 @@ abstract class Tcp extends \Phalcon\Di\Injectable
 
     public function initialize()
     {
-        
-    }
-
-    /**
-     * 在进行完了数据绑定之后,进行映射
-     */
-    public final function afterBinding()
-    {
         $params = $this->dispatcher->getParams();
         $this->connect = $params[0];
         $this->server = $params[1];
     }
+
 
     /**
      * 获取数据

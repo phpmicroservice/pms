@@ -241,7 +241,7 @@ class Server extends Base
                 echo "inotify Event :" . var_export($event, 1) . "\n";
                 echo "关闭系统!自动重启!";
                 $this->swoole_server->default_table->set('server-wkinit', ['data' => 0]);
-                $this->swoole_server->reload();
+                $this->swoole_server->shutdown();
             }
         }
     }

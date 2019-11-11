@@ -20,29 +20,7 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
         $mess = $this->getMessages();
         return count($mess);
     }
-
-    /**
-     * 验证的重构
-     * @param null $data
-     * @param null $entity
-     * @return bool 通过返回true 发现问题返回false
-     */
-    public function check($data = null, $entity = null)
-    {
-        \pms\output($data, 'validation_data');
-        if (method_exists($this, "beforeValidation1")) {
-            if ($this->beforeValidation1($data) === false) {
-                return false;
-            }
-        }
-
-        $message = parent::validate($data, $entity);
-        if ($message->count()) {
-            return false;
-        }
-        return true;
-    }
-
+    
 
     public function getErrorMessages($prefix = ''): string
     {

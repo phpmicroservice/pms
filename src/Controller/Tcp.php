@@ -12,7 +12,7 @@ abstract class Tcp extends \Phalcon\Di\Injectable
 {
     protected $connect;
     protected $server;
-
+    
     use ControllerTrait;
 
     /**

@@ -10,7 +10,7 @@ use pms\Serialize\SerializeTrait;
  * @property \swoole_server $swoole_server
  * @package pms
  */
-class Counnect
+class Counnect implements CounnectInterface
 {
     use SerializeTrait;
     use CounnectTrait;

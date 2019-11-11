@@ -13,7 +13,20 @@ abstract class Tcp extends \Phalcon\Di\Injectable
     protected $connect;
     protected $server;
 
+    use ControllerTrait;
+
+    /**
+     * 初始化,因为phalcon的cli调度器对控制器的实例化采用的时共享模式,每个控制器只会实例化一次,然后在
+     */
     public function initialize()
+    {
+
+    }
+
+    /**
+     * 在进行完了数据绑定之后,进行映射
+     */
+    public function afterBinding()
     {
         $params = $this->dispatcher->getParams();
         $this->connect = $params[0];
@@ -36,11 +49,11 @@ abstract class Tcp extends \Phalcon\Di\Injectable
      * @param $name
      * @param $data
      */
-    public function runTask($name,$data)
+    public function runTask($name, $data)
     {
         return $this->server->task([
-            'name'=>$name,
-            'data'=>$data
+            'name' => $name,
+            'data' => $data
         ]);
     }
 

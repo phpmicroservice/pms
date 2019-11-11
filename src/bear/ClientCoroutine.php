@@ -34,15 +34,13 @@ class ClientCoroutine
         \pms\output([$ip, $port], 'ClientCoroutine');
         $this->swoole_client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
         $this->swoole_client->set($this->option);
-        $this->connect();
+        return $this->connect();
 
     }
 
     public function connect()
     {
-        if (!$this->swoole_client->connect($this->server_ip, $this->server_port, $this->timeout)) {
-           throw new \Exception("connect failed. Error: {$this->swoole_client->errCode}\n");
-        }
+        return $this->swoole_client->connect($this->server_ip, $this->server_port, $this->timeout);
     }
 
 

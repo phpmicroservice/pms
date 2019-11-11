@@ -21,6 +21,9 @@ trait SerializeTrait
      */
     private function decode($data): array
     {
+        if(empty($data)){
+            return [];
+        }
         $length = unpack("N", $data)[1];
         $msg = substr($data, -$length);
         echo $msg;

@@ -1,6 +1,7 @@
 <?php
 
 namespace pms;
+use Phalcon\Validation as PValidation;
 
 class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwareInterface
 {
@@ -26,7 +27,7 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
      * @param null $entity
      * @return bool 通过返回true 发现问题返回false
      */
-    public function validate($data = null, $entity = null)
+    public function check($data = null, $entity = null)
     {
         \pms\output($data, 'validation_data');
         if (method_exists($this, "beforeValidation1")) {
@@ -97,7 +98,7 @@ class Validation extends \Phalcon\Validation implements \Phalcon\Di\InjectionAwa
     /**
      * Appends a message to the messages list
      */
-    public function appendMessage(\Phalcon\Validation\MessageInterface $message): Validation
+    public function appendMessage(\Phalcon\Validation\MessageInterface $message): PValidation
     {
         if ($this->_messages) {
             $messages = new Validation\Message\Group();

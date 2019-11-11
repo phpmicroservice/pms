@@ -52,7 +52,6 @@ class Session
      */
     public function reserve()
     {
-
         $this->data['save_time'] = time();
         $this->sessionCache->save($this->session_key, $this->data, $this->option['lifetime']);
     }
@@ -188,6 +187,7 @@ class Session
     public function remove($index)
     {
         unset($this->data[$index]);
+        $this->reserve();
     }
 
     /**

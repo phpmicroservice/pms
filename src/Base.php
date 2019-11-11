@@ -62,7 +62,7 @@ abstract class Base extends \Phalcon\Di\Injectable implements \Phalcon\Events\Ev
      * 设置事件管理器
      * @return  ManagerInterface $eventsManager
      */
-    public function getEventsManager()
+    public function getEventsManager():ManagerInterface
     {
         return $this->eventsManager;
     }

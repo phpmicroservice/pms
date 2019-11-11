@@ -22,7 +22,7 @@
   "require": {
     "php": ">=7.2",
     "ext-swoole": "4.*",
-    "ext-phalcon": "3.4.*",
+    "ext-phalcon": "*",
     "phpmicroservice/funch": "0.*"
   },
   "require-dev": {

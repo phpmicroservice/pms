@@ -20,7 +20,9 @@ abstract class Tcp extends \Phalcon\Di\Injectable
      */
     public function initialize()
     {
-
+        $params = $this->dispatcher->getParams();
+        $this->connect = $params[0];
+        $this->server = $params[1];
     }
 
     /**
@@ -28,9 +30,7 @@ abstract class Tcp extends \Phalcon\Di\Injectable
      */
     public function afterBinding()
     {
-        $params = $this->dispatcher->getParams();
-        $this->connect = $params[0];
-        $this->server = $params[1];
+
     }
 
 

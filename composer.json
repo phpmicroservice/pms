@@ -27,7 +27,7 @@
   },
   "require-dev": {
     "eaglewu/swoole-ide-helper": "dev-master@dev",
-    "phalcon/ide-stubs": "v3.4.*"
+    "phpmicroservice/phalcon-ide-stubs": "master@dev"
   },
   "suggest": {
     "ext-memcached": "*",

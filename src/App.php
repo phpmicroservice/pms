@@ -58,7 +58,8 @@ class App extends Base
     {
         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
         $di->set('server', $server);
-        $wscounnect = new WsCounnect($server, $frame->fd, $frame->data);
+        $data = $this->decode1($frame->data);
+        $wscounnect = new WsCounnect($server, $frame->fd, $data);
         $wscounnect->setFrame($frame);
         \pms\Output::output($frame, 'message2');
         $router = $wscounnect->getRouter();

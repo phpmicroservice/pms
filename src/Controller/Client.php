@@ -2,22 +2,17 @@
 
 namespace pms\Controller;
 
-
-use Phalcon\Cli\Dispatcher;
-use Phalcon\Translate\InterpolatorInterface;
-
 /**
- * Class WsBase
- * @property \pms\bear\WsCounnect $counnect
- * @property \Swoole\WebSocket\Server $server
- * @package pms\Contoller
+ * Tcp服务的控制器基类
+ * @property \pms\bear\ClientCounnect $counnect
+ * @property \Swoole\Server $server
+ * @author Dongasai
  */
-abstract class WsBase extends \Phalcon\Di\Injectable
+abstract class Client extends \Phalcon\Di\Injectable
 {
-
     protected $counnect;
     protected $server;
-
+    
     use ControllerTrait;
 
     /**

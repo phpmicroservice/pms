@@ -35,6 +35,7 @@ class ClientCounnect
         $this->fd = $fd;
         if (!empty($data)) {
             $this->data = $data;
+            $this->request=$this->getContent();
         }
         $this->cache = \Phalcon\Di\FactoryDefault\Cli::getDefault()->getShared('cache');
     }
@@ -71,20 +72,26 @@ class ClientCounnect
     }
 
     /**
-     * 获取数据
-     * @return mixed
+     * 获取内容
      */
-    public function getData()
+    public function getContent($index = null)
     {
-        return $this->data;
+        if ($index) {
+            return $this->data['d'][$index] ?? null;
+        }
+        return $this->data['d'];
     }
 
     /**
-     * 获取内容
+     * 获取数据
+     * @return mixed
      */
-    public function getContent()
+    public function getData($index = null)
     {
-        return $this->data['d'];
+        if ($index) {
+            return $this->data[$index] ?? null;
+        }
+        return $this->data;
     }
 
     /**

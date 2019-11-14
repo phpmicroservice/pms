@@ -3,6 +3,7 @@
 namespace pms\bear;
 
 use Phalcon\Mvc\Router;
+use pms\Serialize\SerializeTrait;
 use function pms\output;
 use Swoole\WebSocket\Frame;
 
@@ -17,7 +18,7 @@ use Swoole\WebSocket\Frame;
 class WsCounnect
 {
     use CounnectTrait;
-
+    use SerializeTrait;
     public $swoole_server;
     protected $name = 'WsCounnect';
     private $request;
@@ -25,6 +26,7 @@ class WsCounnect
     private $data;
     private $router;
     private $fd;
+    private $interference;
 
     public function __construct(\Swoole\WebSocket\Server $server, int $fd, $data)
     {
@@ -32,13 +34,15 @@ class WsCounnect
         $this->swoole_server = $server;
         $this->fd = $fd;
         if (!empty($data)) {
-            $this->data = $this->decode($data);
+            $this->data = $data;
+            $this->request = $this->data['d'];
         }
         $this->cache = \Phalcon\Di\FactoryDefault\Cli::getDefault()->getShared('cache');
 
         $this->analysisRouter();
     }
 
+    
 
     /**
      * 获取 $frame

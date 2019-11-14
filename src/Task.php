@@ -66,17 +66,27 @@ class Task extends Base
         $dir_iterator = new \RecursiveDirectoryIterator($dir);
         $iterator = new \RecursiveIteratorIterator($dir_iterator);
         foreach ($iterator as $file) {
+
             if (substr($file, -1) != '.') {
+                if(!($file instanceof \SplFileInfo)){
+                    return false;
+                }
                 if ($file->getExtension() == 'php') {
                     // 只检查php文件
                     // 检查时间
                     $getMTime = $file->getMTime();
                     if ($last_mtime < $getMTime) {
                         $last_mtime = time();
+                        $zhiqian = get_included_files();
                         echo $file . " ---|lasttime : " . date('Y-m-d H:i:s', $last_mtime) . "and getMTime: " . date('Y-m-d H:i:s', $getMTime) . " update and reload \n";
                         echo "关闭系统!自动重启!";
                         $this->swoole_server->default_table->set('server-wkinit', ['data' => 0]);
-                        $this->swoole_server->shutdown();
+                        if(in_array($file->getPath(),$zhiqian)){
+                            $this->swoole_server->shutdown();
+                        }else{
+                            $this->swoole_server->reload();
+                        }
+
                         break;
                     }
                 }

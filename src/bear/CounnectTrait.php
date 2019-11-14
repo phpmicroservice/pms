@@ -23,13 +23,18 @@ trait CounnectTrait
      */
     public function getInterference():string
     {
-        $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd, 15552000);
+        if($this->interference){
+            return $this->interference;
+        }
+        $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd, 3600);
         if (empty($interference)) {
             return $this->resetInterference();
         }
+        $this->interference = $interference;
+        $this->extensionInterference();# 延长有效期
         return $interference;
     }
-
+    
 
     /**
      * 重置干扰符,保存干扰符关系
@@ -38,8 +43,17 @@ trait CounnectTrait
     public function resetInterference():string
     {
         $interference = uniqid() . mt_rand(11111111, 99999999);
-        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference, 15552000);
+        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference, 3600);
+        $this->interference = $interference;
         return $interference;
+    }
+
+    /**
+     * 干扰符延期
+     */
+    private function extensionInterference()
+    {
+        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $this->interference, 3600);
     }
 
 
@@ -119,49 +133,6 @@ trait CounnectTrait
         return $this->fd;
     }
 
-    /**
-     * 发送一个成功
-     * @param $m 消息
-     * @param array $d 数据
-     * @param int $t 类型/控制器
-     */
-    public function send_succee($d = [], $m = '成功', $t = '')
-    {
-        $data = [
-            'm' => $m,
-            'd' => $d,
-            'e' => 0,
-            't' => empty($t) ? $this->getRouterString() : $t
-        ];
-        $this->passing = $this->getData('p');
-        if ($this->passing) {
-            $data['p'] = $this->passing;
-        }
-        $data['f'] = strtolower(SERVICE_NAME);
-        return $this->send($data);
-    }
-
-    /**
-     * 发送一个错误的消息
-     * @param $m 错误消息
-     * @param array $d 错误数据
-     * @param int $e 错误代码
-     * @param int $t 类型,路由
-     */
-    public function send_error($m, $d = [], $e = 1, $t = '')
-    {
-        $data = [
-            'm' => $m,
-            'd' => $d,
-            'e' => $e,
-            't' => empty($t) ? $this->getRouterString() : $t
-        ];
-        $this->passing = $this->getData('p');
-        if ($this->passing) {
-            $data['p'] = $this->passing;
-        }
-        $data['f'] = strtolower(SERVICE_NAME);
-        return $this->send($data);
-    }
+    
 
 }

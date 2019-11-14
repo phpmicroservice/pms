@@ -3,6 +3,7 @@
 namespace pms;
 
 use Phalcon\Exception;
+use pms\bear\Counnect;
 use pms\bear\WsCounnect;
 use pms\Serialize\SerializeTrait;
 
@@ -91,6 +92,21 @@ class App extends Base
     public function onConnect(\Swoole\Server $server, int $fd, int $reactorId)
     {
         $this->eventsManager->fire($this->name . ":onConnect", $this, [$fd, $reactorId]);
+        $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
+        $di->set('server', $server);
+        $data = $server->getClientInfo($fd,0,true);
+        $counnect = new Counnect($server, $fd, $reactorId,$data);
+        $counnect->analysisRouter('/connect');
+        $router = $counnect->getRouter();
+        $router['params'] = [$counnect, $server];
+        try {
+            $console = new \Phalcon\Cli\Console();
+            $console->setDI($di);
+            \pms\Output::output([$router['task'], $router['action']], 'connect-params');
+            $console->handle($router);
+        } catch (Exception $exception) {
+            $counnect->send($exception->getMessage());
+        }
     }
 
     /**

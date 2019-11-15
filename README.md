@@ -33,3 +33,6 @@ composer的packagist地址:
 |work:onWorkerExit||
 
 |app:init|应用初始化,启动时执行一次|
+
+# 路由 
+一个`/` 为预定义路由请勿占用,例如:`/connect`是产生链接的路由

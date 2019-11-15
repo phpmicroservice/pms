@@ -28,11 +28,11 @@ class Client extends Base
     /**
      * 配置初始化
      */
-    public function __construct(string $ip, string $port, $option = [], $name = 'client')
+    public function __construct($server,string $ip, string $port, $option = [], $name = 'client')
     {
         static $c_n = 1;
         $c_n++;
-
+        $this->swoole_server = $server;
         $this->name = $name . $c_n;
         $this->server_ip = $ip;
         $this->server_port = $port;
@@ -141,7 +141,7 @@ class Client extends Base
     public function receive(\swoole_client $client, $data_string)
     {
         \pms\Output::output($data_string,'clinet-receive');
-        $this->call('receive', $client, $data_string);
+        $this->call('receive', $client, $this->decode($data_string));
     }
 
 
@@ -158,7 +158,7 @@ class Client extends Base
         $url = '/' . $this->name . '/' . $event;
         $counnect->analysisRouter($url);
         $router = $counnect->getRouter();
-        $router['params'] = [$counnect, $server];
+        $router['params'] = [$counnect, $this->swoole_server];
         if($router['task'] =='empty' && $router['action'] =='empty'){
             return false;
         }
@@ -183,7 +183,6 @@ class Client extends Base
         if (!$this->isConnected) {
             return false;
         } else {
-            $data['f'] = $data['f'] ?? strtolower(SERVICE_NAME);
             $this->eventsManager->fire($this->name . ":beforeSend", $this, $data);
             return $this->swoole_client->send($this->encode($data));
         }
@@ -191,7 +190,7 @@ class Client extends Base
 
     public function isConnected()
     {
-        $this->isConnected;
+        return $this->swoole_client->isConnected();
     }
 
 

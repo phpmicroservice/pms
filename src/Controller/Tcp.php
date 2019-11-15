@@ -4,13 +4,13 @@ namespace pms\Controller;
 
 /**
  * Tcp服务的控制器基类
- * @property \pms\bear\Counnect $connect
+ * @property \pms\bear\Counnect $counnect
  * @property \Swoole\Server $server
  * @author Dongasai
  */
 abstract class Tcp extends \Phalcon\Di\Injectable
 {
-    protected $connect;
+    protected $counnect;
     protected $server;
     
     use ControllerTrait;
@@ -21,7 +21,7 @@ abstract class Tcp extends \Phalcon\Di\Injectable
     public function initialize()
     {
         $params = $this->dispatcher->getParams();
-        $this->connect = $params[0];
+        $this->counnect = $params[0];
         $this->server = $params[1];
     }
 

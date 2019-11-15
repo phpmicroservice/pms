@@ -18,7 +18,7 @@ trait ControllerTrait
      */
     public function getCounnect(): CounnectInterface
     {
-        return $this->connect;
+        return $this->counnect;
     }
 
     public function getServer(): \Swoole\Server

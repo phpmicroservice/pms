@@ -65,5 +65,10 @@ interface CounnectInterface
      * 获取fd_id
      */
     public function getFd(): int;
-    
+
+    /**
+     * 想客户端发送数据
+     * @param array $data
+     */
+    public function send(array $data);
 }

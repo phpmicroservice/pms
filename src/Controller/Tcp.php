@@ -28,7 +28,7 @@ abstract class Tcp extends \Phalcon\Di\Injectable
     /**
      * 在进行完了数据绑定之后,进行映射
      */
-    public function afterBinding()
+    public function afterBinding(\Phalcon\Cli\Dispatcher $dispatcher)
     {
 
     }

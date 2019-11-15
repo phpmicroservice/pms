@@ -19,13 +19,13 @@ trait SerializeTrait
      * 解码
      * @param $string
      */
-    private function decode($data): array
+    private static function decode($data_string): array
     {
-        if(empty($data)){
+        if(empty($data_string)){
             return [];
         }
-        $length = unpack("N", $data)[1];
-        $msg = substr($data, -$length);
+        $length = unpack("N", $data_string)[1];
+        $msg = substr($data_string, -$length);
         echo $msg;
         return \pms\Serialize::unpack($msg);
     }
@@ -47,7 +47,7 @@ trait SerializeTrait
      * @param array $data
      * @return string
      */
-    private function encode(array $data): string
+    private static function encode(array $data): string
     {
         $msg_normal = \pms\Serialize::pack($data);
         $msg_length = pack("N", strlen($msg_normal)) . $msg_normal;

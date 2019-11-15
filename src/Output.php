@@ -48,6 +48,7 @@ class Output
             } else {
                 echo var_export($data, true);
             }
+            echo '[' . date('H:i:s') . '][' . $msg . ']';
             echo " \n";
         }
     }

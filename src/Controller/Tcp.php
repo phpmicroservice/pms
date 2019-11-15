@@ -41,7 +41,7 @@ abstract class Tcp extends \Phalcon\Di\Injectable
      */
     public function getData($index = null)
     {
-        return $this->connect->getContent($index);
+        return $this->counnect->getContent($index);
     }
 
     /**

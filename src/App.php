@@ -102,7 +102,7 @@ class App extends Base
         try {
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
-            \pms\Output::output([$router['task'], $router['action']], 'connect-params');
+            \pms\Output::debug([$router['task'], $router['action']], 'connect-params');
             $console->handle($router);
         } catch (Exception $exception) {
             $counnect->send($exception->getMessage());

@@ -40,6 +40,9 @@ class ClientCoroutine
 
     public function connect()
     {
+        if($this->swoole_client->isConnected()){
+            $this->swoole_client->close();
+        }
         return $this->swoole_client->connect($this->server_ip, $this->server_port, $this->timeout);
     }
 

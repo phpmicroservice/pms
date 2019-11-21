@@ -71,7 +71,12 @@ class App extends Base
             \pms\Output::output([$router['task'], $router['action']], 'message-params');
             $console->handle($router);
         } catch (Exception $exception) {
-            $wscounnect->send($exception->getTrace());
+            if(APP_DEBUG){
+                $wscounnect->send($exception->getMessage());
+            }else{
+                $wscounnect->send($exception->getTrace());
+            }
+
         }
 
     }

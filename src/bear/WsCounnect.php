@@ -15,7 +15,7 @@ use Swoole\WebSocket\Frame;
  * @property \Phalcon\Cache\BackendInterface $cache
  * @package pms\bear
  */
-class WsCounnect
+class WsCounnect implements CounnectInterface
 {
     use CounnectTrait;
     use SerializeTrait;
@@ -106,7 +106,7 @@ class WsCounnect
      */
     public function send($data)
     {
-        return $this->swoole_server->push($this->fd, $this->encode($data));
+        return $this->swoole_server->push($this->fd, $this->encode1($data));
     }
 
 

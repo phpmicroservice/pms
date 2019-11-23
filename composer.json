@@ -1,6 +1,6 @@
 {
   "name": "phpmicroservice/pms-frame",
-  "type": "project",
+  "type": "library",
   "keywords": [
     "swoole",
     "phalcon",

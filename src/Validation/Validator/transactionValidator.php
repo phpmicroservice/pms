@@ -15,7 +15,7 @@ class transactionValidator extends \pms\Validation\Validator
      * @param type $attribute
      * @return boolean
      */
-    public function validate(\Phalcon\Validation $validation, $attribute)
+    public function validate(\Phalcon\Validation $validation, string $attribute):bool
     {
         $transaction = $this->get_transactionManager();
         if (!$transaction->has()) {

@@ -21,7 +21,7 @@ class ExistValidator extends \pms\Validation\Validator
 {
     protected $type = 'exist';
 
-    public function validate(\Phalcon\Validation $validation, $attribute)
+    public function validate(\Phalcon\Validation $validation, string $attribute):bool 
     {
 
         $allowEmpty = $this->getOption('allowEmpty');

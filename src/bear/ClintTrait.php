@@ -34,6 +34,19 @@ trait ClintTrait
         Output::debug([$sd,$data]);
         return $this->swoole_client->send($sd);
     }
+    /**
+     * 发送并接受返回
+     * @param $data
+     */
+    public function send_recv($data)
+    {
+
+        $re = $this->send($data);
+        if (!$re) {
+            return $re;
+        }
+        return $this->recv();
+    }
     
 
 

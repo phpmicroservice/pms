@@ -15,7 +15,7 @@ class whereValidator extends \pms\Validation\Validator
      * @param type $attribute
      * @return boolean
      */
-    public function validate(\Phalcon\Validation $validation, $attribute)
+    public function validate(\Phalcon\Validation $validation, string $attribute):bool
     {
         $model_name = $this->getOption('model', null);
         if (is_string($model_name)) {

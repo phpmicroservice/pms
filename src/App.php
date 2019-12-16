@@ -44,7 +44,9 @@ class App extends Base
             \pms\Output::output([$router['task'], $router['action']], 'open-params');
             $console->handle($router);
         } catch (Exception $exception) {
-            $wscounnect->send($exception->getMessage());
+            output($exception->getMessage());
+            $this->eventsManager->fire($this->name . ":openError", $this, [$counnect, $exception]);
+
         }
 
     }
@@ -71,12 +73,8 @@ class App extends Base
             \pms\Output::output([$router['task'], $router['action']], 'message-params');
             $console->handle($router);
         } catch (Exception $exception) {
-            if(APP_DEBUG){
-                $wscounnect->send($exception->getMessage());
-            }else{
-                $wscounnect->send($exception->getTrace());
-            }
-
+            output($exception->getMessage());
+            $this->eventsManager->fire($this->name . ":messageError", $this, [$counnect, $exception]);
         }
 
     }
@@ -110,7 +108,9 @@ class App extends Base
             \pms\Output::debug([$router['task'], $router['action']], 'connect-params');
             $console->handle($router);
         } catch (Exception $exception) {
-            $counnect->send($exception->getMessage());
+            output($exception->getMessage());
+            $this->eventsManager->fire($this->name . ":connectError", $this, [$counnect, $exception]);
+//            $counnect->send($exception->getMessage());
         }
     }
 
@@ -152,7 +152,8 @@ class App extends Base
             $console->handle($router);
         } catch (Exception $exception) {
             \pms\Output::error([$exception->getMessage(),$exception->getTraceAsString()]);
-            $counnect->send([$exception->getMessage(),$exception->getTraceAsString()]);
+            $this->eventsManager->fire($this->name . ":receiveError", $this, [$counnect, $exception]);
+            #$counnect->send($exception->getTraceAsString());
         }
 
     }
@@ -245,8 +246,10 @@ class App extends Base
             $console->setDI($di);
             $console->handle($router);
         } catch (Exception $exception) {
-            echo $exception->getMessage();
-            $wscounnect->send([$exception->getTrace()]);
+            output($exception->getMessage());
+            $this->eventsManager->fire($this->name . ":closeError", $this, [$counnect, $exception]);
+
+//            $wscounnect->send([$exception->getTrace()]);
         }
     }
 

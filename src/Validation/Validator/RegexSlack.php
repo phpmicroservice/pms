@@ -10,7 +10,7 @@ namespace pms\Validation\Validator;
 class RegexSlack extends \pms\Validation\Validator
 {
 
-    public function validate(\Phalcon\Validation $validation, $attribute)
+    public function validate(\Phalcon\Validation $validation, string $attribute):bool
     {
 
         $value = $validation->getValue($attribute);

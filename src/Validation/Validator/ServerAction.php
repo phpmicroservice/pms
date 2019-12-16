@@ -24,7 +24,7 @@ class ServerAction extends Validator
      * @param string $attribute
      * @return boolean
      */
-    public function validate(\Phalcon\Validation $validation, $attribute)
+    public function validate(\Phalcon\Validation $validation, string $attribute):bool
     {
         $server_action = $this->getOption('server_action');
         $server_action_arr = explode('@', $server_action);

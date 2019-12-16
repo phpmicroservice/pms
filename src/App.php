@@ -120,6 +120,7 @@ class App extends Base
     public function onReceive(\Swoole\Server $server, int $fd, int $reactor_id, string $data_string)
     {
         $this->eventsManager->fire($this->name . ":onReceive", $this, [$fd, $reactor_id, $data_string]);
+        Output::debug($data_string);
         $data = $this->decode($data_string);
         $this->receive($server, $fd, $reactor_id, $data);
 
@@ -150,7 +151,8 @@ class App extends Base
             ], 'message-params');
             $console->handle($router);
         } catch (Exception $exception) {
-            $counnect->send($exception->getTrace());
+            \pms\Output::error([$exception->getMessage(),$exception->getTraceAsString()]);
+            $counnect->send([$exception->getMessage(),$exception->getTraceAsString()]);
         }
 
     }
@@ -196,25 +198,49 @@ class App extends Base
     public function onClose(\Swoole\Server $server, int $fd, int $reactor_id)
     {
         $info = $server->getClientInfo($fd);
-        if (isset($info['websocket_status'])) {
-            $this->wsClose($server, $fd, $reactor_id);
+        if ($server instanceof  \Swoole\WebSocket\Server) {
+            $this->wsClose($server, $fd, $reactor_id,$info);
+        }else{
+            $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
+            $di->set('server', $server);
+
+            $wscounnect = new Counnect($server, $fd, $reactor_id,$info);
+            $wscounnect->analysisRouter('/close');
+            $router = $wscounnect->getRouter();
+            $router['params'] = [$wscounnect, $server];
+            try {
+                \pms\Output::output([
+                    $router['task'],
+                    $router['action']
+                ], 'close');
+                $console = new \Phalcon\Cli\Console();
+                $console->setDI($di);
+                $console->handle($router);
+            } catch (Exception $exception) {
+                echo $exception->getMessage();
+                $wscounnect->send([$exception->getTrace()]);
+            }
         }
-        $this->eventsManager->fire($this->name . ":onClose", $this, [$fd, $reactor_id]);
+        #$this->eventsManager->fire($this->name . ":onClose", $this, [$fd, $reactor_id]);
     }
 
     /**
      * ws客户端关闭
      */
-    private function wsClose($server, int $fd, int $reactor_id)
+    private function wsClose($server, int $fd, int $reactor_id,$data)
     {
         $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
         $di->set('server', $server);
 
-        $wscounnect = new WsCounnect($server, $fd, []);
-        $wscounnect->analysisRouter('/close');
+        $wscounnect = new WsCounnect($server, $fd, $data);
+        $wscounnect->analysisRouter('/wsclose');
         $router = $wscounnect->getRouter();
         $router['params'] = [$wscounnect, $server];
         try {
+            \pms\Output::output([
+                $router['task'],
+                $router['action']
+            ], 'wsclose');
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
             $console->handle($router);

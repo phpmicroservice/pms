@@ -81,12 +81,7 @@ class Task extends Base
                         echo $file . " ---|lasttime : " . date('Y-m-d H:i:s', $last_mtime) . "and getMTime: " . date('Y-m-d H:i:s', $getMTime) . " update and reload \n";
                         echo "关闭系统!自动重启!";
                         $this->swoole_server->default_table->set('server-wkinit', ['data' => 0]);
-                        if(in_array($file->getPath(),$zhiqian)){
-                            $this->swoole_server->shutdown();
-                        }else{
-                            $this->swoole_server->reload();
-                        }
-
+                        $this->swoole_server->shutdown();
                         break;
                     }
                 }

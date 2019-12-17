@@ -66,7 +66,7 @@ class Model extends \Phalcon\Mvc\Model
             foreach ($mess as $v) {
                 $string = $string . ' & ' . $v->getMessage();
             }
-            return $string;
+            return trim($string, ' & ');
         } else {
             return false;
         }

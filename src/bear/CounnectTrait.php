@@ -21,9 +21,9 @@ trait CounnectTrait
      * 获取干扰符
      * @return mixed|string|null
      */
-    public function getInterference():string
+    public function getInterference(): string
     {
-        if($this->interference){
+        if ($this->interference) {
             return $this->interference;
         }
         $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd, 3600);
@@ -34,13 +34,13 @@ trait CounnectTrait
         $this->extensionInterference();# 延长有效期
         return $interference;
     }
-    
+
 
     /**
      * 重置干扰符,保存干扰符关系
      * @return string
      */
-    public function resetInterference():string
+    public function resetInterference(): string
     {
         $interference = uniqid() . mt_rand(11111111, 99999999);
         $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference, 3600);
@@ -97,12 +97,12 @@ trait CounnectTrait
     /**
      * 获取内容
      */
-    public function getContent($index = null)
+    public function getContent($index = null, $default = null)
     {
         if ($index) {
-            return $this->data['d'][$index] ?? null;
+            return $this->data['d'][$index] ?? $default;
         }
-        return $this->data['d'];
+        return $this->data['d'] ?? $default;
     }
 
     /**
@@ -120,7 +120,7 @@ trait CounnectTrait
     /**
      * 获取路由字符串
      */
-    public function getRouterString():string
+    public function getRouterString(): string
     {
         return $this->data[ROUTER_INDEX] ?? '/';
     }
@@ -128,11 +128,10 @@ trait CounnectTrait
     /**
      * 获取fd_id
      */
-    public function getFd():int 
+    public function getFd(): int
     {
         return $this->fd;
     }
 
-    
 
 }

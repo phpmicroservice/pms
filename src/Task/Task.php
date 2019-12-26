@@ -39,6 +39,10 @@ class Task
     {
         $this->src_worker_id = $src_worker_id;
     }
+    public function run()
+    {
+        
+    }
 
     /**
      * 执行方法
@@ -46,7 +50,6 @@ class Task
      */
     final public function execute()
     {
-        \Phalcon\Di::getDefault()->get('db')->connect();
         $startTime = microtime(true);
         $re = $this->run($this->trueData);
         $endTime = microtime(true);
@@ -55,8 +58,12 @@ class Task
         $data['re'] = $re;
         $data['task_id'] = $this->task_id;
         $data['time'] = $endTime - $startTime;
-        \Phalcon\Di::getDefault()->get('db')->close();
         return $data;
+    }
+
+    public function end()
+    {
+
     }
 
     final  public function finish()

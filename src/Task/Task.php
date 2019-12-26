@@ -6,7 +6,7 @@ namespace pms\Task;
  * Class Task
  * @package pms\Task
  */
-class Task
+class Task extends \Phalcon\Di\Injectable
 {
     protected $swoole_server;
     protected $trueData;

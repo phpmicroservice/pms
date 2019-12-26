@@ -5,6 +5,7 @@ namespace pms;
 use Phalcon\Exception;
 use pms\bear\Counnect;
 use pms\bear\WsCounnect;
+use pms\Controller\Http;
 use pms\Serialize\SerializeTrait;
 
 
@@ -80,12 +81,59 @@ class App extends Base
     }
 
 
+    public function emptyCall()
+    {
+        
+    }
+
+
     /**
      * http请求收到
      */
-    public function onRequest(\swoole_http_request $request, \swoole_http_response $response)
+    public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
+        /*  
+            'request_method' => 'GET',
+            'request_uri' => '/demo/ddd',
+            'path_info' => '/demo/ddd',
+            'request_time' => 1577380040,
+            'request_time_float' => 1577380040.455423,
+            'server_protocol' => 'HTTP/1.1',
+            'server_port' => 8080,
+            'remote_port' => 41510,
+            'remote_addr' => '172.19.0.1',
+            'master_time' => 1577380039,
 
+          */
+        $path = $request->server['path_info'];
+        $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+        $router = \Phalcon\Di::getDefault()->get('router');
+        if($router instanceof \Phalcon\Cli\Router){
+            $router->handle($path);
+        }
+        $routerarray = [
+            'module' => $router->getModuleName(),
+            'task' => $router->getTaskName(),
+            'action' => $router->getActionName()
+        ];
+        $routerarray['params'] = [$request, $response];
+        try {
+            $console = new \Phalcon\Cli\Console();
+            $console->setDI($di);
+            \pms\Output::output([$routerarray['task'], $routerarray['action']], 'message-params');
+            $task = $console->handle($routerarray);
+            if($task->getReturnedValue() !== null){
+                $response->write($task->getReturnedValue());
+            }
+            $response->end();
+        } catch (Exception $exception) {
+            $response->write($exception->getMessage());
+            if(APP_DEBUG){
+                $response->write($exception->getTraceAsString());
+            }
+            $response->end();
+        }
+        
     }
 
 

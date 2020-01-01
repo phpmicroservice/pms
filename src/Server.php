@@ -35,6 +35,15 @@ class Server extends Base
         $this->swoole_server = $server;
     }
 
+    protected function callNumMulriple($mulriple=2)
+    {
+        $cpu = \swoole_cpu_num();
+        if ($cpu <= 2) {
+            $cpu = 4;
+        }
+        return $cpu * $mulriple;
+    }
+
     /**
      * 处理进程回调
      */
@@ -143,7 +152,6 @@ class Server extends Base
         # 应用初始化
         $this->app->init($server, $worker_id);
     }
-
 
 
     /**

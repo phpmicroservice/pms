@@ -27,12 +27,12 @@ class WsServer extends Server
     public function __construct($ip, $port, $mode, $tcp, $option = [])
     {
         $this->logo = include "logo.php";
-        $this->d_option['reactor_num'] = \swoole_cpu_num() * ($option['reactor_num_mulriple'] ?? 1);
-        $this->d_option['worker_num'] = \swoole_cpu_num() * ($option['worker_num_mulriple'] ?? 2);
-        $this->d_option['task_worker_num'] = \swoole_cpu_num() * ($option['task_worker_num_mulriple'] ?? 4);
+        $this->d_option['reactor_num'] = $this->callNumMulriple(get_env('reactor_num_mulriple', 2));
+        $this->d_option['worker_num'] = $this->callNumMulriple(get_env('worker_num_mulriple', 2));
+        $this->d_option['task_worker_num'] = $this->callNumMulriple(get_env('task_worker_num_mulriple', 4));
         # 加载依赖注入
         if (defined("DI_FILE")) {
-             Output::output(DI_FILE, 'DI_FILE');
+            Output::output(DI_FILE, 'DI_FILE');
             include_once DI_FILE;
         } else {
             throw new \Phalcon\Exception("undefined constant DI_FILE");
@@ -42,7 +42,7 @@ class WsServer extends Server
 
         $di->setShared('server', $this->swoole_server);
         parent::__construct($this->swoole_server);
-        $this->d_option= array_merge($this->d_option, $option);
+        $this->d_option = array_merge($this->d_option, $option);
         Output::output($this->d_option, 'd_option');
         # 设置运行参数
         $this->swoole_server->set($this->d_option);
@@ -60,7 +60,8 @@ class WsServer extends Server
     /**
      * 处理连接回调
      */
-    private function wsCall() {
+    private function wsCall()
+    {
         # 设置连接回调
         $this->swoole_server->on('open', [$this->app, 'onOpen']);
         $this->swoole_server->on('message', [$this->app, 'onMessage']);

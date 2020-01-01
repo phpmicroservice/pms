@@ -27,9 +27,9 @@ class TcpServer extends Server
     public function __construct($ip, $port, $mode, $tcp, $option = [])
     {
         $this->logo = include "logo.php";
-        $this->d_option['reactor_num'] = \swoole_cpu_num() * ($option['reactor_num_mulriple'] ?? 1);
-        $this->d_option['worker_num'] = \swoole_cpu_num() * ($option['worker_num_mulriple'] ?? 2);
-        $this->d_option['task_worker_num'] = \swoole_cpu_num() * ($option['task_worker_num_mulriple'] ?? 4);
+        $this->d_option['reactor_num'] = $this->callNumMulriple(get_env('reactor_num_mulriple', 2));
+        $this->d_option['worker_num'] = $this->callNumMulriple(get_env('worker_num_mulriple', 2));
+        $this->d_option['task_worker_num'] = $this->callNumMulriple(get_env('task_worker_num_mulriple', 4));
         # 加载依赖注入
         if (defined("DI_FILE")) {
              Output::output(DI_FILE, 'DI_FILE');

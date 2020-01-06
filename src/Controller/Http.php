@@ -12,7 +12,9 @@ abstract class Http extends \Phalcon\Di\Injectable
 {
     protected $request;
     protected $response;
-    
+    protected $params;
+
+
     use ControllerTrait;
 
     /**
@@ -23,6 +25,7 @@ abstract class Http extends \Phalcon\Di\Injectable
         $params = $this->dispatcher->getParams();
         $this->request = $params[0];
         $this->response = $params[1];
+        $this->params = $params[2];
     }
 
     public function getReturnedValue()

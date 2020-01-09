@@ -28,7 +28,7 @@ class ClientCounnect
     private $router;
     private $fd;
 
-    public function __construct(\Swoole\Client $client, $data)
+    public function __construct(\Swoole\Async\Client $client, $data)
     {
 //        echo "创建一个链接对象 \n";
         $this->swoole_client = $client;

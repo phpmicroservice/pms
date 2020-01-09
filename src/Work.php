@@ -56,15 +56,7 @@ class Work extends Base
     {
         \pms\output($worker_id, 'onWorkerStart in work');
         $this->eventsManager->fire($this->name . ':onWorkerStart', $this, $worker_id);
-        $server->tick(3600000,function(){
-            # SHOW ENGINES;
-            var_dump(['SHOW ENGINES',$fd]);
-            $db=\Phalcon\Di::getDefault()->get('db');
-            if($db instanceof \Phalcon\Db\AdapterInterface){
-                $this->db->query('SHOW ENGINES');
-            }
-        });
-
+       
     }
 
     /**

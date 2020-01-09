@@ -107,20 +107,27 @@ class App extends Base
           */
         $path = $request->server['path_info'];
         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
-        $router = \Phalcon\Di::getDefault()->get('router');
-        if($router instanceof \Phalcon\Cli\Router){
+        $router = \Phalcon\Di::getDefault()->get('router_http');
+        if($router instanceof \Phalcon\Mvc\Router){
             $router->handle($path);
         }
         $routerarray = [
             'module' => $router->getModuleName(),
-            'task' => $router->getTaskName(),
+            'task' => $router->getControllerName(),
             'action' => $router->getActionName()
         ];
-        $routerarray['params'] = [$request, $response];
+        
+        $routerarray['params'] = [
+            $request, $response,$router->getParams()
+                ];
         try {
             $console = new \Phalcon\Cli\Console();
             $console->setDI($di);
-            \pms\Output::output([$routerarray['task'], $routerarray['action']], 'message-params');
+            \pms\Output::output([
+                $routerarray['task'], 
+                $routerarray['action'],
+                $routerarray['params'][2]
+                    ], 'message-params');
             $task = $console->handle($routerarray);
             if($task->getReturnedValue() !== null){
                 $response->write($task->getReturnedValue());

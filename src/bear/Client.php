@@ -10,7 +10,7 @@ use function pms\output;
 /**
  * 客户端 异步
  * Class Client
- * @property \swoole_client $swoole_client
+ * @property \Swoole\Async\Client $swoole_client
  * @package pms\bear
  */
 class Client extends Base
@@ -47,10 +47,14 @@ class Client extends Base
     {
         \pms\Output::info([$this->server_ip,$this->server_port],'get_swoole_client');
         \pms\Output::debug('get_swoole_client');
-        if ($this->swoole_client instanceof \Swoole\Client) {
+       
+        if ($this->swoole_client instanceof \Swoole\Async\Client) {
         } else {
-            $this->swoole_client = new \Swoole\Client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
+
+            $this->swoole_client = new \Swoole\Async\Client(SWOOLE_SOCK_TCP);
         }
+       
+        
         $this->swoole_client->set($this->option);
 
         $this->swoole_client->on("connect", [$this, 'connect']);
@@ -80,7 +84,7 @@ class Client extends Base
     /**
      * 当缓存区低于最低水位线时触发此事件。
      */
-    public function bufferEmpty(\Swoole\Client $client)
+    public function bufferEmpty(\Swoole\Async\Client $client)
     {
         $this->call('bufferEmpty', $client);
         
@@ -89,7 +93,7 @@ class Client extends Base
     /**
      * 当缓存区达到最高水位时触发此事件。
      */
-    public function bufferFull(\Swoole\Client $client)
+    public function bufferFull(\Swoole\Async\Client $client)
     {
         $this->call('bufferFull', $client);
     }
@@ -98,9 +102,9 @@ class Client extends Base
 
     /**
      * 链接出错的
-     * @param \swoole_client $client
+     * @param \Swoole\Async\Client $client
      */
-    public function error(\swoole_client $client)
+    public function error(\Swoole\Async\Client $client)
     {
         \pms\Output::error(['client error', $this->name], 'error');
         $this->call('error', $client);
@@ -110,9 +114,9 @@ class Client extends Base
 
     /**
      * 当链接关闭
-     * @param \swoole_client $client
+     * @param \Swoole\Async\Client $client
      */
-    public function close(\swoole_client $client)
+    public function close(\Swoole\Async\Client $client)
     {
         $this->isConnected = false;
         \pms\Output::info('client server close');
@@ -122,9 +126,9 @@ class Client extends Base
 
     /**
      * 链接成功
-     * @param \swoole_client $client
+     * @param \Swoole\Async\Client $client
      */
-    public function connect(\swoole_client $client)
+    public function connect(\Swoole\Async\Client $client)
     {
         $this->isConnected = true;
         output([$this->server_ip,$this->server_port],'connect');
@@ -135,10 +139,10 @@ class Client extends Base
 
     /**
      * 收到值,真实
-     * @param \swoole_client $cli
+     * @param \Swoole\Async\Client $cli
      * @param $data
      */
-    public function receive(\swoole_client $client, $data_string)
+    public function receive(\Swoole\Async\Client $client, $data_string)
     {
         \pms\Output::output($data_string,'clinet-receive');
         $this->call('receive', $client, $this->decode($data_string));
@@ -148,9 +152,9 @@ class Client extends Base
     /**
      * 时间执行
      * @param $event
-     * @param \Swoole\Client $client
+     * @param \Swoole\Async\Client $client
      */
-    private function call($event, \Swoole\Client $client, $data = null)
+    private function call($event, \Swoole\Async\Client $client, $data = null)
     {
         $di = \Phalcon\DI\FactoryDefault\Cli::getDefault();
         \pms\Output::output($request, $this->name . $event);

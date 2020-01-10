@@ -88,7 +88,6 @@ class Server extends Base
      */
     public function start()
     {
-
         $this->eventsManager->fire($this->name . ':beforeStart', $this, $this->swoole_server);
         $this->swoole_server->start();
     }

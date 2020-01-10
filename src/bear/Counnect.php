@@ -29,8 +29,12 @@ class Counnect implements CounnectInterface
             $this->data = $data;
             $this->request = $this->data['d'];
         }
-        $this->cache = \Phalcon\Di\FactoryDefault\Cli::getDefault()->getShared('cache');
-
+        try{
+            $this->cache = \Phalcon\Di\FactoryDefault\Cli::getDefault()->getShared('cacheInterference');
+        } catch (\Phalcon\Di\Exception $ex) {
+            $this->cache = \Phalcon\Di\FactoryDefault\Cli::getDefault()->getShared('cache');
+        }
+        
         $this->analysisRouter();
     }
 

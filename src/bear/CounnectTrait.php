@@ -3,7 +3,9 @@
 
 namespace pms\bear;
 
-
+/**
+ * @property \Phalcon\Cache\BackendInterface $cache
+ */
 trait CounnectTrait
 {
 
@@ -26,7 +28,7 @@ trait CounnectTrait
         if ($this->interference) {
             return $this->interference;
         }
-        $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd, 3600);
+        $interference = $this->cache->get('interference' . RUN_UNIQID . $this->fd);
         if (empty($interference)) {
             return $this->resetInterference();
         }
@@ -43,7 +45,7 @@ trait CounnectTrait
     public function resetInterference(): string
     {
         $interference = uniqid() . mt_rand(11111111, 99999999);
-        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference, 3600);
+        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $interference,0);
         $this->interference = $interference;
         return $interference;
     }
@@ -53,7 +55,7 @@ trait CounnectTrait
      */
     private function extensionInterference()
     {
-        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $this->interference, 3600);
+        $this->cache->save('interference' . RUN_UNIQID . $this->fd, $this->interference, 0);
     }
 
 

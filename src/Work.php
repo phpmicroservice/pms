@@ -25,10 +25,16 @@ class Work extends Base
         if (is_array($data)) {
             //数组的数据是要进行任务类调用
             $name = $data['name'] ? $data['name'] : $data[0];
-            $class_name = 'app\\task\\' . ucfirst($name);
-            $handel = new $class_name($server, $data);
-            $handel->setTaskId($task_id);
-            return $handel->finish();
+            $class_name = $name;
+            if (class_exists($class_name)) {
+                $handel = new $class_name($server, $data);
+                $handel->setTaskId($task_id);
+                return $handel->finish();
+            } else {
+                throw new Exception('任务类没有找到: '.$class_name, 1);
+            }
+        }else{
+            throw new Exception('任务数据不符合规范 :'.$data, 2);
         }
 
     }

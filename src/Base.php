@@ -13,7 +13,7 @@ use Phalcon\Events\ManagerInterface;
  * @property \Swoole\Server $swoole_server
  * @package pms
  */
-abstract class Base extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface
+abstract class Base extends \pms\Di\Injectable implements \Phalcon\Events\EventsAwareInterface
 {
     protected $swoole_server;
     protected $name;

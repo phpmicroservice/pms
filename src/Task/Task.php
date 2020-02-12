@@ -5,8 +5,9 @@ namespace pms\Task;
  * 任务基类
  * Class Task
  * @package pms\Task
+ * @property-read \Swoole\Server $swoole_server Swoole的服务类
  */
-class Task extends \Phalcon\Di\Injectable
+class Task extends \pms\Di\Injectable
 {
     protected $swoole_server;
     protected $trueData;
@@ -15,18 +16,33 @@ class Task extends \Phalcon\Di\Injectable
     protected $src_worker_id;
 
 
-    public function __construct($swoole_server, $data)
+    /**
+     * 构造函数
+     * @param type $swoole_server
+     * @param type $data
+     */
+    final public function __construct($swoole_server, $data)
     {
         $this->swoole_server = $swoole_server;
         $this->trueData = $data;
         $this->data = $data['data'] ? $data['data'] : $data[0];
+        $this->init();
     }
+
+    /**
+     * 初始化函数,需要覆盖
+     */
+    public function init()
+    {
+        
+    }
+
 
     /**
      * 设置任务进程id
      * @param $task_id
      */
-    public function setTaskId($task_id)
+    final public function setTaskId($task_id)
     {
         $this->task_id = $task_id;
     }
@@ -35,14 +51,11 @@ class Task extends \Phalcon\Di\Injectable
      * 设置任务进程id
      * @param $task_id
      */
-    public function setWorkId($src_worker_id)
+    final public function setWorkId($src_worker_id)
     {
         $this->src_worker_id = $src_worker_id;
     }
-    public function run()
-    {
-        
-    }
+    
 
     /**
      * 执行方法
@@ -61,10 +74,7 @@ class Task extends \Phalcon\Di\Injectable
         return $data;
     }
 
-    public function end()
-    {
-
-    }
+ 
 
     final  public function finish()
     {

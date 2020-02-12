@@ -13,6 +13,7 @@ use Swoole\Table;
  * @property \Phalcon\Config $config
  * @property \Phalcon\Config $dConfig
  * @property \Swoole\Server $swoole_server
+ * @property App $app
  * @package pms
  */
 class Server extends Base
@@ -31,8 +32,10 @@ class Server extends Base
 
     public function __construct($server)
     {
-//        $this->logo = require 'logo.php';
-        $this->swoole_server = $server;
+//       $this->logo = require 'logo.php';
+         $this->swoole_server = $server;
+         $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
+         $di->set('service', $this);
     }
 
     protected function callNumMulriple($mulriple=2)
@@ -136,16 +139,12 @@ class Server extends Base
      * @param $server
      * @param $worker_id
      */
-    protected function initapp($server, $worker_id)
+    protected function initapp(\Swoole\Server $server, $worker_id)
     {
         \pms\output('init');
         # 热更新
         if (\pms\get_envbl('APP_CODEUPDATE', true)) {
-            if (\pms\get_envbl('CODEUPDATA_INOTIFY', false)) {
-                $this->codeUpdata_inotify();
-            } else {
-                \swoole_timer_tick(10000, [$this, 'codeUpdata']);
-            }
+             $server->after(3000, [$this, 'codeUpdata']);
         }
 
         # 应用初始化
@@ -153,54 +152,8 @@ class Server extends Base
     }
 
 
-    /**
-     * 代码热更新inotify 版本
-     * @param $dir
-     */
-    public function codeUpdata_inotify()
-    {
-
-
-        $array = $this->dConfig->codeUpdata;
-        \pms\output(ROOT_DIR, 'codeUpdata');
-
-        // 初始化inotify句柄
-        $this->inotify_fd = inotify_init();
-        // 设置为非阻塞
-        stream_set_blocking($this->inotify_fd, 0);
-
-
-        foreach ($array as $dir) {
-            $this->codeUpdateCall(ROOT_DIR . $dir);
-        }
-        //加入到swoole的事件循环中
-        $re = swoole_event_add($this->inotify_fd, [$this, 'inotify_reload']);
-        \pms\output($re, 230);
-    }
-
-    /**
-     * 更新代码的执行部分
-     * @param $timer_id
-     * @param $dir
-     */
-    public function codeUpdateCall($dir)
-    {
-        // 监控的目录，默认是Applications
-        $monitor_dir = realpath($dir);
-
-        // 递归遍历目录里面的文件
-        $dir_iterator = new \RecursiveDirectoryIterator($monitor_dir);
-        $iterator = new \RecursiveIteratorIterator($dir_iterator);
-        foreach ($iterator as $file) {
-
-            // 只监控php文件
-            if (pathinfo($file, PATHINFO_EXTENSION) != 'php') {
-                continue;
-            }
-            // 把文件加入inotify监控，这里只监控了IN_MODIFY文件更新事件
-            $wd = inotify_add_watch($this->inotify_fd, $file, IN_MODIFY);
-        }
-    }
+   
+    
 
     /**
      * 准备判断事件,可以再这个事件内判断应用是否准备完毕
@@ -237,20 +190,21 @@ class Server extends Base
      */
     public function codeUpdata()
     {
-        $this->swoole_server->task('codeUpdata');
+        \pms\output('codeUpdatacodeUpdata');
+        $this->toTask(Task\HotReload::class);
     }
 
-    public function inotify_reload()
+    /**
+     * 任务投递
+     * @param type $name
+     * @param type $data
+     */
+    public function toTask($name,$data=[])
     {
-        $events = inotify_read($this->inotify_fd);
-        if ($events) {
-            foreach ($events as $event) {
-                echo "inotify Event :" . var_export($event, 1) . "\n";
-                echo "关闭系统!自动重启!";
-                $this->swoole_server->default_table->set('server-wkinit', ['data' => 0]);
-                $this->swoole_server->shutdown();
-            }
-        }
+         $this->swoole_server->task([
+             'name'=>$name,
+             'data'=>$data
+         ]);
     }
 
     /**

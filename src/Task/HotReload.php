@@ -28,18 +28,20 @@ class HotReload extends Task implements TaskInterface {
     ];
     private $suffix = [
     ];
-    private $interval = 2; # 间隔时间,秒
+    private $interval = 3; # 间隔时间,秒
     private $exclude = [];
+    private $startTime=0;
 
     /**
      * 初始化任务
      */
     public function init() {
+        $this->startTime=$this->service->getWorkerStartTime();
         $config = $this->dConfig->hotReloadOption->toArray();
         $config = empty($config) ? $this->option : $config;
         $this->folder = (array) $config['Folder'] ?? $this->folder;
-        $this->callExclude((array) $config['Suffix'] ?? $this->suffix);
-        $this->exclude = (array) $config['Exclude'] ?? $this->exclude;
+        $this->callExclude((array) $config['Exclude'] ?? $this->suffix);
+        $this->suffix = (array) $config['Suffix'] ?? $this->suffix;
         $this->interval = (int) ($config['Interval'] ?? $this->interval);
         if ($this->interval < 1) {
             $this->interval = 1;
@@ -80,12 +82,10 @@ class HotReload extends Task implements TaskInterface {
      * @param $dir
      */
     protected function codeUpdateCall($dir) {
-        static $last_mtime = START_TIME;
         // recursive traversal directory
         $dir_iterator = new \RecursiveDirectoryIterator($dir);
         $iterator = new \RecursiveIteratorIterator($dir_iterator);
         foreach ($iterator as $file) {
-
             if (substr($file, -1) != '.') {
                 if (!($file instanceof \SplFileInfo)) {
                     return false;
@@ -97,10 +97,10 @@ class HotReload extends Task implements TaskInterface {
                     if (in_array($file, $this->exclude)) {
                         continue;
                     }
-                    if ($last_mtime < $getMTime) {
-                        \pms\output([$last_mtime, $getMTime], 'HotReload');
+                    if ($this->startTime < $getMTime) {
+                        \pms\output([$this->startTime, $getMTime], 'HotReload');
                         $this->reload($file);
-                        break;
+                        return false;
                     }
                 }
             }
@@ -112,10 +112,10 @@ class HotReload extends Task implements TaskInterface {
      * @param \SplFileInfo $file
      */
     private function reload(\SplFileInfo $file) {
-        $last_mtime = START_TIME;
+       
         $getMTime = $file->getMTime();
         $noreload = get_included_files();
-        echo $file . " ---|最后检查时间 : " . date('Y-m-d H:i:s', $last_mtime) .
+        echo $file . " ---|服务启动时间 : " . date('Y-m-d H:i:s', $this->startTime) .
         "|| 文件修改时间: " . date('Y-m-d H:i:s', $getMTime) . "  \n";
         echo '检测到代码修改,进行重载!';
         $this->swoole_server->default_table->set('server-wkinit', ['data' => 0]);

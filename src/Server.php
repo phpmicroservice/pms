@@ -29,6 +29,7 @@ class Server extends Base
     protected $inotify_fd; # 热更新用
     protected $logo;
     protected $d_option = SD_OPTION;
+    private $workerStartTime=0;
 
     public function __construct($server)
     {
@@ -37,6 +38,12 @@ class Server extends Base
          $di = \Phalcon\Di\FactoryDefault\Cli::getDefault();
          $di->set('service', $this);
     }
+
+    public function getWorkerStartTime()
+    {
+        return $this->workerStartTime;
+    }
+
 
     protected function callNumMulriple($mulriple=2)
     {
@@ -113,6 +120,7 @@ class Server extends Base
      */
     public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
+        $this->workerStartTime = time();
         \pms\output('WorkerStart', 'onWorkerStart');
         # 加载依赖注入器
         include_once ROOT_DIR . '/app/di.php';
@@ -201,10 +209,7 @@ class Server extends Base
      */
     public function toTask($name,$data=[])
     {
-         $this->swoole_server->task([
-             'name'=>$name,
-             'data'=>$data
-         ]);
+         $this->swoole_server->task(Task\Data::get4NameData($name, $data));
     }
 
     /**

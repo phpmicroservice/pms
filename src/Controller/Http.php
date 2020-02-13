@@ -8,7 +8,7 @@ namespace pms\Controller;
  * @property \Swoole\Http\Response $response
  * @author Dongasai
  */
-abstract class Http extends \Phalcon\Di\Injectable
+abstract class Http extends \pms\Di\Injectable
 {
     protected $request;
     protected $response;

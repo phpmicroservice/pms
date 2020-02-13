@@ -6,14 +6,15 @@ namespace pms\Task;
  * Class Task
  * @package pms\Task
  * @property-read \Swoole\Server $swoole_server Swoole的服务类
+ * @property-read Data $data 任务数据对象
  */
 class Task extends \pms\Di\Injectable
 {
     protected $swoole_server;
-    protected $trueData;
     protected $data;
     protected $task_id;
     protected $src_worker_id;
+    private $startTime;
 
 
     /**
@@ -21,11 +22,11 @@ class Task extends \pms\Di\Injectable
      * @param type $swoole_server
      * @param type $data
      */
-    final public function __construct($swoole_server, $data)
+    final public function __construct(\Swoole\Server $swoole_server, $data)
     {
+        $this->startTime = microtime(true);
         $this->swoole_server = $swoole_server;
-        $this->trueData = $data;
-        $this->data = $data['data'] ? $data['data'] : $data[0];
+        $this->data = $data;
         $this->init();
     }
 
@@ -45,15 +46,17 @@ class Task extends \pms\Di\Injectable
     final public function setTaskId($task_id)
     {
         $this->task_id = $task_id;
+        $this->data->setTaskId($task_id);
     }
 
     /**
-     * 设置任务进程id
-     * @param $task_id
+     * 设置工作进程id
+     * @param $src_worker_id
      */
     final public function setWorkId($src_worker_id)
     {
         $this->src_worker_id = $src_worker_id;
+        $this->data->setWorkId($src_worker_id);
     }
     
 
@@ -63,14 +66,11 @@ class Task extends \pms\Di\Injectable
      */
     final public function execute()
     {
-        $startTime = microtime(true);
-        $re = $this->run($this->trueData);
+        $re = $this->run($this->data->getData());
         $endTime = microtime(true);
-
-        $data = $this->trueData;
-        $data['re'] = $re;
-        $data['task_id'] = $this->task_id;
-        $data['time'] = $endTime - $startTime;
+        $data = $this->data;
+        $data->setReturn($re);
+        $data->setTime($endTime - $this->startTime);
         return $data;
     }
 
@@ -78,14 +78,7 @@ class Task extends \pms\Di\Injectable
 
     final  public function finish()
     {
-        $startFinishTime = microtime(true);
-        $re = $this->end();
-        $endFinishTime = microtime(true);
-        $data = $this->trueData;
-        $data['re'] = $re;
-        $data['task_id'] = $this->task_id;
-        $data['time'] = $endFinishTime - $startFinishTime;
-        return $data;
+        $this->end($this->data->getData());
     }
 
     /**
@@ -94,7 +87,7 @@ class Task extends \pms\Di\Injectable
      */
     protected function getData()
     {
-        return $this->trueData['data']??$this->trueData[1];
+        return $this->data->getData();
     }
 
     /**
@@ -103,7 +96,7 @@ class Task extends \pms\Di\Injectable
      */
     protected function getName()
     {
-        return $this->trueData['name']??$this->trueData[0];
+        return $this->data->getName();
     }
 
 }

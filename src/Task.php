@@ -22,10 +22,9 @@ class Task extends Base
     public function onTask(\Swoole\Server $server, int $task_id, int $src_worker_id, $data) {
         \pms\output($data, 'onTask');
         $this->eventsManager->fire($this->name . ':onTask', $this, [$task_id, $src_worker_id, $data]);
-        if (is_array($data)) {
+        if ($data instanceof Task\Data) {
             //数组的数据是要进行任务类调用
-            $name = $data['name'] ? $data['name'] : $data[0];
-            $class_name = $name;
+            $class_name =$data->getName();
             if (class_exists($class_name)) {
                 $handel = new $class_name($server, $data);
                 $handel->setTaskId($task_id);

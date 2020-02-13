@@ -22,10 +22,9 @@ class Work extends Base
     {
         \pms\output([$task_id, $data], 'onFinish');
         $this->eventsManager->fire($this->name . ':onFinish', $this, [$task_id, $data]);
-        if (is_array($data)) {
+        if ($data instanceof Task\Data) {
             //数组的数据是要进行任务类调用
-            $name = $data['name'] ? $data['name'] : $data[0];
-            $class_name = $name;
+            $class_name =$data->getName();
             if (class_exists($class_name)) {
                 $handel = new $class_name($server, $data);
                 $handel->setTaskId($task_id);

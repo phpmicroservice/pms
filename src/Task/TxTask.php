@@ -17,7 +17,7 @@ class TxTask
     {
         $this->swoole_server = $swoole_server;
         $this->trueData = $data;
-        $this->data = $data['data'] ? $data['data'] : $data[0];
+        $this->data = $data['data'] ? $data['data'] : $data[1];
     }
 
     /**
